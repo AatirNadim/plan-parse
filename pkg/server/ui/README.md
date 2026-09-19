@@ -15,7 +15,7 @@ Because the source frontend project lives at the repository root (`ui/`), the Ne
 ```mermaid
 flowchart LR
     subgraph FrontendSource["ui/ (Source Code)"]
-        Src["React / Next.js Source"] --> Build["npm run build"]
+        Src["React / Next.js Source"] --> Build["pnpm run build"]
         Build --> Out["ui/out/ (Static Export)"]
     end
 
@@ -38,7 +38,7 @@ The synchronization process is automated via `Makefile`:
 ```makefile
 build-ui:
 	@echo "Building UI..."
-	cd ui && npm run build
+	cd ui && pnpm run build
 	mkdir -p pkg/server/ui
 	rm -rf pkg/server/ui/out
 	cp -r ui/out pkg/server/ui/out

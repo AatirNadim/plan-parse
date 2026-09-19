@@ -1,0 +1,27 @@
+.PHONY: all build build-ui test clean
+
+all: build
+
+build-ui:
+	@echo "Building UI..."
+	@if [ ! -d "ui/node_modules" ]; then \
+		echo "Installing UI dependencies with pnpm..."; \
+		cd ui && pnpm install --frozen-lockfile; \
+	fi
+	cd ui && pnpm run build
+	mkdir -p pkg/server/ui
+	rm -rf pkg/server/ui/out
+	cp -r ui/out pkg/server/ui/out
+
+build: build-ui
+	@echo "Building plan-parse Go binary..."
+	go build -o plan-parse main.go
+
+test:
+	@echo "Running all tests..."
+	go test -v ./...
+
+clean:
+	@echo "Cleaning build artifacts..."
+	rm -f plan-parse
+	rm -rf ui/out ui/.next

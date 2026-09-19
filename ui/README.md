@@ -63,7 +63,7 @@ const nextConfig = {
   images: { unoptimized: true },
 };
 ```
-Running `npm run build` generates pure static HTML, CSS, and JS bundles into `ui/out`, removing the need for a Node.js server runtime in production.
+Running `pnpm run build` generates pure static HTML, CSS, and JS bundles into `ui/out`, removing the need for a Node.js server runtime in production.
 
 ---
 
@@ -84,13 +84,13 @@ Running `npm run build` generates pure static HTML, CSS, and JS bundles into `ui
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start local Next.js development server on port 3000
-npm run dev
+pnpm dev
 
 # Compile production static export to ui/out
-npm run build
+pnpm run build
 ```
 
 ---

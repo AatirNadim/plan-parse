@@ -6,12 +6,13 @@ FROM node:20-alpine AS ui-builder
 WORKDIR /app/ui
 
 # Install dependencies first for better layer caching
-COPY ui/package.json ui/package-lock.json ./
-RUN npm ci
+RUN corepack enable && corepack prepare pnpm@9.1.3 --activate
+COPY ui/package.json ui/pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
 
 # Copy UI source files and generate static export
 COPY ui/ ./
-RUN npm run build
+RUN pnpm run build
 
 # ==============================================================================
 # Stage 2: Build Go Backend Binary

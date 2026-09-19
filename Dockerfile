@@ -1,7 +1,7 @@
 # ==============================================================================
 # Stage 1: Build Frontend UI
 # ==============================================================================
-FROM node:20-alpine AS ui-builder
+FROM node:22-alpine AS ui-builder
 
 WORKDIR /app/ui
 

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"plan-parse/pkg/core"
+	"github.com/AatirNadim/plan-parse/pkg/core"
 )
 
 //go:embed all:ui/out

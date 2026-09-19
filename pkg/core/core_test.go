@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	tfjson "github.com/hashicorp/terraform-json"
 
-	"plan-parse/pkg/core"
+	"github.com/AatirNadim/plan-parse/pkg/core"
 )
 
 func getTestDataDir() string {
@@ -577,4 +577,3 @@ func TestEmptyWorkingDirFallback(t *testing.T) {
 		t.Fatal("expected at least one resource/data node in graph")
 	}
 }
-

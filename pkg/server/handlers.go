@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"plan-parse/pkg/core"
+	"github.com/AatirNadim/plan-parse/pkg/core"
 )
 
 // StatusResponse represents the response payload for GET /api/status.

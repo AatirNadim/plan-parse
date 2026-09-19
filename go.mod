@@ -1,4 +1,4 @@
-module plan-parse
+module github.com/AatirNadim/plan-parse
 
 go 1.23.1
 

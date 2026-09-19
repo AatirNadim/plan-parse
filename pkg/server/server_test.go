@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"plan-parse/pkg/core"
-	"plan-parse/pkg/server"
+	"github.com/AatirNadim/plan-parse/pkg/core"
+	"github.com/AatirNadim/plan-parse/pkg/server"
 )
 
 func getSamplePlanPath() string {

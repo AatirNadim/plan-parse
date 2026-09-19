@@ -1,6 +1,7 @@
 package core_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -266,3 +267,314 @@ func TestFindResourceFileNestedModuleKey(t *testing.T) {
 		t.Errorf("expected line 42, got %v", line)
 	}
 }
+
+func TestSyntheticResourceChangesActions(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actions        []tfjson.Action
+		expectedAction core.Action
+	}{
+		{
+			name:           "create",
+			actions:        []tfjson.Action{tfjson.ActionCreate},
+			expectedAction: core.ActionCreate,
+		},
+		{
+			name:           "update",
+			actions:        []tfjson.Action{tfjson.ActionUpdate},
+			expectedAction: core.ActionUpdate,
+		},
+		{
+			name:           "delete",
+			actions:        []tfjson.Action{tfjson.ActionDelete},
+			expectedAction: core.ActionDelete,
+		},
+		{
+			name:           "replace create delete",
+			actions:        []tfjson.Action{tfjson.ActionCreate, tfjson.ActionDelete},
+			expectedAction: core.ActionReplace,
+		},
+		{
+			name:           "replace delete create",
+			actions:        []tfjson.Action{tfjson.ActionDelete, tfjson.ActionCreate},
+			expectedAction: core.ActionReplace,
+		},
+		{
+			name:           "read",
+			actions:        []tfjson.Action{tfjson.ActionRead},
+			expectedAction: core.ActionRead,
+		},
+		{
+			name:           "no-op",
+			actions:        []tfjson.Action{tfjson.ActionNoop},
+			expectedAction: core.ActionNoop,
+		},
+	}
+
+	var resourceChanges []*tfjson.ResourceChange
+	for i, tc := range testCases {
+		rc := &tfjson.ResourceChange{
+			Address: fmt.Sprintf("res.%s_%d", tc.name, i),
+			Change: &tfjson.Change{
+				Actions: tc.actions,
+			},
+		}
+		action := core.GetChangeAction(rc)
+		if action != tc.expectedAction {
+			t.Errorf("GetChangeAction(%s) = %v; want %v", tc.name, action, tc.expectedAction)
+		}
+		resourceChanges = append(resourceChanges, rc)
+	}
+
+	// Also verify nil change, empty actions, and nil rc
+	if act := core.GetChangeAction(nil); act != core.ActionNoop {
+		t.Errorf("GetChangeAction(nil) = %v; want %v", act, core.ActionNoop)
+	}
+	if act := core.GetChangeAction(&tfjson.ResourceChange{}); act != core.ActionNoop {
+		t.Errorf("GetChangeAction(empty rc) = %v; want %v", act, core.ActionNoop)
+	}
+	if act := core.GetChangeAction(&tfjson.ResourceChange{Change: &tfjson.Change{Actions: []tfjson.Action{}}}); act != core.ActionNoop {
+		t.Errorf("GetChangeAction(empty actions) = %v; want %v", act, core.ActionNoop)
+	}
+
+	plan := &tfjson.Plan{
+		FormatVersion:    "1.2",
+		TerraformVersion: "1.5.0",
+		ResourceChanges:  resourceChanges,
+	}
+	parser := core.NewParser(plan, "")
+	summary := parser.ComputeSummary()
+
+	if summary.Total != 7 {
+		t.Errorf("summary.Total = %d; want 7", summary.Total)
+	}
+	if summary.Create != 1 {
+		t.Errorf("summary.Create = %d; want 1", summary.Create)
+	}
+	if summary.Update != 1 {
+		t.Errorf("summary.Update = %d; want 1", summary.Update)
+	}
+	if summary.Delete != 1 {
+		t.Errorf("summary.Delete = %d; want 1", summary.Delete)
+	}
+	if summary.Replace != 2 {
+		t.Errorf("summary.Replace = %d; want 2", summary.Replace)
+	}
+	if summary.Read != 1 {
+		t.Errorf("summary.Read = %d; want 1", summary.Read)
+	}
+	if summary.Noop != 1 {
+		t.Errorf("summary.Noop = %d; want 1", summary.Noop)
+	}
+}
+
+func TestResolveTargetAndLocalsWorkspaceEdges(t *testing.T) {
+	plan := &tfjson.Plan{
+		FormatVersion:    "1.2",
+		TerraformVersion: "1.5.0",
+		ResourceChanges: []*tfjson.ResourceChange{
+			{
+				Address: "aws_s3_bucket.main",
+				Mode:    "managed",
+				Type:    "aws_s3_bucket",
+				Name:    "main",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.child.aws_instance.worker",
+				ModuleAddress: "module.child",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "worker",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+		},
+		Config: &tfjson.Config{
+			RootModule: &tfjson.ConfigModule{
+				Resources: []*tfjson.ConfigResource{
+					{
+						Address: "aws_s3_bucket.main",
+						Mode:    "managed",
+						Type:    "aws_s3_bucket",
+						Name:    "main",
+						Expressions: map[string]*tfjson.Expression{
+							"tags": {
+								ExpressionData: &tfjson.ExpressionData{
+									References: []string{"local.tags"},
+								},
+							},
+							"bucket_prefix": {
+								ExpressionData: &tfjson.ExpressionData{
+									References: []string{"terraform.workspace"},
+								},
+							},
+						},
+					},
+				},
+				ModuleCalls: map[string]*tfjson.ModuleCall{
+					"child": {
+						Source: "./child",
+						Module: &tfjson.ConfigModule{
+							Variables: map[string]*tfjson.ConfigVariable{
+								"subnet_id": {},
+							},
+							Outputs: map[string]*tfjson.ConfigOutput{
+								"instance_id": {
+									Expression: &tfjson.Expression{
+										ExpressionData: &tfjson.ExpressionData{
+											References: []string{"aws_instance.worker.id"},
+										},
+									},
+								},
+							},
+							Resources: []*tfjson.ConfigResource{
+								{
+									Address: "aws_instance.worker",
+									Mode:    "managed",
+									Type:    "aws_instance",
+									Name:    "worker",
+									Expressions: map[string]*tfjson.Expression{
+										"subnet_id": {
+											ExpressionData: &tfjson.ExpressionData{
+												References: []string{"var.subnet_id"},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	parser := core.NewParser(plan, "")
+	graph, err := parser.GenerateGraph()
+	if err != nil {
+		t.Fatalf("GenerateGraph failed: %v", err)
+	}
+
+	nodeMap := make(map[string]core.Node)
+	for _, n := range graph.Nodes {
+		nodeMap[n.Data.ID] = n
+	}
+
+	// 1. Verify local.tags node exists
+	localNode, ok := nodeMap["local.tags"]
+	if !ok {
+		t.Error("expected node for 'local.tags' in graph.Nodes")
+	} else {
+		if localNode.Data.Type != core.ResourceTypeLocal {
+			t.Errorf("expected local.tags type %s, got %s", core.ResourceTypeLocal, localNode.Data.Type)
+		}
+		if localNode.Classes != "locals" {
+			t.Errorf("expected local.tags classes 'locals', got %s", localNode.Classes)
+		}
+		if localNode.Data.ParentColor != core.ColorLocal {
+			t.Errorf("expected local.tags parentColor %s, got %s", core.ColorLocal, localNode.Data.ParentColor)
+		}
+	}
+
+	// 2. Verify terraform.workspace node exists
+	wsNode, ok := nodeMap["terraform.workspace"]
+	if !ok {
+		t.Error("expected node for 'terraform.workspace' in graph.Nodes")
+	} else {
+		if wsNode.Data.Type != core.ResourceTypeLocal {
+			t.Errorf("expected terraform.workspace type %s, got %s", core.ResourceTypeLocal, wsNode.Data.Type)
+		}
+		if wsNode.Classes != "locals" {
+			t.Errorf("expected terraform.workspace classes 'locals', got %s", wsNode.Classes)
+		}
+		if wsNode.Data.Parent != "root" {
+			t.Errorf("expected terraform.workspace parent 'root', got %s", wsNode.Data.Parent)
+		}
+		if wsNode.Data.ParentColor != core.ColorLocal {
+			t.Errorf("expected terraform.workspace parentColor %s, got %s", core.ColorLocal, wsNode.Data.ParentColor)
+		}
+	}
+
+	// 3. Verify child module variable node exists
+	varNode, ok := nodeMap["module.child.var.subnet_id"]
+	if !ok {
+		t.Error("expected node for 'module.child.var.subnet_id' in graph.Nodes")
+	} else {
+		if varNode.Data.Type != core.ResourceTypeVariable {
+			t.Errorf("expected child var type %s, got %s", core.ResourceTypeVariable, varNode.Data.Type)
+		}
+		if varNode.Classes != "variable" {
+			t.Errorf("expected child var classes 'variable', got %s", varNode.Classes)
+		}
+		if varNode.Data.ParentColor != core.ColorVariable {
+			t.Errorf("expected child var parentColor %s, got %s", core.ColorVariable, varNode.Data.ParentColor)
+		}
+	}
+
+	// 4. Verify child module output node exists
+	outNode, ok := nodeMap["module.child.output.instance_id"]
+	if !ok {
+		t.Error("expected node for 'module.child.output.instance_id' in graph.Nodes")
+	} else {
+		if outNode.Data.Type != core.ResourceTypeOutput {
+			t.Errorf("expected child out type %s, got %s", core.ResourceTypeOutput, outNode.Data.Type)
+		}
+		if outNode.Classes != "output" {
+			t.Errorf("expected child out classes 'output', got %s", outNode.Classes)
+		}
+	}
+
+	// 5. Verify directional edges
+	edgeMap := make(map[string]core.Edge)
+	for _, e := range graph.Edges {
+		edgeMap[fmt.Sprintf("%s->%s", e.Data.Source, e.Data.Target)] = e
+	}
+
+	if _, ok := edgeMap["aws_s3_bucket.main->local.tags"]; !ok {
+		t.Error("expected directional edge 'aws_s3_bucket.main->local.tags'")
+	}
+	if _, ok := edgeMap["aws_s3_bucket.main->terraform.workspace"]; !ok {
+		t.Error("expected directional edge 'aws_s3_bucket.main->terraform.workspace'")
+	}
+	if _, ok := edgeMap["module.child.aws_instance.worker->module.child.var.subnet_id"]; !ok {
+		t.Error("expected directional edge 'module.child.aws_instance.worker->module.child.var.subnet_id'")
+	}
+	if _, ok := edgeMap["module.child.output.instance_id->module.child.aws_instance.worker"]; !ok {
+		t.Error("expected directional edge 'module.child.output.instance_id->module.child.aws_instance.worker'")
+	}
+}
+
+func TestEmptyWorkingDirFallback(t *testing.T) {
+	plan, err := core.ValidatePlanFile(getSamplePlanPath())
+	if err != nil {
+		t.Fatalf("failed to validate sample plan: %v", err)
+	}
+
+	parser := core.NewParser(plan, "")
+	graph, err := parser.GenerateGraph()
+	if err != nil {
+		t.Fatalf("GenerateGraph failed with empty workingDir: %v", err)
+	}
+	if graph == nil {
+		t.Fatal("expected non-nil graph")
+	}
+
+	resourceCount := 0
+	for _, n := range graph.Nodes {
+		if (n.Data.Type == core.ResourceTypeResource || n.Data.Type == core.ResourceTypeData) && n.Data.ResourceName != "" {
+			resourceCount++
+			if n.Data.File != core.DefaultFileName {
+				t.Errorf("node %s: expected file %q, got %q", n.Data.ID, core.DefaultFileName, n.Data.File)
+			}
+		}
+	}
+
+	if resourceCount == 0 {
+		t.Fatal("expected at least one resource/data node in graph")
+	}
+}
+

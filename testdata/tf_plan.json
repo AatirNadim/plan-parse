@@ -1,0 +1,5130 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.16.2",
+  "variables": {
+    "availability_zones": {
+      "value": ["us-east-1a", "us-east-1b", "us-east-1c"]
+    },
+    "db_engine": { "value": "postgres" },
+    "db_engine_version": { "value": "15.4" },
+    "db_instance_class": { "value": "db.t3.medium" },
+    "environment": { "value": "dev" },
+    "instance_count": { "value": 2 },
+    "instance_type": { "value": "t3.medium" },
+    "lambda_memory": { "value": 256 },
+    "lambda_runtime": { "value": "python3.11" },
+    "lambda_timeout": { "value": 30 },
+    "project": { "value": "tf-visualize" },
+    "region": { "value": "us-east-1" },
+    "tags": { "value": { "ManagedBy": "terraform", "Tool": "tf-visualize" } },
+    "vpc_cidr": { "value": "10.0.0.0/16" }
+  },
+  "planned_values": {
+    "outputs": {
+      "alb_arn": { "sensitive": false },
+      "alb_dns_name": { "sensitive": false },
+      "bucket_arn": { "sensitive": false },
+      "bucket_name": { "sensitive": false },
+      "db_endpoint": { "sensitive": false },
+      "db_password": { "sensitive": true },
+      "db_subnet_group_id": { "sensitive": false },
+      "instance_ids": { "sensitive": false },
+      "lambda_function_name": {
+        "sensitive": false,
+        "type": "string",
+        "value": "tf-visualize-dev-processor"
+      },
+      "lambda_log_group": {
+        "sensitive": false,
+        "type": "string",
+        "value": "/aws/lambda/tf-visualize-dev-processor"
+      },
+      "private_subnet_ids": { "sensitive": false },
+      "public_subnet_ids": { "sensitive": false },
+      "security_group_id": { "sensitive": false },
+      "ssh_public_key": { "sensitive": true },
+      "target_group_id": { "sensitive": false },
+      "vpc_id": { "sensitive": false }
+    },
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.compute.local_file.ssh_private_key",
+              "mode": "managed",
+              "type": "local_file",
+              "name": "ssh_private_key",
+              "provider_name": "registry.terraform.io/hashicorp/local",
+              "schema_version": 0,
+              "values": {
+                "content_base64": null,
+                "directory_permission": "0777",
+                "file_permission": "0600",
+                "filename": "modules/compute/generated/tf-visualize-dev.pem",
+                "sensitive_content": null,
+                "source": null
+              },
+              "sensitive_values": { "content": true, "sensitive_content": true }
+            },
+            {
+              "address": "module.compute.null_resource.instances[0]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "instances",
+              "index": 0,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "instance_type": "t3.medium",
+                  "name": "tf-visualize-dev-instance-0",
+                  "private_ip": "10.0.0.10",
+                  "resource_type": "aws_instance"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.null_resource.instances[1]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "instances",
+              "index": 1,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "instance_type": "t3.medium",
+                  "name": "tf-visualize-dev-instance-1",
+                  "private_ip": "10.0.1.10",
+                  "resource_type": "aws_instance"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.null_resource.key_pair",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "key_pair",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "key_name": "tf-visualize-dev-keypair",
+                  "resource_type": "aws_key_pair",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.null_resource.launch_template",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "launch_template",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "image_id": "ami-0abcdef1234567890",
+                  "instance_type": "t3.medium",
+                  "name": "tf-visualize-dev-lt",
+                  "resource_type": "aws_launch_template",
+                  "user_data_hash": "dUDWuIA2MrfBO02cO5r4MkoQ3buXBhBswuWZ5mKT5vo="
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.null_resource.sg_rule_app",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "sg_rule_app",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "cidr_blocks": "0.0.0.0/0",
+                  "description": "Application port for compute instances",
+                  "from_port": "8080",
+                  "protocol": "tcp",
+                  "resource_type": "aws_security_group_rule",
+                  "to_port": "8080",
+                  "type": "ingress"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.null_resource.sg_rule_ssh",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "sg_rule_ssh",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "cidr_blocks": "10.0.0.0/16",
+                  "description": "SSH access for compute instances",
+                  "from_port": "22",
+                  "protocol": "tcp",
+                  "resource_type": "aws_security_group_rule",
+                  "to_port": "22",
+                  "type": "ingress"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.compute.tls_private_key.ssh_key",
+              "mode": "managed",
+              "type": "tls_private_key",
+              "name": "ssh_key",
+              "provider_name": "registry.terraform.io/hashicorp/tls",
+              "schema_version": 1,
+              "values": {
+                "algorithm": "RSA",
+                "ecdsa_curve": "P224",
+                "rsa_bits": 4096
+              },
+              "sensitive_values": {
+                "private_key_openssh": true,
+                "private_key_pem": true,
+                "private_key_pem_pkcs8": true
+              }
+            }
+          ],
+          "address": "module.compute"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.database.local_file.db_connection_info",
+              "mode": "managed",
+              "type": "local_file",
+              "name": "db_connection_info",
+              "provider_name": "registry.terraform.io/hashicorp/local",
+              "schema_version": 0,
+              "values": {
+                "content_base64": null,
+                "directory_permission": "0777",
+                "file_permission": "0777",
+                "filename": "modules/database/generated/tf-visualize-dev-db-connection.json",
+                "sensitive_content": null,
+                "source": null
+              },
+              "sensitive_values": { "sensitive_content": true }
+            },
+            {
+              "address": "module.database.null_resource.db_parameter_group",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "db_parameter_group",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "family": "postgres15",
+                  "name": "tf-visualize-dev-db-params",
+                  "param_log_connections": "1",
+                  "param_log_disconnections": "1",
+                  "param_log_duration": "1",
+                  "resource_type": "aws_db_parameter_group"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.database.null_resource.db_sg_rule",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "db_sg_rule",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "cidr_blocks": "10.0.0.0/16",
+                  "description": "PostgreSQL access from VPC",
+                  "from_port": "5432",
+                  "protocol": "tcp",
+                  "resource_type": "aws_security_group_rule",
+                  "to_port": "5432",
+                  "type": "ingress"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.database.null_resource.db_subnet_group",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "db_subnet_group",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "description": "Database subnet group for tf-visualize dev",
+                  "name": "tf-visualize-dev-db-subnet-group",
+                  "resource_type": "aws_db_subnet_group",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.database.null_resource.rds_instance",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "rds_instance",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "allocated_storage": "50",
+                  "engine": "postgres",
+                  "engine_version": "15.4",
+                  "instance_class": "db.t3.medium",
+                  "max_allocated_storage": "200",
+                  "multi_az": "true",
+                  "resource_type": "aws_db_instance",
+                  "skip_final_snapshot": "true",
+                  "storage_encrypted": "true"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.database.random_id.db_identifier",
+              "mode": "managed",
+              "type": "random_id",
+              "name": "db_identifier",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": {
+                "byte_length": 4,
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "prefix": null
+              },
+              "sensitive_values": { "keepers": {} }
+            },
+            {
+              "address": "module.database.random_password.db_password",
+              "mode": "managed",
+              "type": "random_password",
+              "name": "db_password",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 3,
+              "values": {
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "length": 24,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": "!#$%\u0026*()-_=+[]{}|:,.\u003c\u003e?",
+                "special": true,
+                "upper": true
+              },
+              "sensitive_values": {
+                "bcrypt_hash": true,
+                "keepers": {},
+                "result": true
+              }
+            }
+          ],
+          "address": "module.database"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.lambda.local_file.lambda_manifest",
+              "mode": "managed",
+              "type": "local_file",
+              "name": "lambda_manifest",
+              "provider_name": "registry.terraform.io/hashicorp/local",
+              "schema_version": 0,
+              "values": {
+                "content_base64": null,
+                "directory_permission": "0777",
+                "file_permission": "0777",
+                "filename": "modules/lambda/generated/tf-visualize-dev-lambda-manifest.json",
+                "sensitive_content": null,
+                "source": null
+              },
+              "sensitive_values": { "sensitive_content": true }
+            },
+            {
+              "address": "module.lambda.null_resource.cloudwatch_log_group",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "cloudwatch_log_group",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "name": "/aws/lambda/tf-visualize-dev-processor",
+                  "resource_type": "aws_cloudwatch_log_group",
+                  "retention_in_days": "14"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.null_resource.lambda_execution_role",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "lambda_execution_role",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                  "resource_type": "aws_iam_role",
+                  "role_name": "tf-visualize-dev-lambda-exec",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.null_resource.lambda_function",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "lambda_function",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "function_name": "tf-visualize-dev-processor",
+                  "handler": "index.handler",
+                  "memory_size": "256",
+                  "resource_type": "aws_lambda_function",
+                  "runtime": "python3.11",
+                  "timeout": "30"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.null_resource.lambda_permission_apigw",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "lambda_permission_apigw",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "action": "lambda:InvokeFunction",
+                  "principal": "apigateway.amazonaws.com",
+                  "resource_type": "aws_lambda_permission",
+                  "statement_id": "AllowAPIGatewayInvoke"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.null_resource.lambda_policy",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "lambda_policy",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "policy_name": "tf-visualize-dev-lambda-policy",
+                  "resource_type": "aws_iam_policy"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.null_resource.lambda_policy_attachment",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "lambda_policy_attachment",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "resource_type": "aws_iam_role_policy_attachment"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.lambda.random_id.lambda_version",
+              "mode": "managed",
+              "type": "random_id",
+              "name": "lambda_version",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": {
+                "byte_length": 8,
+                "keepers": {
+                  "memory_size": "256",
+                  "runtime": "python3.11",
+                  "timeout": "30"
+                },
+                "prefix": null
+              },
+              "sensitive_values": { "keepers": {} }
+            },
+            {
+              "address": "module.lambda.random_string.log_group_suffix",
+              "mode": "managed",
+              "type": "random_string",
+              "name": "log_group_suffix",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 2,
+              "values": {
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "length": 6,
+                "lower": true,
+                "min_lower": 0,
+                "min_numeric": 0,
+                "min_special": 0,
+                "min_upper": 0,
+                "number": true,
+                "numeric": true,
+                "override_special": null,
+                "special": false,
+                "upper": false
+              },
+              "sensitive_values": { "keepers": {} }
+            }
+          ],
+          "address": "module.lambda"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.loadbalancer.local_file.alb_config",
+              "mode": "managed",
+              "type": "local_file",
+              "name": "alb_config",
+              "provider_name": "registry.terraform.io/hashicorp/local",
+              "schema_version": 0,
+              "values": {
+                "content_base64": null,
+                "directory_permission": "0777",
+                "file_permission": "0777",
+                "filename": "modules/loadbalancer/generated/tf-visualize-dev-alb-config.json",
+                "sensitive_content": null,
+                "source": null
+              },
+              "sensitive_values": { "sensitive_content": true }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.alb",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "alb",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "internal": "false",
+                  "load_balancer_type": "application",
+                  "name": "tf-visualize-dev-alb",
+                  "resource_type": "aws_lb",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.listener_http",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "listener_http",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "default_action_type": "redirect",
+                  "port": "80",
+                  "protocol": "HTTP",
+                  "redirect_port": "443",
+                  "redirect_protocol": "HTTPS",
+                  "redirect_status": "HTTP_301",
+                  "resource_type": "aws_lb_listener"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.listener_https",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "listener_https",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "default_action_type": "forward",
+                  "port": "443",
+                  "protocol": "HTTPS",
+                  "resource_type": "aws_lb_listener",
+                  "ssl_policy": "ELBSecurityPolicy-TLS13-1-2-2021-06"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.listener_rule_api",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "listener_rule_api",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "action_type": "forward",
+                  "condition_field": "path-pattern",
+                  "condition_value": "/api/*",
+                  "priority": "100",
+                  "resource_type": "aws_lb_listener_rule"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.listener_rule_static",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "listener_rule_static",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "action_type": "fixed-response",
+                  "condition_field": "path-pattern",
+                  "condition_value": "/static/*",
+                  "content_type": "text/plain",
+                  "message_body": "Static content not found",
+                  "priority": "200",
+                  "resource_type": "aws_lb_listener_rule",
+                  "status_code": "404"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.target_group",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "target_group",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "health_check_matcher": "200-299",
+                  "health_check_path": "/health",
+                  "name": "tf-visualize-dev-tg",
+                  "port": "8080",
+                  "protocol": "HTTP",
+                  "resource_type": "aws_lb_target_group",
+                  "target_type": "instance"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.target_group_attachments[\"0\"]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "target_group_attachments",
+              "index": "0",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "port": "8080",
+                  "resource_type": "aws_lb_target_group_attachment"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.null_resource.target_group_attachments[\"1\"]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "target_group_attachments",
+              "index": "1",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "port": "8080",
+                  "resource_type": "aws_lb_target_group_attachment"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.loadbalancer.random_id.alb_suffix",
+              "mode": "managed",
+              "type": "random_id",
+              "name": "alb_suffix",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": {
+                "byte_length": 4,
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "prefix": null
+              },
+              "sensitive_values": { "keepers": {} }
+            },
+            {
+              "address": "module.loadbalancer.random_integer.health_check_interval",
+              "mode": "managed",
+              "type": "random_integer",
+              "name": "health_check_interval",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": {
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "max": 60,
+                "min": 15,
+                "seed": null
+              },
+              "sensitive_values": { "keepers": {} }
+            },
+            {
+              "address": "module.loadbalancer.tls_private_key.alb_cert_key",
+              "mode": "managed",
+              "type": "tls_private_key",
+              "name": "alb_cert_key",
+              "provider_name": "registry.terraform.io/hashicorp/tls",
+              "schema_version": 1,
+              "values": {
+                "algorithm": "RSA",
+                "ecdsa_curve": "P224",
+                "rsa_bits": 2048
+              },
+              "sensitive_values": {
+                "private_key_openssh": true,
+                "private_key_pem": true,
+                "private_key_pem_pkcs8": true
+              }
+            },
+            {
+              "address": "module.loadbalancer.tls_self_signed_cert.alb_cert",
+              "mode": "managed",
+              "type": "tls_self_signed_cert",
+              "name": "alb_cert",
+              "provider_name": "registry.terraform.io/hashicorp/tls",
+              "schema_version": 0,
+              "values": {
+                "allowed_uses": [
+                  "key_encipherment",
+                  "digital_signature",
+                  "server_auth"
+                ],
+                "dns_names": null,
+                "early_renewal_hours": 0,
+                "ip_addresses": null,
+                "is_ca_certificate": false,
+                "private_key_pem_wo": null,
+                "private_key_pem_wo_version": null,
+                "ready_for_renewal": false,
+                "set_authority_key_id": false,
+                "set_subject_key_id": false,
+                "subject": [
+                  {
+                    "common_name": "tf-visualize-dev.example.com",
+                    "country": null,
+                    "email_address": null,
+                    "locality": null,
+                    "organization": "tf-visualize",
+                    "organizational_unit": null,
+                    "postal_code": null,
+                    "province": null,
+                    "serial_number": null,
+                    "street_address": null
+                  }
+                ],
+                "uris": null,
+                "validity_period_hours": 8760
+              },
+              "sensitive_values": {
+                "allowed_uses": [false, false, false],
+                "private_key_pem": true,
+                "private_key_pem_wo": true,
+                "subject": [{}]
+              }
+            }
+          ],
+          "address": "module.loadbalancer"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.networking.null_resource.default_security_group",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "default_security_group",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "egress_all": "0.0.0.0/0:0-65535",
+                  "ingress_http": "0.0.0.0/0:80",
+                  "ingress_https": "0.0.0.0/0:443",
+                  "ingress_ssh": "10.0.0.0/16:22",
+                  "name": "tf-visualize-dev-default-sg",
+                  "resource_type": "aws_security_group"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.internet_gateway",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "internet_gateway",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "name": "tf-visualize-dev-igw",
+                  "resource_type": "aws_internet_gateway"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.nat_eip",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "nat_eip",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "domain": "vpc",
+                  "name": "tf-visualize-dev-nat-eip",
+                  "resource_type": "aws_eip"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.nat_gateway",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "nat_gateway",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "name": "tf-visualize-dev-nat",
+                  "resource_type": "aws_nat_gateway"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_route_table",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_route_table",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "name": "tf-visualize-dev-private-rt",
+                  "resource_type": "aws_route_table"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_rt_associations[0]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_rt_associations",
+              "index": 0,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_rt_associations[1]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_rt_associations",
+              "index": 1,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_rt_associations[2]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_rt_associations",
+              "index": 2,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_subnets[0]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_subnets",
+              "index": 0,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1a",
+                  "cidr_block": "10.0.3.0/24",
+                  "map_public_ip": "false",
+                  "name": "tf-visualize-dev-private-us-east-1a",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "private"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_subnets[1]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_subnets",
+              "index": 1,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1b",
+                  "cidr_block": "10.0.4.0/24",
+                  "map_public_ip": "false",
+                  "name": "tf-visualize-dev-private-us-east-1b",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "private"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.private_subnets[2]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "private_subnets",
+              "index": 2,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1c",
+                  "cidr_block": "10.0.5.0/24",
+                  "map_public_ip": "false",
+                  "name": "tf-visualize-dev-private-us-east-1c",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "private"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_route_table",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_route_table",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "name": "tf-visualize-dev-public-rt",
+                  "resource_type": "aws_route_table"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_rt_associations[0]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_rt_associations",
+              "index": 0,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_rt_associations[1]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_rt_associations",
+              "index": 1,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_rt_associations[2]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_rt_associations",
+              "index": 2,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": { "resource_type": "aws_route_table_association" }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_subnets[0]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_subnets",
+              "index": 0,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1a",
+                  "cidr_block": "10.0.0.0/24",
+                  "map_public_ip": "true",
+                  "name": "tf-visualize-dev-public-us-east-1a",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "public"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_subnets[1]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_subnets",
+              "index": 1,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1b",
+                  "cidr_block": "10.0.1.0/24",
+                  "map_public_ip": "true",
+                  "name": "tf-visualize-dev-public-us-east-1b",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "public"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.public_subnets[2]",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "public_subnets",
+              "index": 2,
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "availability_zone": "us-east-1c",
+                  "cidr_block": "10.0.2.0/24",
+                  "map_public_ip": "true",
+                  "name": "tf-visualize-dev-public-us-east-1c",
+                  "resource_type": "aws_subnet",
+                  "subnet_type": "public"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.null_resource.vpc",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "vpc",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "cidr_block": "10.0.0.0/16",
+                  "environment": "dev",
+                  "name": "tf-visualize-dev-vpc",
+                  "resource_type": "aws_vpc",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.networking.random_id.security_group_suffix",
+              "mode": "managed",
+              "type": "random_id",
+              "name": "security_group_suffix",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": { "byte_length": 4, "keepers": {}, "prefix": null },
+              "sensitive_values": { "keepers": {} }
+            }
+          ],
+          "address": "module.networking"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.storage.local_file.bucket_policy",
+              "mode": "managed",
+              "type": "local_file",
+              "name": "bucket_policy",
+              "provider_name": "registry.terraform.io/hashicorp/local",
+              "schema_version": 0,
+              "values": {
+                "content_base64": null,
+                "directory_permission": "0777",
+                "file_permission": "0777",
+                "filename": "modules/storage/generated/tf-visualize-dev-bucket-policy.json",
+                "sensitive_content": null,
+                "source": null
+              },
+              "sensitive_values": { "sensitive_content": true }
+            },
+            {
+              "address": "module.storage.null_resource.bucket_encryption",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "bucket_encryption",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "bucket_key_enabled": "true",
+                  "resource_type": "aws_s3_bucket_server_side_encryption_configuration",
+                  "sse_algorithm": "aws:kms"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.null_resource.bucket_versioning",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "bucket_versioning",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "resource_type": "aws_s3_bucket_versioning",
+                  "status": "Enabled"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.null_resource.s3_access_role",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "s3_access_role",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                  "resource_type": "aws_iam_role"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.null_resource.s3_bucket",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "s3_bucket",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "acl": "private",
+                  "force_destroy": "true",
+                  "region": "us-east-1",
+                  "resource_type": "aws_s3_bucket",
+                  "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.null_resource.s3_policy",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "s3_policy",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "policy_name": "tf-visualize-dev-s3-rw-policy",
+                  "resource_type": "aws_iam_policy"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.null_resource.s3_policy_attachment",
+              "mode": "managed",
+              "type": "null_resource",
+              "name": "s3_policy_attachment",
+              "provider_name": "registry.terraform.io/hashicorp/null",
+              "schema_version": 0,
+              "values": {
+                "triggers": {
+                  "resource_type": "aws_iam_role_policy_attachment"
+                }
+              },
+              "sensitive_values": { "triggers": {} }
+            },
+            {
+              "address": "module.storage.random_id.iam_role_suffix",
+              "mode": "managed",
+              "type": "random_id",
+              "name": "iam_role_suffix",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": { "byte_length": 4, "keepers": {}, "prefix": null },
+              "sensitive_values": { "keepers": {} }
+            },
+            {
+              "address": "module.storage.random_pet.bucket_name",
+              "mode": "managed",
+              "type": "random_pet",
+              "name": "bucket_name",
+              "provider_name": "registry.terraform.io/hashicorp/random",
+              "schema_version": 0,
+              "values": {
+                "keepers": { "environment": "dev", "project": "tf-visualize" },
+                "length": 2,
+                "prefix": "tf-visualize-dev",
+                "separator": "-"
+              },
+              "sensitive_values": { "keepers": {} }
+            }
+          ],
+          "address": "module.storage"
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "module.compute.local_file.ssh_private_key",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "local_file",
+      "name": "ssh_private_key",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0600",
+          "filename": "modules/compute/generated/tf-visualize-dev.pem",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "content": true, "sensitive_content": true }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.instances[0]",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "instances",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "instance_type": "t3.medium",
+            "name": "tf-visualize-dev-instance-0",
+            "private_ip": "10.0.0.10",
+            "resource_type": "aws_instance"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "launch_template_id": true,
+            "subnet_id": true,
+            "vpc_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.instances[1]",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "instances",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "instance_type": "t3.medium",
+            "name": "tf-visualize-dev-instance-1",
+            "private_ip": "10.0.1.10",
+            "resource_type": "aws_instance"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "launch_template_id": true,
+            "subnet_id": true,
+            "vpc_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.key_pair",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "key_pair",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "key_name": "tf-visualize-dev-keypair",
+            "resource_type": "aws_key_pair",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "public_key": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.launch_template",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "launch_template",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "image_id": "ami-0abcdef1234567890",
+            "instance_type": "t3.medium",
+            "name": "tf-visualize-dev-lt",
+            "resource_type": "aws_launch_template",
+            "user_data_hash": "dUDWuIA2MrfBO02cO5r4MkoQ3buXBhBswuWZ5mKT5vo="
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "key_name": true, "security_group_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.sg_rule_app",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "sg_rule_app",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "cidr_blocks": "0.0.0.0/0",
+            "description": "Application port for compute instances",
+            "from_port": "8080",
+            "protocol": "tcp",
+            "resource_type": "aws_security_group_rule",
+            "to_port": "8080",
+            "type": "ingress"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "security_group_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.null_resource.sg_rule_ssh",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "sg_rule_ssh",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "cidr_blocks": "10.0.0.0/16",
+            "description": "SSH access for compute instances",
+            "from_port": "22",
+            "protocol": "tcp",
+            "resource_type": "aws_security_group_rule",
+            "to_port": "22",
+            "type": "ingress"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "security_group_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.compute.tls_private_key.ssh_key",
+      "module_address": "module.compute",
+      "mode": "managed",
+      "type": "tls_private_key",
+      "name": "ssh_key",
+      "provider_name": "registry.terraform.io/hashicorp/tls",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "algorithm": "RSA",
+          "ecdsa_curve": "P224",
+          "rsa_bits": 4096
+        },
+        "after_unknown": {
+          "id": true,
+          "private_key_openssh": true,
+          "private_key_pem": true,
+          "private_key_pem_pkcs8": true,
+          "public_key_fingerprint_md5": true,
+          "public_key_fingerprint_sha256": true,
+          "public_key_openssh": true,
+          "public_key_pem": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "private_key_openssh": true,
+          "private_key_pem": true,
+          "private_key_pem_pkcs8": true
+        }
+      }
+    },
+    {
+      "address": "module.database.local_file.db_connection_info",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "local_file",
+      "name": "db_connection_info",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0777",
+          "filename": "modules/database/generated/tf-visualize-dev-db-connection.json",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "sensitive_content": true }
+      }
+    },
+    {
+      "address": "module.database.null_resource.db_parameter_group",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "db_parameter_group",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "family": "postgres15",
+            "name": "tf-visualize-dev-db-params",
+            "param_log_connections": "1",
+            "param_log_disconnections": "1",
+            "param_log_duration": "1",
+            "resource_type": "aws_db_parameter_group"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": {} },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.database.null_resource.db_sg_rule",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "db_sg_rule",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "cidr_blocks": "10.0.0.0/16",
+            "description": "PostgreSQL access from VPC",
+            "from_port": "5432",
+            "protocol": "tcp",
+            "resource_type": "aws_security_group_rule",
+            "to_port": "5432",
+            "type": "ingress"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "security_group_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.database.null_resource.db_subnet_group",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "db_subnet_group",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "description": "Database subnet group for tf-visualize dev",
+            "name": "tf-visualize-dev-db-subnet-group",
+            "resource_type": "aws_db_subnet_group",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "subnet_ids": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.database.null_resource.rds_instance",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "rds_instance",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "allocated_storage": "50",
+            "engine": "postgres",
+            "engine_version": "15.4",
+            "instance_class": "db.t3.medium",
+            "max_allocated_storage": "200",
+            "multi_az": "true",
+            "resource_type": "aws_db_instance",
+            "skip_final_snapshot": "true",
+            "storage_encrypted": "true"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "db_subnet_group_name": true,
+            "identifier": true,
+            "parameter_group_name": true,
+            "password_set": true,
+            "sg_rule_id": true,
+            "vpc_id": true,
+            "vpc_security_group_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.database.random_id.db_identifier",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "random_id",
+      "name": "db_identifier",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "byte_length": 4,
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "prefix": null
+        },
+        "after_unknown": {
+          "b64_std": true,
+          "b64_url": true,
+          "dec": true,
+          "hex": true,
+          "id": true,
+          "keepers": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.database.random_password.db_password",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "random_password",
+      "name": "db_password",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "length": 24,
+          "lower": true,
+          "min_lower": 0,
+          "min_numeric": 0,
+          "min_special": 0,
+          "min_upper": 0,
+          "number": true,
+          "numeric": true,
+          "override_special": "!#$%\u0026*()-_=+[]{}|:,.\u003c\u003e?",
+          "special": true,
+          "upper": true
+        },
+        "after_unknown": {
+          "bcrypt_hash": true,
+          "id": true,
+          "keepers": {},
+          "result": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "bcrypt_hash": true,
+          "keepers": {},
+          "result": true
+        }
+      }
+    },
+    {
+      "address": "module.lambda.local_file.lambda_manifest",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "local_file",
+      "name": "lambda_manifest",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0777",
+          "filename": "modules/lambda/generated/tf-visualize-dev-lambda-manifest.json",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "sensitive_content": true }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.cloudwatch_log_group",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "cloudwatch_log_group",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "name": "/aws/lambda/tf-visualize-dev-processor",
+            "resource_type": "aws_cloudwatch_log_group",
+            "retention_in_days": "14"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "log_group_suffix": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.lambda_execution_role",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "lambda_execution_role",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "resource_type": "aws_iam_role",
+            "role_name": "tf-visualize-dev-lambda-exec",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": {} },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.lambda_function",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "lambda_function",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "function_name": "tf-visualize-dev-processor",
+            "handler": "index.handler",
+            "memory_size": "256",
+            "resource_type": "aws_lambda_function",
+            "runtime": "python3.11",
+            "timeout": "30"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "environment_variables": true,
+            "log_group_id": true,
+            "role_id": true,
+            "s3_bucket": true,
+            "source_code_hash": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.lambda_permission_apigw",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "lambda_permission_apigw",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "action": "lambda:InvokeFunction",
+            "principal": "apigateway.amazonaws.com",
+            "resource_type": "aws_lambda_permission",
+            "statement_id": "AllowAPIGatewayInvoke"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "function_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.lambda_policy",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "lambda_policy",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "policy_name": "tf-visualize-dev-lambda-policy",
+            "resource_type": "aws_iam_policy"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "policy_document": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.null_resource.lambda_policy_attachment",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "lambda_policy_attachment",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_iam_role_policy_attachment" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "policy_id": true, "role_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.random_id.lambda_version",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "random_id",
+      "name": "lambda_version",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "byte_length": 8,
+          "keepers": {
+            "memory_size": "256",
+            "runtime": "python3.11",
+            "timeout": "30"
+          },
+          "prefix": null
+        },
+        "after_unknown": {
+          "b64_std": true,
+          "b64_url": true,
+          "dec": true,
+          "hex": true,
+          "id": true,
+          "keepers": { "bucket_name": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.lambda.random_string.log_group_suffix",
+      "module_address": "module.lambda",
+      "mode": "managed",
+      "type": "random_string",
+      "name": "log_group_suffix",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "length": 6,
+          "lower": true,
+          "min_lower": 0,
+          "min_numeric": 0,
+          "min_special": 0,
+          "min_upper": 0,
+          "number": true,
+          "numeric": true,
+          "override_special": null,
+          "special": false,
+          "upper": false
+        },
+        "after_unknown": { "id": true, "keepers": {}, "result": true },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.local_file.alb_config",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "local_file",
+      "name": "alb_config",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0777",
+          "filename": "modules/loadbalancer/generated/tf-visualize-dev-alb-config.json",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "sensitive_content": true }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.alb",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "alb",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "internal": "false",
+            "load_balancer_type": "application",
+            "name": "tf-visualize-dev-alb",
+            "resource_type": "aws_lb",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "arn": true,
+            "dns_name": true,
+            "subnets": true,
+            "vpc_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.listener_http",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "listener_http",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "default_action_type": "redirect",
+            "port": "80",
+            "protocol": "HTTP",
+            "redirect_port": "443",
+            "redirect_protocol": "HTTPS",
+            "redirect_status": "HTTP_301",
+            "resource_type": "aws_lb_listener"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "load_balancer_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.listener_https",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "listener_https",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "default_action_type": "forward",
+            "port": "443",
+            "protocol": "HTTPS",
+            "resource_type": "aws_lb_listener",
+            "ssl_policy": "ELBSecurityPolicy-TLS13-1-2-2021-06"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "certificate_arn": true,
+            "certificate_created": true,
+            "load_balancer_id": true,
+            "target_group_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.listener_rule_api",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "listener_rule_api",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "action_type": "forward",
+            "condition_field": "path-pattern",
+            "condition_value": "/api/*",
+            "priority": "100",
+            "resource_type": "aws_lb_listener_rule"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "listener_id": true, "target_group_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.listener_rule_static",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "listener_rule_static",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "action_type": "fixed-response",
+            "condition_field": "path-pattern",
+            "condition_value": "/static/*",
+            "content_type": "text/plain",
+            "message_body": "Static content not found",
+            "priority": "200",
+            "resource_type": "aws_lb_listener_rule",
+            "status_code": "404"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "listener_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.target_group",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "target_group",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "health_check_matcher": "200-299",
+            "health_check_path": "/health",
+            "name": "tf-visualize-dev-tg",
+            "port": "8080",
+            "protocol": "HTTP",
+            "resource_type": "aws_lb_target_group",
+            "target_type": "instance"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "health_check_interval": true, "vpc_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.target_group_attachments[\"0\"]",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "target_group_attachments",
+      "index": "0",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "port": "8080",
+            "resource_type": "aws_lb_target_group_attachment"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "target_group_id": true, "target_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.null_resource.target_group_attachments[\"1\"]",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "target_group_attachments",
+      "index": "1",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "port": "8080",
+            "resource_type": "aws_lb_target_group_attachment"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "target_group_id": true, "target_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.random_id.alb_suffix",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "random_id",
+      "name": "alb_suffix",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "byte_length": 4,
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "prefix": null
+        },
+        "after_unknown": {
+          "b64_std": true,
+          "b64_url": true,
+          "dec": true,
+          "hex": true,
+          "id": true,
+          "keepers": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.random_integer.health_check_interval",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "random_integer",
+      "name": "health_check_interval",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "max": 60,
+          "min": 15,
+          "seed": null
+        },
+        "after_unknown": { "id": true, "keepers": {}, "result": true },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.loadbalancer.tls_private_key.alb_cert_key",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "tls_private_key",
+      "name": "alb_cert_key",
+      "provider_name": "registry.terraform.io/hashicorp/tls",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "algorithm": "RSA",
+          "ecdsa_curve": "P224",
+          "rsa_bits": 2048
+        },
+        "after_unknown": {
+          "id": true,
+          "private_key_openssh": true,
+          "private_key_pem": true,
+          "private_key_pem_pkcs8": true,
+          "public_key_fingerprint_md5": true,
+          "public_key_fingerprint_sha256": true,
+          "public_key_openssh": true,
+          "public_key_pem": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "private_key_openssh": true,
+          "private_key_pem": true,
+          "private_key_pem_pkcs8": true
+        }
+      }
+    },
+    {
+      "address": "module.loadbalancer.tls_self_signed_cert.alb_cert",
+      "module_address": "module.loadbalancer",
+      "mode": "managed",
+      "type": "tls_self_signed_cert",
+      "name": "alb_cert",
+      "provider_name": "registry.terraform.io/hashicorp/tls",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "allowed_uses": [
+            "key_encipherment",
+            "digital_signature",
+            "server_auth"
+          ],
+          "dns_names": null,
+          "early_renewal_hours": 0,
+          "ip_addresses": null,
+          "is_ca_certificate": false,
+          "private_key_pem_wo": null,
+          "private_key_pem_wo_version": null,
+          "ready_for_renewal": false,
+          "set_authority_key_id": false,
+          "set_subject_key_id": false,
+          "subject": [
+            {
+              "common_name": "tf-visualize-dev.example.com",
+              "country": null,
+              "email_address": null,
+              "locality": null,
+              "organization": "tf-visualize",
+              "organizational_unit": null,
+              "postal_code": null,
+              "province": null,
+              "serial_number": null,
+              "street_address": null
+            }
+          ],
+          "uris": null,
+          "validity_period_hours": 8760
+        },
+        "after_unknown": {
+          "allowed_uses": [false, false, false],
+          "cert_pem": true,
+          "id": true,
+          "key_algorithm": true,
+          "max_path_length": true,
+          "private_key_pem": true,
+          "subject": [{}],
+          "validity_end_time": true,
+          "validity_start_time": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "allowed_uses": [false, false, false],
+          "private_key_pem": true,
+          "private_key_pem_wo": true,
+          "subject": [{}]
+        }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.default_security_group",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "default_security_group",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "egress_all": "0.0.0.0/0:0-65535",
+            "ingress_http": "0.0.0.0/0:80",
+            "ingress_https": "0.0.0.0/0:443",
+            "ingress_ssh": "10.0.0.0/16:22",
+            "name": "tf-visualize-dev-default-sg",
+            "resource_type": "aws_security_group"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "sg_id": true, "vpc_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.internet_gateway",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "internet_gateway",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "name": "tf-visualize-dev-igw",
+            "resource_type": "aws_internet_gateway"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.nat_eip",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "nat_eip",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "domain": "vpc",
+            "name": "tf-visualize-dev-nat-eip",
+            "resource_type": "aws_eip"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": {} },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.nat_gateway",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "nat_gateway",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "name": "tf-visualize-dev-nat",
+            "resource_type": "aws_nat_gateway"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": {
+            "allocation_id": true,
+            "igw_id": true,
+            "subnet_id": true
+          }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_route_table",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_route_table",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "name": "tf-visualize-dev-private-rt",
+            "resource_type": "aws_route_table"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "nat_gateway_id": true, "vpc_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_rt_associations[0]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_rt_associations",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_rt_associations[1]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_rt_associations",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_rt_associations[2]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_rt_associations",
+      "index": 2,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_subnets[0]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_subnets",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1a",
+            "cidr_block": "10.0.3.0/24",
+            "map_public_ip": "false",
+            "name": "tf-visualize-dev-private-us-east-1a",
+            "resource_type": "aws_subnet",
+            "subnet_type": "private"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_subnets[1]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_subnets",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1b",
+            "cidr_block": "10.0.4.0/24",
+            "map_public_ip": "false",
+            "name": "tf-visualize-dev-private-us-east-1b",
+            "resource_type": "aws_subnet",
+            "subnet_type": "private"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.private_subnets[2]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "private_subnets",
+      "index": 2,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1c",
+            "cidr_block": "10.0.5.0/24",
+            "map_public_ip": "false",
+            "name": "tf-visualize-dev-private-us-east-1c",
+            "resource_type": "aws_subnet",
+            "subnet_type": "private"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_route_table",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_route_table",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "name": "tf-visualize-dev-public-rt",
+            "resource_type": "aws_route_table"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "gateway_id": true, "vpc_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_rt_associations[0]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_rt_associations",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_rt_associations[1]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_rt_associations",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_rt_associations[2]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_rt_associations",
+      "index": 2,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_route_table_association" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "route_table_id": true, "subnet_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_subnets[0]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_subnets",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1a",
+            "cidr_block": "10.0.0.0/24",
+            "map_public_ip": "true",
+            "name": "tf-visualize-dev-public-us-east-1a",
+            "resource_type": "aws_subnet",
+            "subnet_type": "public"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_subnets[1]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_subnets",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1b",
+            "cidr_block": "10.0.1.0/24",
+            "map_public_ip": "true",
+            "name": "tf-visualize-dev-public-us-east-1b",
+            "resource_type": "aws_subnet",
+            "subnet_type": "public"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.public_subnets[2]",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "public_subnets",
+      "index": 2,
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "availability_zone": "us-east-1c",
+            "cidr_block": "10.0.2.0/24",
+            "map_public_ip": "true",
+            "name": "tf-visualize-dev-public-us-east-1c",
+            "resource_type": "aws_subnet",
+            "subnet_type": "public"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "vpc_id": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.null_resource.vpc",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "vpc",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "cidr_block": "10.0.0.0/16",
+            "environment": "dev",
+            "name": "tf-visualize-dev-vpc",
+            "resource_type": "aws_vpc",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": {} },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.networking.random_id.security_group_suffix",
+      "module_address": "module.networking",
+      "mode": "managed",
+      "type": "random_id",
+      "name": "security_group_suffix",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "byte_length": 4, "keepers": {}, "prefix": null },
+        "after_unknown": {
+          "b64_std": true,
+          "b64_url": true,
+          "dec": true,
+          "hex": true,
+          "id": true,
+          "keepers": { "vpc_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.storage.local_file.bucket_policy",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "local_file",
+      "name": "bucket_policy",
+      "provider_name": "registry.terraform.io/hashicorp/local",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "content_base64": null,
+          "directory_permission": "0777",
+          "file_permission": "0777",
+          "filename": "modules/storage/generated/tf-visualize-dev-bucket-policy.json",
+          "sensitive_content": null,
+          "source": null
+        },
+        "after_unknown": {
+          "content": true,
+          "content_base64sha256": true,
+          "content_base64sha512": true,
+          "content_md5": true,
+          "content_sha1": true,
+          "content_sha256": true,
+          "content_sha512": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "sensitive_content": true }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.bucket_encryption",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "bucket_encryption",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "bucket_key_enabled": "true",
+            "resource_type": "aws_s3_bucket_server_side_encryption_configuration",
+            "sse_algorithm": "aws:kms"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "bucket": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.bucket_versioning",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "bucket_versioning",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "resource_type": "aws_s3_bucket_versioning",
+            "status": "Enabled"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "bucket": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.s3_access_role",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "s3_access_role",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "resource_type": "aws_iam_role"
+          }
+        },
+        "after_unknown": { "id": true, "triggers": { "role_name": true } },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.s3_bucket",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "s3_bucket",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "acl": "private",
+            "force_destroy": "true",
+            "region": "us-east-1",
+            "resource_type": "aws_s3_bucket",
+            "tags": "{\"ManagedBy\":\"terraform\",\"Tool\":\"tf-visualize\"}"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "bucket": true, "name": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.s3_policy",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "s3_policy",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": {
+            "policy_name": "tf-visualize-dev-s3-rw-policy",
+            "resource_type": "aws_iam_policy"
+          }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "policy_document": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.null_resource.s3_policy_attachment",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "s3_policy_attachment",
+      "provider_name": "registry.terraform.io/hashicorp/null",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "triggers": { "resource_type": "aws_iam_role_policy_attachment" }
+        },
+        "after_unknown": {
+          "id": true,
+          "triggers": { "policy_id": true, "role_id": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "triggers": {} }
+      }
+    },
+    {
+      "address": "module.storage.random_id.iam_role_suffix",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "random_id",
+      "name": "iam_role_suffix",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "byte_length": 4, "keepers": {}, "prefix": null },
+        "after_unknown": {
+          "b64_std": true,
+          "b64_url": true,
+          "dec": true,
+          "hex": true,
+          "id": true,
+          "keepers": { "bucket": true }
+        },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    },
+    {
+      "address": "module.storage.random_pet.bucket_name",
+      "module_address": "module.storage",
+      "mode": "managed",
+      "type": "random_pet",
+      "name": "bucket_name",
+      "provider_name": "registry.terraform.io/hashicorp/random",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "keepers": { "environment": "dev", "project": "tf-visualize" },
+          "length": 2,
+          "prefix": "tf-visualize-dev",
+          "separator": "-"
+        },
+        "after_unknown": { "id": true, "keepers": {} },
+        "before_sensitive": false,
+        "after_sensitive": { "keepers": {} }
+      }
+    }
+  ],
+  "output_changes": {
+    "alb_arn": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "alb_dns_name": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "bucket_arn": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "bucket_name": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "db_endpoint": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "db_password": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": true,
+      "after_sensitive": true
+    },
+    "db_subnet_group_id": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "instance_ids": {
+      "actions": ["create"],
+      "before": null,
+      "after": [null, null],
+      "after_unknown": [true, true],
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "lambda_function_name": {
+      "actions": ["create"],
+      "before": null,
+      "after": "tf-visualize-dev-processor",
+      "after_unknown": false,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "lambda_log_group": {
+      "actions": ["create"],
+      "before": null,
+      "after": "/aws/lambda/tf-visualize-dev-processor",
+      "after_unknown": false,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "private_subnet_ids": {
+      "actions": ["create"],
+      "before": null,
+      "after": [null, null, null],
+      "after_unknown": [true, true, true],
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "public_subnet_ids": {
+      "actions": ["create"],
+      "before": null,
+      "after": [null, null, null],
+      "after_unknown": [true, true, true],
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "security_group_id": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "ssh_public_key": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": true,
+      "after_sensitive": true
+    },
+    "target_group_id": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    },
+    "vpc_id": {
+      "actions": ["create"],
+      "before": null,
+      "after_unknown": true,
+      "before_sensitive": false,
+      "after_sensitive": false
+    }
+  },
+  "prior_state": {
+    "format_version": "1.0",
+    "terraform_version": "1.16.2",
+    "values": {
+      "outputs": {
+        "lambda_function_name": {
+          "sensitive": false,
+          "value": "tf-visualize-dev-processor",
+          "type": "string"
+        },
+        "lambda_log_group": {
+          "sensitive": false,
+          "value": "/aws/lambda/tf-visualize-dev-processor",
+          "type": "string"
+        }
+      },
+      "root_module": {}
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "local": {
+        "name": "local",
+        "full_name": "registry.terraform.io/hashicorp/local",
+        "version_constraint": "~\u003e 2.0"
+      },
+      "null": {
+        "name": "null",
+        "full_name": "registry.terraform.io/hashicorp/null",
+        "version_constraint": "~\u003e 3.0"
+      },
+      "random": {
+        "name": "random",
+        "full_name": "registry.terraform.io/hashicorp/random",
+        "version_constraint": "~\u003e 3.0"
+      },
+      "tls": {
+        "name": "tls",
+        "full_name": "registry.terraform.io/hashicorp/tls",
+        "version_constraint": "~\u003e 4.0"
+      }
+    },
+    "root_module": {
+      "outputs": {
+        "alb_arn": {
+          "expression": {
+            "references": ["module.loadbalancer.alb_arn", "module.loadbalancer"]
+          },
+          "description": "The simulated ALB ARN"
+        },
+        "alb_dns_name": {
+          "expression": {
+            "references": [
+              "module.loadbalancer.alb_dns_name",
+              "module.loadbalancer"
+            ]
+          },
+          "description": "The simulated ALB DNS name"
+        },
+        "bucket_arn": {
+          "expression": {
+            "references": ["module.storage.bucket_arn", "module.storage"]
+          },
+          "description": "The simulated S3 bucket ARN"
+        },
+        "bucket_name": {
+          "expression": {
+            "references": ["module.storage.bucket_name", "module.storage"]
+          },
+          "description": "The simulated S3 bucket name"
+        },
+        "db_endpoint": {
+          "expression": {
+            "references": ["module.database.db_endpoint", "module.database"]
+          },
+          "description": "The simulated RDS endpoint"
+        },
+        "db_password": {
+          "sensitive": true,
+          "expression": {
+            "references": ["module.database.db_password", "module.database"]
+          },
+          "description": "The generated database password"
+        },
+        "db_subnet_group_id": {
+          "expression": {
+            "references": [
+              "module.database.db_subnet_group_id",
+              "module.database"
+            ]
+          },
+          "description": "The simulated DB subnet group ID"
+        },
+        "instance_ids": {
+          "expression": {
+            "references": ["module.compute.instance_ids", "module.compute"]
+          },
+          "description": "List of simulated EC2 instance IDs"
+        },
+        "lambda_function_name": {
+          "expression": {
+            "references": ["module.lambda.function_name", "module.lambda"]
+          },
+          "description": "The simulated Lambda function name"
+        },
+        "lambda_log_group": {
+          "expression": {
+            "references": ["module.lambda.log_group_name", "module.lambda"]
+          },
+          "description": "The simulated CloudWatch log group name"
+        },
+        "private_subnet_ids": {
+          "expression": {
+            "references": [
+              "module.networking.private_subnet_ids",
+              "module.networking"
+            ]
+          },
+          "description": "List of simulated private subnet IDs"
+        },
+        "public_subnet_ids": {
+          "expression": {
+            "references": [
+              "module.networking.public_subnet_ids",
+              "module.networking"
+            ]
+          },
+          "description": "List of simulated public subnet IDs"
+        },
+        "security_group_id": {
+          "expression": {
+            "references": [
+              "module.networking.security_group_id",
+              "module.networking"
+            ]
+          },
+          "description": "The simulated default security group ID"
+        },
+        "ssh_public_key": {
+          "sensitive": true,
+          "expression": {
+            "references": ["module.compute.ssh_public_key", "module.compute"]
+          },
+          "description": "The generated SSH public key (simulated key pair)"
+        },
+        "target_group_id": {
+          "expression": {
+            "references": [
+              "module.loadbalancer.target_group_id",
+              "module.loadbalancer"
+            ]
+          },
+          "description": "The simulated target group resource ID"
+        },
+        "vpc_id": {
+          "expression": {
+            "references": ["module.networking.vpc_id", "module.networking"]
+          },
+          "description": "The simulated VPC ID"
+        }
+      },
+      "module_calls": {
+        "compute": {
+          "source": "./modules/compute",
+          "expressions": {
+            "environment": { "references": ["var.environment"] },
+            "instance_count": { "references": ["var.instance_count"] },
+            "instance_type": { "references": ["var.instance_type"] },
+            "project": { "references": ["var.project"] },
+            "security_group_id": {
+              "references": [
+                "module.networking.security_group_id",
+                "module.networking"
+              ]
+            },
+            "subnet_ids": {
+              "references": [
+                "module.networking.public_subnet_ids",
+                "module.networking"
+              ]
+            },
+            "tags": { "references": ["var.tags"] },
+            "vpc_id": {
+              "references": ["module.networking.vpc_id", "module.networking"]
+            }
+          },
+          "module": {
+            "outputs": {
+              "instance_ids": {
+                "expression": { "references": ["null_resource.instances"] },
+                "description": "List of simulated EC2 instance IDs"
+              },
+              "key_pair_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.key_pair.id",
+                    "null_resource.key_pair"
+                  ]
+                },
+                "description": "The simulated key pair ID"
+              },
+              "launch_template_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.launch_template.id",
+                    "null_resource.launch_template"
+                  ]
+                },
+                "description": "The simulated launch template ID"
+              },
+              "ssh_public_key": {
+                "sensitive": true,
+                "expression": {
+                  "references": [
+                    "tls_private_key.ssh_key.public_key_openssh",
+                    "tls_private_key.ssh_key"
+                  ]
+                },
+                "description": "The generated SSH public key"
+              }
+            },
+            "resources": [
+              {
+                "address": "local_file.ssh_private_key",
+                "mode": "managed",
+                "type": "local_file",
+                "name": "ssh_private_key",
+                "provider_config_key": "local",
+                "expressions": {
+                  "content": {
+                    "references": [
+                      "tls_private_key.ssh_key.private_key_pem",
+                      "tls_private_key.ssh_key"
+                    ]
+                  },
+                  "file_permission": { "constant_value": "0600" },
+                  "filename": {
+                    "references": [
+                      "path.module",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.instances",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "instances",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.launch_template.id",
+                      "null_resource.launch_template",
+                      "var.subnet_ids",
+                      "count.index",
+                      "var.subnet_ids",
+                      "var.instance_type",
+                      "var.project",
+                      "var.environment",
+                      "count.index",
+                      "var.vpc_id",
+                      "count.index"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": { "references": ["var.instance_count"] },
+                "depends_on": ["null_resource.launch_template"]
+              },
+              {
+                "address": "null_resource.key_pair",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "key_pair",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "tls_private_key.ssh_key.public_key_openssh",
+                      "tls_private_key.ssh_key",
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.launch_template",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "launch_template",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.instance_type",
+                      "null_resource.key_pair.id",
+                      "null_resource.key_pair",
+                      "var.security_group_id",
+                      "var.project"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.sg_rule_app",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "sg_rule_app",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": { "references": ["var.security_group_id"] }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.sg_rule_ssh",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "sg_rule_ssh",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": { "references": ["var.security_group_id"] }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "tls_private_key.ssh_key",
+                "mode": "managed",
+                "type": "tls_private_key",
+                "name": "ssh_key",
+                "provider_config_key": "tls",
+                "expressions": {
+                  "algorithm": { "constant_value": "RSA" },
+                  "rsa_bits": { "constant_value": 4096 }
+                },
+                "schema_version": 1
+              }
+            ],
+            "variables": {
+              "environment": { "description": "Deployment environment" },
+              "instance_count": {
+                "description": "Number of EC2 instances to create"
+              },
+              "instance_type": { "description": "EC2 instance type" },
+              "project": { "description": "Project name prefix" },
+              "security_group_id": {
+                "description": "Security group ID to attach to instances (from networking module)"
+              },
+              "subnet_ids": {
+                "description": "List of subnet IDs to place instances in (from networking module)"
+              },
+              "tags": { "default": {}, "description": "Common resource tags" },
+              "vpc_id": { "description": "VPC ID (from networking module)" }
+            }
+          }
+        },
+        "database": {
+          "source": "./modules/database",
+          "expressions": {
+            "db_engine": { "references": ["var.db_engine"] },
+            "db_engine_version": { "references": ["var.db_engine_version"] },
+            "db_instance_class": { "references": ["var.db_instance_class"] },
+            "environment": { "references": ["var.environment"] },
+            "project": { "references": ["var.project"] },
+            "security_group_id": {
+              "references": [
+                "module.networking.security_group_id",
+                "module.networking"
+              ]
+            },
+            "subnet_ids": {
+              "references": [
+                "module.networking.private_subnet_ids",
+                "module.networking"
+              ]
+            },
+            "tags": { "references": ["var.tags"] },
+            "vpc_id": {
+              "references": ["module.networking.vpc_id", "module.networking"]
+            }
+          },
+          "module": {
+            "outputs": {
+              "db_endpoint": {
+                "expression": {
+                  "references": [
+                    "var.project",
+                    "var.environment",
+                    "random_id.db_identifier.hex",
+                    "random_id.db_identifier",
+                    "var.environment"
+                  ]
+                },
+                "description": "The simulated RDS endpoint"
+              },
+              "db_instance_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.rds_instance.id",
+                    "null_resource.rds_instance"
+                  ]
+                },
+                "description": "The simulated RDS instance resource ID"
+              },
+              "db_parameter_group_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.db_parameter_group.id",
+                    "null_resource.db_parameter_group"
+                  ]
+                },
+                "description": "The simulated DB parameter group ID"
+              },
+              "db_password": {
+                "sensitive": true,
+                "expression": {
+                  "references": [
+                    "random_password.db_password.result",
+                    "random_password.db_password"
+                  ]
+                },
+                "description": "The generated database master password"
+              },
+              "db_subnet_group_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.db_subnet_group.id",
+                    "null_resource.db_subnet_group"
+                  ]
+                },
+                "description": "The simulated DB subnet group ID"
+              }
+            },
+            "resources": [
+              {
+                "address": "local_file.db_connection_info",
+                "mode": "managed",
+                "type": "local_file",
+                "name": "db_connection_info",
+                "provider_config_key": "local",
+                "expressions": {
+                  "content": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "random_id.db_identifier.hex",
+                      "random_id.db_identifier",
+                      "var.environment",
+                      "var.project",
+                      "var.db_engine"
+                    ]
+                  },
+                  "filename": {
+                    "references": [
+                      "path.module",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.db_parameter_group",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "db_parameter_group",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.db_engine",
+                      "var.db_engine_version"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.db_sg_rule",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "db_sg_rule",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": { "references": ["var.security_group_id"] }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.db_subnet_group",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "db_subnet_group",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.subnet_ids",
+                      "var.project",
+                      "var.environment",
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.rds_instance",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "rds_instance",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "random_id.db_identifier.hex",
+                      "random_id.db_identifier",
+                      "var.db_engine",
+                      "var.db_engine_version",
+                      "var.db_instance_class",
+                      "null_resource.db_subnet_group.id",
+                      "null_resource.db_subnet_group",
+                      "null_resource.db_parameter_group.id",
+                      "null_resource.db_parameter_group",
+                      "var.security_group_id",
+                      "var.vpc_id",
+                      "random_password.db_password.id",
+                      "random_password.db_password",
+                      "null_resource.db_sg_rule.id",
+                      "null_resource.db_sg_rule"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "depends_on": [
+                  "null_resource.db_subnet_group",
+                  "null_resource.db_parameter_group",
+                  "null_resource.db_sg_rule"
+                ]
+              },
+              {
+                "address": "random_id.db_identifier",
+                "mode": "managed",
+                "type": "random_id",
+                "name": "db_identifier",
+                "provider_config_key": "random",
+                "expressions": {
+                  "byte_length": { "constant_value": 4 },
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_password.db_password",
+                "mode": "managed",
+                "type": "random_password",
+                "name": "db_password",
+                "provider_config_key": "random",
+                "expressions": {
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  },
+                  "length": { "constant_value": 24 },
+                  "override_special": {
+                    "constant_value": "!#$%\u0026*()-_=+[]{}|:,.\u003c\u003e?"
+                  },
+                  "special": { "constant_value": true }
+                },
+                "schema_version": 3
+              }
+            ],
+            "variables": {
+              "db_engine": {
+                "description": "Database engine (e.g. postgres, mysql)"
+              },
+              "db_engine_version": { "description": "Database engine version" },
+              "db_instance_class": { "description": "RDS instance class" },
+              "environment": { "description": "Deployment environment" },
+              "project": { "description": "Project name prefix" },
+              "security_group_id": {
+                "description": "Security group ID for DB access (from networking module)"
+              },
+              "subnet_ids": {
+                "description": "List of private subnet IDs for the DB subnet group (from networking module)"
+              },
+              "tags": { "default": {}, "description": "Common resource tags" },
+              "vpc_id": { "description": "VPC ID (from networking module)" }
+            }
+          }
+        },
+        "lambda": {
+          "source": "./modules/lambda",
+          "expressions": {
+            "bucket_arn": {
+              "references": ["module.storage.bucket_arn", "module.storage"]
+            },
+            "bucket_name": {
+              "references": ["module.storage.bucket_name", "module.storage"]
+            },
+            "environment": { "references": ["var.environment"] },
+            "memory_size": { "references": ["var.lambda_memory"] },
+            "project": { "references": ["var.project"] },
+            "runtime": { "references": ["var.lambda_runtime"] },
+            "tags": { "references": ["var.tags"] },
+            "timeout": { "references": ["var.lambda_timeout"] }
+          },
+          "module": {
+            "outputs": {
+              "execution_role_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.lambda_execution_role.id",
+                    "null_resource.lambda_execution_role"
+                  ]
+                },
+                "description": "The simulated Lambda execution role ID"
+              },
+              "function_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.lambda_function.id",
+                    "null_resource.lambda_function"
+                  ]
+                },
+                "description": "The simulated Lambda function resource ID"
+              },
+              "function_name": {
+                "expression": {
+                  "references": ["var.project", "var.environment"]
+                },
+                "description": "The simulated Lambda function name"
+              },
+              "lambda_permission_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.lambda_permission_apigw.id",
+                    "null_resource.lambda_permission_apigw"
+                  ]
+                },
+                "description": "The simulated Lambda permission ID"
+              },
+              "log_group_name": {
+                "expression": {
+                  "references": ["var.project", "var.environment"]
+                },
+                "description": "The simulated CloudWatch log group name"
+              }
+            },
+            "resources": [
+              {
+                "address": "local_file.lambda_manifest",
+                "mode": "managed",
+                "type": "local_file",
+                "name": "lambda_manifest",
+                "provider_config_key": "local",
+                "expressions": {
+                  "content": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.runtime",
+                      "var.memory_size",
+                      "var.timeout",
+                      "var.bucket_name",
+                      "var.environment"
+                    ]
+                  },
+                  "filename": {
+                    "references": [
+                      "path.module",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.cloudwatch_log_group",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "cloudwatch_log_group",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "random_string.log_group_suffix.result",
+                      "random_string.log_group_suffix"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.lambda_execution_role",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "lambda_execution_role",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": ["var.project", "var.environment", "var.tags"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.lambda_function",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "lambda_function",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.runtime",
+                      "var.memory_size",
+                      "var.timeout",
+                      "null_resource.lambda_execution_role.id",
+                      "null_resource.lambda_execution_role",
+                      "random_id.lambda_version.hex",
+                      "random_id.lambda_version",
+                      "null_resource.cloudwatch_log_group.id",
+                      "null_resource.cloudwatch_log_group",
+                      "var.bucket_name",
+                      "var.bucket_name",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "depends_on": [
+                  "null_resource.lambda_policy_attachment",
+                  "null_resource.cloudwatch_log_group"
+                ]
+              },
+              {
+                "address": "null_resource.lambda_permission_apigw",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "lambda_permission_apigw",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.lambda_function.id",
+                      "null_resource.lambda_function"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.lambda_policy",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "lambda_policy",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.bucket_arn"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.lambda_policy_attachment",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "lambda_policy_attachment",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.lambda_execution_role.id",
+                      "null_resource.lambda_execution_role",
+                      "null_resource.lambda_policy.id",
+                      "null_resource.lambda_policy"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_id.lambda_version",
+                "mode": "managed",
+                "type": "random_id",
+                "name": "lambda_version",
+                "provider_config_key": "random",
+                "expressions": {
+                  "byte_length": { "constant_value": 8 },
+                  "keepers": {
+                    "references": [
+                      "var.runtime",
+                      "var.memory_size",
+                      "var.timeout",
+                      "var.bucket_name"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_string.log_group_suffix",
+                "mode": "managed",
+                "type": "random_string",
+                "name": "log_group_suffix",
+                "provider_config_key": "random",
+                "expressions": {
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  },
+                  "length": { "constant_value": 6 },
+                  "special": { "constant_value": false },
+                  "upper": { "constant_value": false }
+                },
+                "schema_version": 2
+              }
+            ],
+            "variables": {
+              "bucket_arn": {
+                "description": "S3 bucket ARN for IAM policy (from storage module)"
+              },
+              "bucket_name": {
+                "description": "S3 bucket name for Lambda config (from storage module)"
+              },
+              "environment": { "description": "Deployment environment" },
+              "memory_size": {
+                "description": "Lambda memory allocation in MB"
+              },
+              "project": { "description": "Project name prefix" },
+              "runtime": {
+                "description": "Lambda runtime (e.g. python3.11, nodejs18.x)"
+              },
+              "tags": { "default": {}, "description": "Common resource tags" },
+              "timeout": { "description": "Lambda timeout in seconds" }
+            }
+          }
+        },
+        "loadbalancer": {
+          "source": "./modules/loadbalancer",
+          "expressions": {
+            "environment": { "references": ["var.environment"] },
+            "instance_ids": {
+              "references": ["module.compute.instance_ids", "module.compute"]
+            },
+            "project": { "references": ["var.project"] },
+            "subnet_ids": {
+              "references": [
+                "module.networking.public_subnet_ids",
+                "module.networking"
+              ]
+            },
+            "tags": { "references": ["var.tags"] },
+            "vpc_id": {
+              "references": ["module.networking.vpc_id", "module.networking"]
+            }
+          },
+          "module": {
+            "outputs": {
+              "alb_arn": {
+                "expression": {
+                  "references": [
+                    "var.project",
+                    "var.environment",
+                    "random_id.alb_suffix.hex",
+                    "random_id.alb_suffix"
+                  ]
+                },
+                "description": "The simulated ALB ARN"
+              },
+              "alb_dns_name": {
+                "expression": {
+                  "references": [
+                    "var.project",
+                    "var.environment",
+                    "random_id.alb_suffix.hex",
+                    "random_id.alb_suffix",
+                    "var.environment"
+                  ]
+                },
+                "description": "The simulated ALB DNS name"
+              },
+              "alb_id": {
+                "expression": {
+                  "references": ["null_resource.alb.id", "null_resource.alb"]
+                },
+                "description": "The simulated ALB resource ID"
+              },
+              "listener_http_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.listener_http.id",
+                    "null_resource.listener_http"
+                  ]
+                },
+                "description": "The simulated HTTP listener resource ID"
+              },
+              "listener_https_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.listener_https.id",
+                    "null_resource.listener_https"
+                  ]
+                },
+                "description": "The simulated HTTPS listener resource ID"
+              },
+              "target_group_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.target_group.id",
+                    "null_resource.target_group"
+                  ]
+                },
+                "description": "The simulated target group resource ID"
+              }
+            },
+            "resources": [
+              {
+                "address": "local_file.alb_config",
+                "mode": "managed",
+                "type": "local_file",
+                "name": "alb_config",
+                "provider_config_key": "local",
+                "expressions": {
+                  "content": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.project",
+                      "var.environment",
+                      "random_id.alb_suffix.hex",
+                      "random_id.alb_suffix",
+                      "var.environment",
+                      "var.instance_ids"
+                    ]
+                  },
+                  "filename": {
+                    "references": [
+                      "path.module",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.alb",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "alb",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.subnet_ids",
+                      "var.vpc_id",
+                      "var.project",
+                      "var.environment",
+                      "random_id.alb_suffix.hex",
+                      "random_id.alb_suffix",
+                      "var.environment",
+                      "var.project",
+                      "var.environment",
+                      "random_id.alb_suffix.hex",
+                      "random_id.alb_suffix",
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.listener_http",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "listener_http",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": ["null_resource.alb.id", "null_resource.alb"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.listener_https",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "listener_https",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.alb.id",
+                      "null_resource.alb",
+                      "random_id.alb_suffix.hex",
+                      "random_id.alb_suffix",
+                      "tls_self_signed_cert.alb_cert.id",
+                      "tls_self_signed_cert.alb_cert",
+                      "null_resource.target_group.id",
+                      "null_resource.target_group"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.listener_rule_api",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "listener_rule_api",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.listener_https.id",
+                      "null_resource.listener_https",
+                      "null_resource.target_group.id",
+                      "null_resource.target_group"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.listener_rule_static",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "listener_rule_static",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.listener_https.id",
+                      "null_resource.listener_https"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.target_group",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "target_group",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "var.vpc_id",
+                      "random_integer.health_check_interval.result",
+                      "random_integer.health_check_interval"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.target_group_attachments",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "target_group_attachments",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.target_group.id",
+                      "null_resource.target_group",
+                      "each.value"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "for_each_expression": { "references": ["var.instance_ids"] }
+              },
+              {
+                "address": "random_id.alb_suffix",
+                "mode": "managed",
+                "type": "random_id",
+                "name": "alb_suffix",
+                "provider_config_key": "random",
+                "expressions": {
+                  "byte_length": { "constant_value": 4 },
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_integer.health_check_interval",
+                "mode": "managed",
+                "type": "random_integer",
+                "name": "health_check_interval",
+                "provider_config_key": "random",
+                "expressions": {
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  },
+                  "max": { "constant_value": 60 },
+                  "min": { "constant_value": 15 }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "tls_private_key.alb_cert_key",
+                "mode": "managed",
+                "type": "tls_private_key",
+                "name": "alb_cert_key",
+                "provider_config_key": "tls",
+                "expressions": {
+                  "algorithm": { "constant_value": "RSA" },
+                  "rsa_bits": { "constant_value": 2048 }
+                },
+                "schema_version": 1
+              },
+              {
+                "address": "tls_self_signed_cert.alb_cert",
+                "mode": "managed",
+                "type": "tls_self_signed_cert",
+                "name": "alb_cert",
+                "provider_config_key": "tls",
+                "expressions": {
+                  "allowed_uses": {
+                    "constant_value": [
+                      "key_encipherment",
+                      "digital_signature",
+                      "server_auth"
+                    ]
+                  },
+                  "private_key_pem": {
+                    "references": [
+                      "tls_private_key.alb_cert_key.private_key_pem",
+                      "tls_private_key.alb_cert_key"
+                    ]
+                  },
+                  "subject": [
+                    {
+                      "common_name": {
+                        "references": ["var.project", "var.environment"]
+                      },
+                      "organization": { "references": ["var.project"] }
+                    }
+                  ],
+                  "validity_period_hours": { "constant_value": 8760 }
+                },
+                "schema_version": 0
+              }
+            ],
+            "variables": {
+              "environment": { "description": "Deployment environment" },
+              "instance_ids": {
+                "description": "List of EC2 instance IDs to register as targets (from compute module)"
+              },
+              "project": { "description": "Project name prefix" },
+              "subnet_ids": {
+                "description": "List of public subnet IDs for the ALB (from networking module)"
+              },
+              "tags": { "default": {}, "description": "Common resource tags" },
+              "vpc_id": { "description": "VPC ID (from networking module)" }
+            }
+          }
+        },
+        "networking": {
+          "source": "./modules/networking",
+          "expressions": {
+            "availability_zones": { "references": ["var.availability_zones"] },
+            "environment": { "references": ["var.environment"] },
+            "project": { "references": ["var.project"] },
+            "tags": { "references": ["var.tags"] },
+            "vpc_cidr": { "references": ["var.vpc_cidr"] }
+          },
+          "module": {
+            "outputs": {
+              "internet_gateway_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.internet_gateway.id",
+                    "null_resource.internet_gateway"
+                  ]
+                },
+                "description": "The simulated internet gateway ID"
+              },
+              "nat_gateway_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.nat_gateway.id",
+                    "null_resource.nat_gateway"
+                  ]
+                },
+                "description": "The simulated NAT gateway ID"
+              },
+              "private_subnet_ids": {
+                "expression": {
+                  "references": ["null_resource.private_subnets"]
+                },
+                "description": "List of simulated private subnet IDs"
+              },
+              "public_subnet_ids": {
+                "expression": {
+                  "references": ["null_resource.public_subnets"]
+                },
+                "description": "List of simulated public subnet IDs"
+              },
+              "security_group_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.default_security_group.id",
+                    "null_resource.default_security_group"
+                  ]
+                },
+                "description": "The simulated default security group ID"
+              },
+              "vpc_id": {
+                "expression": {
+                  "references": ["null_resource.vpc.id", "null_resource.vpc"]
+                },
+                "description": "The simulated VPC resource ID"
+              }
+            },
+            "resources": [
+              {
+                "address": "null_resource.default_security_group",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "default_security_group",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "random_id.security_group_suffix.hex",
+                      "random_id.security_group_suffix",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.internet_gateway",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "internet_gateway",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.nat_eip",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "nat_eip",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": ["var.project", "var.environment"]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.nat_gateway",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "nat_gateway",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.nat_eip.id",
+                      "null_resource.nat_eip",
+                      "null_resource.public_subnets[0].id",
+                      "null_resource.public_subnets[0]",
+                      "null_resource.public_subnets",
+                      "null_resource.internet_gateway.id",
+                      "null_resource.internet_gateway",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.private_route_table",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "private_route_table",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "null_resource.nat_gateway.id",
+                      "null_resource.nat_gateway",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.private_rt_associations",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "private_rt_associations",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.private_subnets",
+                      "count.index",
+                      "null_resource.private_route_table.id",
+                      "null_resource.private_route_table"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": { "references": ["var.availability_zones"] }
+              },
+              {
+                "address": "null_resource.private_subnets",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "private_subnets",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "var.vpc_cidr",
+                      "count.index",
+                      "var.availability_zones",
+                      "var.availability_zones",
+                      "count.index",
+                      "var.project",
+                      "var.environment",
+                      "var.availability_zones",
+                      "count.index"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": { "references": ["var.availability_zones"] }
+              },
+              {
+                "address": "null_resource.public_route_table",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "public_route_table",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "null_resource.internet_gateway.id",
+                      "null_resource.internet_gateway",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.public_rt_associations",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "public_rt_associations",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.public_subnets",
+                      "count.index",
+                      "null_resource.public_route_table.id",
+                      "null_resource.public_route_table"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": { "references": ["var.availability_zones"] }
+              },
+              {
+                "address": "null_resource.public_subnets",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "public_subnets",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.vpc.id",
+                      "null_resource.vpc",
+                      "var.vpc_cidr",
+                      "count.index",
+                      "var.availability_zones",
+                      "count.index",
+                      "var.project",
+                      "var.environment",
+                      "var.availability_zones",
+                      "count.index"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": { "references": ["var.availability_zones"] }
+              },
+              {
+                "address": "null_resource.vpc",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "vpc",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.vpc_cidr",
+                      "var.project",
+                      "var.environment",
+                      "var.environment",
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_id.security_group_suffix",
+                "mode": "managed",
+                "type": "random_id",
+                "name": "security_group_suffix",
+                "provider_config_key": "random",
+                "expressions": {
+                  "byte_length": { "constant_value": 4 },
+                  "keepers": {
+                    "references": ["null_resource.vpc.id", "null_resource.vpc"]
+                  }
+                },
+                "schema_version": 0
+              }
+            ],
+            "variables": {
+              "availability_zones": {
+                "description": "List of availability zones for subnet distribution"
+              },
+              "environment": { "description": "Deployment environment" },
+              "project": { "description": "Project name prefix" },
+              "tags": { "default": {}, "description": "Common resource tags" },
+              "vpc_cidr": { "description": "CIDR block for the VPC" }
+            }
+          }
+        },
+        "storage": {
+          "source": "./modules/storage",
+          "expressions": {
+            "environment": { "references": ["var.environment"] },
+            "project": { "references": ["var.project"] },
+            "region": { "references": ["var.region"] },
+            "tags": { "references": ["var.tags"] }
+          },
+          "module": {
+            "outputs": {
+              "bucket_arn": {
+                "expression": {
+                  "references": [
+                    "random_pet.bucket_name.id",
+                    "random_pet.bucket_name"
+                  ]
+                },
+                "description": "The simulated S3 bucket ARN"
+              },
+              "bucket_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.s3_bucket.id",
+                    "null_resource.s3_bucket"
+                  ]
+                },
+                "description": "The simulated S3 bucket resource ID"
+              },
+              "bucket_name": {
+                "expression": {
+                  "references": [
+                    "random_pet.bucket_name.id",
+                    "random_pet.bucket_name"
+                  ]
+                },
+                "description": "The simulated S3 bucket name"
+              },
+              "iam_policy_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.s3_policy.id",
+                    "null_resource.s3_policy"
+                  ]
+                },
+                "description": "The simulated IAM policy ID"
+              },
+              "iam_role_id": {
+                "expression": {
+                  "references": [
+                    "null_resource.s3_access_role.id",
+                    "null_resource.s3_access_role"
+                  ]
+                },
+                "description": "The simulated IAM role ID for S3 access"
+              }
+            },
+            "resources": [
+              {
+                "address": "local_file.bucket_policy",
+                "mode": "managed",
+                "type": "local_file",
+                "name": "bucket_policy",
+                "provider_config_key": "local",
+                "expressions": {
+                  "content": {
+                    "references": [
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name",
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name"
+                    ]
+                  },
+                  "filename": {
+                    "references": [
+                      "path.module",
+                      "var.project",
+                      "var.environment"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.bucket_encryption",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "bucket_encryption",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.s3_bucket.id",
+                      "null_resource.s3_bucket"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.bucket_versioning",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "bucket_versioning",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.s3_bucket.id",
+                      "null_resource.s3_bucket"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.s3_access_role",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "s3_access_role",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "random_id.iam_role_suffix.hex",
+                      "random_id.iam_role_suffix"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.s3_bucket",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "s3_bucket",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name",
+                      "var.region",
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name",
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.s3_policy",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "s3_policy",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "var.project",
+                      "var.environment",
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name",
+                      "random_pet.bucket_name.id",
+                      "random_pet.bucket_name"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "null_resource.s3_policy_attachment",
+                "mode": "managed",
+                "type": "null_resource",
+                "name": "s3_policy_attachment",
+                "provider_config_key": "null",
+                "expressions": {
+                  "triggers": {
+                    "references": [
+                      "null_resource.s3_access_role.id",
+                      "null_resource.s3_access_role",
+                      "null_resource.s3_policy.id",
+                      "null_resource.s3_policy"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_id.iam_role_suffix",
+                "mode": "managed",
+                "type": "random_id",
+                "name": "iam_role_suffix",
+                "provider_config_key": "random",
+                "expressions": {
+                  "byte_length": { "constant_value": 4 },
+                  "keepers": {
+                    "references": [
+                      "null_resource.s3_bucket.id",
+                      "null_resource.s3_bucket"
+                    ]
+                  }
+                },
+                "schema_version": 0
+              },
+              {
+                "address": "random_pet.bucket_name",
+                "mode": "managed",
+                "type": "random_pet",
+                "name": "bucket_name",
+                "provider_config_key": "random",
+                "expressions": {
+                  "keepers": {
+                    "references": ["var.project", "var.environment"]
+                  },
+                  "length": { "constant_value": 2 },
+                  "prefix": {
+                    "references": ["var.project", "var.environment"]
+                  },
+                  "separator": { "constant_value": "-" }
+                },
+                "schema_version": 0
+              }
+            ],
+            "variables": {
+              "environment": { "description": "Deployment environment" },
+              "project": { "description": "Project name prefix" },
+              "region": {
+                "description": "Simulated AWS region for the bucket"
+              },
+              "tags": { "default": {}, "description": "Common resource tags" }
+            }
+          }
+        }
+      },
+      "variables": {
+        "availability_zones": {
+          "default": ["us-east-1a", "us-east-1b", "us-east-1c"],
+          "description": "List of simulated availability zones"
+        },
+        "db_engine": {
+          "default": "postgres",
+          "description": "Simulated database engine"
+        },
+        "db_engine_version": {
+          "default": "15.4",
+          "description": "Simulated database engine version"
+        },
+        "db_instance_class": {
+          "default": "db.t3.medium",
+          "description": "Simulated RDS instance class"
+        },
+        "environment": {
+          "default": "dev",
+          "description": "Deployment environment (dev, staging, prod)"
+        },
+        "instance_count": {
+          "default": 2,
+          "description": "Number of simulated EC2 instances"
+        },
+        "instance_type": {
+          "default": "t3.medium",
+          "description": "Simulated EC2 instance type"
+        },
+        "lambda_memory": {
+          "default": 256,
+          "description": "Simulated Lambda memory in MB"
+        },
+        "lambda_runtime": {
+          "default": "python3.11",
+          "description": "Simulated Lambda runtime"
+        },
+        "lambda_timeout": {
+          "default": 30,
+          "description": "Simulated Lambda timeout in seconds"
+        },
+        "project": {
+          "default": "tf-visualize",
+          "description": "Project name used as a prefix for all resources"
+        },
+        "region": {
+          "default": "us-east-1",
+          "description": "Simulated AWS region"
+        },
+        "tags": {
+          "default": { "ManagedBy": "terraform", "Tool": "tf-visualize" },
+          "description": "Common tags applied to all resources"
+        },
+        "vpc_cidr": {
+          "default": "10.0.0.0/16",
+          "description": "CIDR block for the simulated VPC"
+        }
+      }
+    }
+  },
+  "relevant_attributes": [
+    {
+      "resource": "module.compute.null_resource.launch_template",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.lambda.null_resource.cloudwatch_log_group",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.compute.null_resource.key_pair",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.null_resource.nat_eip",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.loadbalancer.tls_private_key.alb_cert_key",
+      "attribute": ["private_key_pem"]
+    },
+    {
+      "resource": "module.networking.null_resource.public_route_table",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.loadbalancer.null_resource.alb",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.storage.random_id.iam_role_suffix",
+      "attribute": ["hex"]
+    },
+    {
+      "resource": "module.loadbalancer.null_resource.listener_http",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.null_resource.internet_gateway",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.compute.tls_private_key.ssh_key",
+      "attribute": ["private_key_pem"]
+    },
+    {
+      "resource": "module.loadbalancer.null_resource.listener_https",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.storage.null_resource.s3_access_role",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.storage.null_resource.s3_bucket",
+      "attribute": ["id"]
+    },
+    { "resource": "module.compute.null_resource.instances", "attribute": [] },
+    {
+      "resource": "module.lambda.null_resource.lambda_policy",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.null_resource.rds_instance",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.null_resource.db_subnet_group",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.loadbalancer.random_id.alb_suffix",
+      "attribute": ["hex"]
+    },
+    {
+      "resource": "module.networking.null_resource.public_subnets[0]",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.random_id.security_group_suffix",
+      "attribute": ["hex"]
+    },
+    {
+      "resource": "module.storage.random_pet.bucket_name",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.lambda.random_id.lambda_version",
+      "attribute": ["hex"]
+    },
+    {
+      "resource": "module.lambda.null_resource.lambda_function",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.storage.null_resource.s3_policy",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.compute.tls_private_key.ssh_key",
+      "attribute": ["public_key_openssh"]
+    },
+    {
+      "resource": "module.loadbalancer.tls_self_signed_cert.alb_cert",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.random_password.db_password",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.null_resource.default_security_group",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.lambda.null_resource.lambda_execution_role",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.null_resource.public_subnets",
+      "attribute": []
+    },
+    {
+      "resource": "module.lambda.null_resource.lambda_permission_apigw",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.lambda.random_string.log_group_suffix",
+      "attribute": ["result"]
+    },
+    {
+      "resource": "module.loadbalancer.random_integer.health_check_interval",
+      "attribute": ["result"]
+    },
+    {
+      "resource": "module.networking.null_resource.nat_gateway",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.random_id.db_identifier",
+      "attribute": ["hex"]
+    },
+    { "resource": "module.networking.null_resource.vpc", "attribute": ["id"] },
+    {
+      "resource": "module.database.null_resource.db_parameter_group",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.loadbalancer.null_resource.target_group",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.networking.null_resource.private_route_table",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.null_resource.db_sg_rule",
+      "attribute": ["id"]
+    },
+    {
+      "resource": "module.database.random_password.db_password",
+      "attribute": ["result"]
+    },
+    {
+      "resource": "module.networking.null_resource.private_subnets",
+      "attribute": []
+    }
+  ],
+  "checks": [
+    {
+      "address": {
+        "kind": "var",
+        "module": "module.database",
+        "name": "db_engine_version",
+        "to_display": "module.database.var.db_engine_version"
+      },
+      "status": "pass",
+      "instances": [
+        {
+          "address": {
+            "module": "module.database",
+            "to_display": "module.database.var.db_engine_version"
+          },
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "timestamp": "2026-09-12T12:08:46Z",
+  "applyable": true,
+  "complete": true,
+  "errored": false
+}

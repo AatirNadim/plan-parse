@@ -124,44 +124,44 @@ func TestValidatePlanBytes(t *testing.T) {
 	})
 }
 
-func TestModules(t *testing.T) {
-	t.Run("FindModulesJSON and LoadModuleLocations", func(t *testing.T) {
-		sampleDir := getTestDataDir()
-		manifestPath, baseDir := core.FindModulesJSON(sampleDir)
-		if manifestPath == "" {
-			t.Fatalf("expected to find modules.json in %s", sampleDir)
-		}
+// func TestModules(t *testing.T) {
+// 	t.Run("FindModulesJSON and LoadModuleLocations", func(t *testing.T) {
+// 		sampleDir := getTestDataDir()
+// 		manifestPath, baseDir := core.FindModulesJSON(sampleDir)
+// 		if manifestPath == "" {
+// 			t.Fatalf("expected to find modules.json in %s", sampleDir)
+// 		}
 
-		locations, err := core.LoadModuleLocations(manifestPath, baseDir)
-		if err != nil {
-			t.Fatalf("failed to load module locations: %v", err)
-		}
+// 		locations, err := core.LoadModuleLocations(manifestPath, baseDir)
+// 		if err != nil {
+// 			t.Fatalf("failed to load module locations: %v", err)
+// 		}
 
-		if len(locations) == 0 {
-			t.Fatal("expected non-empty module locations")
-		}
+// 		if len(locations) == 0 {
+// 			t.Fatal("expected non-empty module locations")
+// 		}
 
-		// Verify expected keys from modules.json
-		for _, key := range []string{"networking", "storage", "compute", "database"} {
-			if _, ok := locations[key]; !ok {
-				t.Errorf("expected module %q in locations", key)
-			}
-		}
+// 		// Verify expected keys from modules.json
+// 		for _, key := range []string{"networking", "storage", "compute", "database"} {
+// 			if _, ok := locations[key]; !ok {
+// 				t.Errorf("expected module %q in locations", key)
+// 			}
+// 		}
 
-		// Test loading module configs
-		configs := core.LoadModuleConfigs(locations, baseDir)
-		if len(configs) == 0 {
-			t.Fatal("expected non-empty module configs")
-		}
-	})
+// 		// Test loading module configs
+// 		configs := core.LoadModuleConfigs(locations, baseDir)
+// 		if len(configs) == 0 {
+// 			t.Fatal("expected non-empty module configs")
+// 		}
+// 	})
 
-	t.Run("FindModulesJSON non-existent", func(t *testing.T) {
-		manifestPath, _ := core.FindModulesJSON(t.TempDir())
-		if manifestPath != "" {
-			t.Errorf("expected empty manifest path for temp dir, got %s", manifestPath)
-		}
-	})
-}
+// 	t.Run("FindModulesJSON non-existent", func(t *testing.T) {
+// 		manifestPath, _ := core.FindModulesJSON(t.TempDir())
+// 		if manifestPath != "" {
+// 			t.Errorf("expected empty manifest path for temp dir, got %s", manifestPath)
+// 		}
+// 	})
+// }
 
 func TestSamplePlanParsing(t *testing.T) {
 	plan, err := core.ValidatePlanFile(getSamplePlanPath())

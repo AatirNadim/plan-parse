@@ -535,8 +535,8 @@ export default function Home() {
       {/* Cytoscape Graph Canvas */}
       <div id="cy" ref={cyContainerRef} className="w-full h-full" />
 
-      {/* Empty Canvas Guidance State (shown when no graph is loaded) */}
-      {!hasGraph && (
+      {/* Empty Canvas Guidance State (shown when no graph is loaded and drawer is collapsed) */}
+      {!hasGraph && !isDrawerOpen && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
           <div className="p-8 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-800/80 shadow-2xl text-center max-w-md pointer-events-auto space-y-4">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-inner shadow-indigo-500/20">
@@ -573,7 +573,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Drawable Collapsible Input Panel */}
+      {/* Floating Collapsible Panel */}
       <InputDrawer
         isOpen={isDrawerOpen}
         onToggle={() => setIsDrawerOpen((prev) => !prev)}
@@ -582,6 +582,9 @@ export default function Home() {
         cliLoaded={cliLoaded}
         disabled={disabled}
         currentSummary={graphData?.summary}
+        graphData={graphData}
+        selectedNode={selectedNode}
+        onNavigateToNode={handleNavigateToNode}
       />
 
       {/* Quick Search & Navigate Bar (Top-Right) */}

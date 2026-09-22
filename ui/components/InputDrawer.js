@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 /**
  * Format bytes into human-readable string (KB, MB).
@@ -14,9 +14,63 @@ function formatBytes(bytes, decimals = 1) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
+const ACTION_CONFIG = {
+  create: {
+    label: "Create",
+    color: "#22c55e",
+    text: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/30",
+    symbol: "+",
+  },
+  update: {
+    label: "Update",
+    color: "#3b82f6",
+    text: "text-blue-400",
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/30",
+    symbol: "~",
+  },
+  delete: {
+    label: "Delete",
+    color: "#ef4444",
+    text: "text-rose-400",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/30",
+    symbol: "-",
+  },
+  replace: {
+    label: "Replace",
+    color: "#f59e0b",
+    text: "text-amber-400",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/30",
+    symbol: "±",
+  },
+  "no-op": {
+    label: "No-op",
+    color: "#64748b",
+    text: "text-slate-400",
+    bg: "bg-slate-500/10",
+    border: "border-slate-500/30",
+    symbol: "=",
+  },
+  read: {
+    label: "Read",
+    color: "#ec4899",
+    text: "text-pink-400",
+    bg: "bg-pink-500/10",
+    border: "border-pink-500/30",
+    symbol: "?",
+  },
+};
+
+const METRIC_KEYS = ["create", "update", "delete", "replace", "no-op", "read"];
+
 /**
- * InputDrawer: A slide-out collapsible panel dedicated to Terraform plan JSON input.
- * Features real-time pre-flight client validations and Go server API pass-through.
+ * InputDrawer: Floating collapsible glassmorphic panel for Terraform plan input,
+ * action distribution metrics, and interactive resource exploration.
+ * Designed with a Figma/tldraw/React Flow floating workspace architecture.
  */
 export default function InputDrawer({
   isOpen,
@@ -26,16 +80,116 @@ export default function InputDrawer({
   cliLoaded,
   disabled,
   currentSummary,
+  graphData,
+  selectedNode,
+  onNavigateToNode,
 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [validationState, setValidationState] = useState(null);
-  // validationState: { valid: boolean, error?: string, warnings?: string[], meta?: { formatVersion, tfVersion, resourceCount } }
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [lastParsedSummary, setLastParsedSummary] = useState(null);
 
+  const summary = graphData?.summary || currentSummary || lastParsedSummary;
+  const hasGraph = Boolean(
+    (graphData && graphData.nodes && graphData.nodes.length > 0) ||
+    (summary && summary.total > 0)
+  );
+
+  const [activeTab, setActiveTab] = useState(hasGraph ? "overview" : "source");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [actionFilter, setActionFilter] = useState("all");
+
   const fileInputRef = useRef(null);
+
+  // If graph arrives and we haven't selected a new file to upload, show overview
+  useEffect(() => {
+    if (hasGraph && !selectedFile) {
+      setActiveTab("overview");
+    } else if (!hasGraph) {
+      setActiveTab("source");
+    }
+  }, [hasGraph]);
+
+  // Auto-scroll selected resource into view in the resource explorer list
+  useEffect(() => {
+    if (selectedNode?.id && isOpen && activeTab === "overview") {
+      const el = document.getElementById(`res-item-${selectedNode.id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [selectedNode?.id, isOpen, activeTab]);
+
+  // Compute counts for actions
+  const counts = useMemo(() => {
+    return {
+      create: summary?.create || 0,
+      update: summary?.update || 0,
+      delete: summary?.delete || 0,
+      replace: summary?.replace || 0,
+      "no-op": summary ? (summary["no-op"] ?? summary.noop ?? 0) : 0,
+      read: summary?.read || 0,
+    };
+  }, [summary]);
+
+  const totalCount = useMemo(() => {
+    return summary?.total ?? Object.values(counts).reduce((a, b) => a + b, 0);
+  }, [summary, counts]);
+
+  // Proportional distribution segments for horizontal bar
+  const distributionSegments = useMemo(() => {
+    if (totalCount === 0) return [];
+    return METRIC_KEYS.map((key) => {
+      const cfg = ACTION_CONFIG[key];
+      const count = counts[key] || 0;
+      const percent = (count / totalCount) * 100;
+      return {
+        action: key,
+        label: cfg.label,
+        color: cfg.color,
+        count,
+        percent,
+      };
+    }).filter((s) => s.count > 0);
+  }, [counts, totalCount]);
+
+  // Extract leaf resource nodes for the explorer
+  const resourceNodes = useMemo(() => {
+    if (!graphData?.nodes || graphData.nodes.length === 0) return [];
+    const nonContainers = graphData.nodes.filter(
+      (n) =>
+        n.data?.type !== "basename" &&
+        n.data?.type !== "module" &&
+        n.data?.type !== "file"
+    );
+    return nonContainers.length > 0 ? nonContainers : graphData.nodes;
+  }, [graphData]);
+
+  // Filtered resources based on search query and action filter
+  const filteredResources = useMemo(() => {
+    return resourceNodes.filter((n) => {
+      const change = (n.data?.change || "no-op").toLowerCase();
+      if (actionFilter !== "all" && change !== actionFilter) {
+        return false;
+      }
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const id = (n.data?.id || "").toLowerCase();
+      const label = (n.data?.label || "").toLowerCase();
+      const rType = (n.data?.resourceType || "").toLowerCase();
+      const rName = (n.data?.resourceName || "").toLowerCase();
+      const mod = (n.data?.module || "").toLowerCase();
+      return (
+        id.includes(q) ||
+        label.includes(q) ||
+        rType.includes(q) ||
+        rName.includes(q) ||
+        mod.includes(q)
+      );
+    });
+  }, [resourceNodes, actionFilter, searchQuery]);
 
   // Validate file content on client-side before submission
   const validateFileContent = useCallback(async (file) => {
@@ -44,7 +198,6 @@ export default function InputDrawer({
       return false;
     }
 
-    // 1. Extension check
     if (!file.name.toLowerCase().endsWith(".json")) {
       setValidationState({
         valid: false,
@@ -53,7 +206,6 @@ export default function InputDrawer({
       return false;
     }
 
-    // 2. File size check (50MB server limit)
     if (file.size > 50 * 1024 * 1024) {
       setValidationState({
         valid: false,
@@ -62,7 +214,6 @@ export default function InputDrawer({
       return false;
     }
 
-    // 3. Read and parse JSON syntax
     try {
       const text = await file.text();
       if (!text.trim()) {
@@ -84,7 +235,6 @@ export default function InputDrawer({
         return false;
       }
 
-      // 4. Schema validation for Terraform Plan
       if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
         setValidationState({
           valid: false,
@@ -99,7 +249,8 @@ export default function InputDrawer({
       if (!formatVersion || typeof formatVersion !== "string" || !formatVersion.trim()) {
         setValidationState({
           valid: false,
-          error: "Invalid Terraform plan: Missing or empty 'format_version'. Ensure you used 'terraform show -json <plan>'.",
+          error:
+            "Invalid Terraform plan: Missing or empty 'format_version'. Ensure you used 'terraform show -json <plan>'.",
         });
         return false;
       }
@@ -107,7 +258,8 @@ export default function InputDrawer({
       if (!tfVersion || typeof tfVersion !== "string" || !tfVersion.trim()) {
         setValidationState({
           valid: false,
-          error: "Invalid Terraform plan: Missing or empty 'terraform_version'. Ensure you used 'terraform show -json <plan>'.",
+          error:
+            "Invalid Terraform plan: Missing or empty 'terraform_version'. Ensure you used 'terraform show -json <plan>'.",
         });
         return false;
       }
@@ -166,7 +318,6 @@ export default function InputDrawer({
     }
   };
 
-  // Submit file to Go server /api/parse
   const handleSubmit = async () => {
     if (!selectedFile || (validationState && !validationState.valid)) return;
 
@@ -192,6 +343,7 @@ export default function InputDrawer({
       if (onPlanParsed) {
         onPlanParsed(graph);
       }
+      setActiveTab("overview");
     } catch (err) {
       setApiError(err.message || "Failed to communicate with Go server");
     } finally {
@@ -209,20 +361,16 @@ export default function InputDrawer({
     }
   };
 
-  return (
-    <>
-      {/* Persistent Toggle Handle (Top-Left) */}
+  // If collapsed, display sleek floating pill
+  if (!isOpen) {
+    return (
       <button
         onClick={onToggle}
-        title={isOpen ? "Collapse Plan Input Panel" : "Open Plan Input Panel"}
-        className={`fixed top-4 left-4 z-40 flex items-center gap-2.5 px-3.5 py-2 rounded-xl backdrop-blur-md border shadow-2xl transition-all duration-200 ${
-          isOpen
-            ? "bg-slate-900 border-indigo-500/50 text-indigo-400 shadow-indigo-950/40"
-            : "bg-slate-900/95 border-slate-800 hover:border-slate-700 text-slate-200 hover:text-white hover:bg-slate-800/90 shadow-slate-950/60"
-        }`}
+        title="Open Plan Input Panel"
+        className="fixed top-4 left-4 z-30 flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-800 shadow-2xl hover:border-slate-700 text-slate-200 hover:text-white hover:bg-slate-800/90 transition-all cursor-pointer select-none group pointer-events-auto"
       >
         <svg
-          className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-90 text-indigo-400" : "text-slate-400"}`}
+          className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -234,307 +382,579 @@ export default function InputDrawer({
             d="M4 6h16M4 12h16M4 18h7"
           />
         </svg>
-        <span className="text-xs font-semibold tracking-wide">Plan Input</span>
+        <span className="text-xs font-semibold tracking-wide">
+          {hasGraph ? "Plan Overview" : "Plan Input"}
+        </span>
         {cliLoaded ? (
           <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
             CLI
           </span>
-        ) : currentSummary ? (
+        ) : totalCount > 0 ? (
           <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            {currentSummary.total} res
+            {totalCount} res
           </span>
         ) : null}
+        <svg
+          className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 transition-transform"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </button>
+    );
+  }
 
-      {/* Slide-out Backdrop (click to close on mobile/compact) */}
-      {isOpen && (
-        <div
-          onClick={onClose}
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-[2px] transition-opacity md:hidden"
-        />
-      )}
-
-      {/* Slide-out Drawer Panel */}
-      <div
-        className={`fixed top-0 left-0 h-full w-[420px] max-w-[92vw] z-30 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/80 shadow-2xl flex flex-col pt-16 transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500" />
-            <div>
-              <h2 className="text-sm font-bold text-white tracking-wide">
-                Terraform Plan Input
-              </h2>
-              <p className="text-[11px] text-slate-400">
-                Upload exported plan JSON to visualize DAG
-              </p>
-            </div>
+  // Expanded Floating Glassmorphic Panel (No full-screen blocking backdrops)
+  return (
+    <div
+      className="fixed top-4 left-4 z-30 w-[420px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] flex flex-col rounded-2xl border border-slate-800/90 bg-slate-900/90 backdrop-blur-xl shadow-2xl shadow-slate-950/80 overflow-hidden pointer-events-auto transition-all duration-200 select-none"
+    >
+      {/* Panel Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 bg-slate-900/70 select-none shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500 animate-pulse" />
+          <div>
+            <h2 className="text-xs font-bold text-white tracking-wide flex items-center gap-2">
+              <span>Terraform Plan</span>
+              {cliLoaded ? (
+                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  CLI
+                </span>
+              ) : totalCount > 0 ? (
+                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  {totalCount} resources
+                </span>
+              ) : null}
+            </h2>
           </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition"
+          title="Collapse panel (Esc)"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Dual Tabs Navigation when Graph is Loaded */}
+      {hasGraph && (
+        <div className="flex border-b border-slate-800/80 bg-slate-950/40 p-1.5 gap-1.5 select-none shrink-0">
           <button
-            onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition"
-            title="Collapse drawer (Esc)"
+            onClick={() => setActiveTab("overview")}
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "overview"
+                ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
+            }`}
           >
-            ✕
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            <span>Graph Overview</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("source")}
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "source"
+                ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
+            }`}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            <span>Plan Source</span>
           </button>
         </div>
+      )}
 
-        {/* Drawer Content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          {disabled && (
-            <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-800/40 text-amber-300 text-xs leading-relaxed">
-              <div className="font-semibold mb-0.5">CLI Session Active</div>
-              Input is currently locked to the CLI-loaded plan. Reload the page to load an arbitrary plan.
+      {/* Scrollable Panel Body */}
+      <div className="flex-1 overflow-y-auto px-4 py-3.5 space-y-4 min-h-0 custom-scrollbar">
+        {disabled && (
+          <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-300 text-xs leading-relaxed">
+            <div className="font-semibold mb-0.5">CLI Session Active</div>
+            Input is locked to the CLI-loaded plan. Reload the page to load an arbitrary plan.
+          </div>
+        )}
+
+        {/* Tab 1: Graph Overview */}
+        {activeTab === "overview" && hasGraph && (
+          <div className="space-y-4">
+            {/* a. Multi-segment Action Distribution Bar */}
+            <div className="space-y-2 bg-slate-950/50 p-3 rounded-xl border border-slate-800/70">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-slate-300">Action Distribution</span>
+                <span className="text-slate-400 font-mono">{totalCount} Changes</span>
+              </div>
+
+              {/* Horizontal Bar */}
+              <div className="h-3 w-full rounded-full flex overflow-hidden bg-slate-950 border border-slate-800/80 p-0.5 gap-0.5">
+                {distributionSegments.length > 0 ? (
+                  distributionSegments.map((seg) => (
+                    <div
+                      key={seg.action}
+                      style={{
+                        width: `${Math.max(seg.percent, 1.5)}%`,
+                        backgroundColor: seg.color,
+                      }}
+                      title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%)`}
+                      title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%) • Click to filter`}
+                      className="h-full rounded-sm transition-all duration-300 hover:brightness-125 cursor-pointer"
+                      onClick={() =>
+                        setActionFilter((prev) => (prev === seg.action ? "all" : seg.action))
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="h-full w-full rounded-sm bg-slate-800" />
+                )}
+              </div>
+
+              {/* Proportional percentages readout */}
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] pt-1">
+                {distributionSegments.map((seg) => (
+                  <div
+                    key={seg.action}
+                    onClick={() =>
+                      setActionFilter((prev) => (prev === seg.action ? "all" : seg.action))
+                    }
+                    className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition"
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: seg.color }}
+                    />
+                    <span className="text-slate-300 font-medium">{seg.label}</span>
+                    <span className="text-slate-400 font-mono">
+                      {seg.percent.toFixed(0)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Dedicated File Dropzone / Upload Area */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Plan JSON File
-            </label>
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => !disabled && !loading && fileInputRef.current && fileInputRef.current.click()}
-              className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
-                disabled
-                  ? "border-slate-800 bg-slate-950/40 opacity-50 cursor-not-allowed"
-                  : isDragging
-                  ? "border-indigo-400 bg-indigo-950/30 scale-[1.01]"
-                  : selectedFile
-                  ? "border-emerald-500/50 bg-slate-950/60 hover:border-emerald-500/70"
-                  : "border-slate-700/80 bg-slate-950/50 hover:border-indigo-500/70 hover:bg-slate-950/80"
-              }`}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                disabled={disabled || loading}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleFileSelect(e.target.files[0]);
-                  }
-                }}
-                accept=".json,application/json"
-                className="hidden"
-              />
+            {/* b. Metric Cards */}
+            <div>
+              <div className="text-[11px] font-semibold text-slate-400 mb-1.5">
+                Change Metrics
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 select-none">
+                {METRIC_KEYS.map((key) => {
+                  const cfg = ACTION_CONFIG[key];
+                  const count = counts[key] || 0;
+                  const isCurrentFilter = actionFilter === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setActionFilter(actionFilter === key ? "all" : key)}
+                      className={`p-2 rounded-xl border transition-all text-left flex flex-col justify-between cursor-pointer ${
+                        isCurrentFilter
+                          ? "bg-slate-800/90 border-indigo-400/80 ring-1 ring-indigo-400/40"
+                          : "bg-slate-950/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-[10px] font-bold ${cfg.text}`}>
+                          {cfg.symbol} {cfg.label}
+                        </span>
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: cfg.color }}
+                        />
+                      </div>
+                      <div className="text-sm font-bold text-white mt-1 font-mono">
+                        {count}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-              <div className="flex flex-col items-center justify-center gap-2 text-center">
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                    selectedFile
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                      : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* c. Interactive Resource Explorer */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-300">
+                  Resource Explorer
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  {filteredResources.length} of {resourceNodes.length}
+                </span>
+              </div>
+
+              {/* Search input within panel */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-500">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
                 </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Filter resources by name, type, module..."
+                  className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-950/80 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/70 shadow-inner"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-500 hover:text-slate-300"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
 
-                <div>
-                  <div className="text-xs font-semibold text-slate-200">
-                    {selectedFile ? (
-                      <span className="text-emerald-300 font-mono break-all">
-                        {selectedFile.name}
-                      </span>
-                    ) : (
-                      <>
-                        <span className="text-indigo-400 underline underline-offset-2">
-                          Click to upload
-                        </span>{" "}
-                        or drag & drop
-                      </>
+              {/* Action Filter Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar text-[10px]">
+                {["all", "create", "update", "delete", "replace", "no-op", "read"].map((act) => {
+                  const isActive = actionFilter === act;
+                  return (
+                    <button
+                      key={act}
+                      onClick={() => setActionFilter(act)}
+                      className={`px-2 py-0.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer ${
+                        isActive
+                          ? "bg-indigo-600 text-white font-bold shadow-sm"
+                          : "bg-slate-950/80 border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                      }`}
+                    >
+                      {act === "all" ? "All" : act.charAt(0).toUpperCase() + act.slice(1)}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Interactive Resource List */}
+              <div className="space-y-1.5 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
+                {filteredResources.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/50">
+                    No resources found matching filter
+                  </div>
+                ) : (
+                  filteredResources.map((n) => {
+                    const isSelected = selectedNode?.id === n.data?.id;
+                    const change = (n.data?.change || "no-op").toLowerCase();
+                    const cfg = ACTION_CONFIG[change] || ACTION_CONFIG["no-op"];
+                    return (
+                      <div
+                        key={n.data?.id}
+                        id={`res-item-${n.data?.id}`}
+                        onClick={() => onNavigateToNode && onNavigateToNode(n.data?.id)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 select-none ${
+                          isSelected
+                            ? "bg-indigo-950/80 border-indigo-500/90 ring-1 ring-indigo-500/50 shadow-md shadow-indigo-950/60"
+                            : "bg-slate-950/60 border-slate-800/70 hover:bg-slate-800/60 hover:border-slate-700"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1.5">
+                          <span
+                            className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0"
+                            style={{
+                              backgroundColor: `${cfg.color}20`,
+                              color: cfg.color,
+                              border: `1px solid ${cfg.color}40`,
+                            }}
+                          >
+                            {cfg.symbol} {change}
+                          </span>
+                          {n.data?.module && (
+                            <span
+                              className="text-[9px] font-mono text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.5 rounded truncate max-w-[150px]"
+                              title={n.data.module}
+                            >
+                              {n.data.module}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-xs font-semibold text-white font-mono break-all leading-snug">
+                          {n.data?.label || n.data?.id}
+                        </div>
+
+                        {n.data?.resourceType && (
+                          <div className="text-[10px] text-slate-400 font-mono truncate">
+                            {n.data.resourceType}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Plan Source / Upload Plan */}
+        {(activeTab === "source" || !hasGraph) && (
+          <div className="space-y-4">
+            {/* If a plan is already loaded, show metadata overview card */}
+            {hasGraph && (
+              <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-200">Loaded Plan Details</span>
+                  <span className="text-[10px] text-emerald-400 font-medium bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
+                    Active on Canvas
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono text-slate-300">
+                  <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
+                    <span className="text-slate-500 block text-[9px] uppercase font-sans">
+                      Total Resources
+                    </span>
+                    <span className="text-white font-bold">{totalCount}</span>
+                  </div>
+                  <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
+                    <span className="text-slate-500 block text-[9px] uppercase font-sans">
+                      Source
+                    </span>
+                    <span className="text-white font-bold truncate block">
+                      {cliLoaded ? "CLI Mode" : selectedFile ? selectedFile.name : "Server Plan"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dedicated File Dropzone / Upload Area */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                {hasGraph ? "Upload or Replace Plan JSON" : "Plan JSON File"}
+              </label>
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() =>
+                  !disabled &&
+                  !loading &&
+                  fileInputRef.current &&
+                  fileInputRef.current.click()
+                }
+                className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
+                  disabled
+                    ? "border-slate-800 bg-slate-950/40 opacity-50 cursor-not-allowed"
+                    : isDragging
+                    ? "border-indigo-400 bg-indigo-950/30 scale-[1.01]"
+                    : selectedFile
+                    ? "border-emerald-500/50 bg-slate-950/60 hover:border-emerald-500/70"
+                    : "border-slate-700/80 bg-slate-950/50 hover:border-indigo-500/70 hover:bg-slate-950/80"
+                }`}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  disabled={disabled || loading}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileSelect(e.target.files[0]);
+                    }
+                  }}
+                  accept=".json,application/json"
+                  className="hidden"
+                />
+
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                      selectedFile
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                        : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">
+                      {selectedFile ? (
+                        <span className="text-emerald-300 font-mono break-all">
+                          {selectedFile.name}
+                        </span>
+                      ) : (
+                        <>
+                          <span className="text-indigo-400 underline underline-offset-2">
+                            Click to upload
+                          </span>{" "}
+                          or drag & drop
+                        </>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-1">
+                      {selectedFile
+                        ? `${formatBytes(selectedFile.size)} • Click to replace`
+                        : "Terraform plan output (.json format)"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pre-Flight Validation State */}
+            {validationState && (
+              <div>
+                {validationState.valid ? (
+                  <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-xs">
+                    <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <span>Valid Terraform Plan JSON</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-300 mt-2 font-mono">
+                      <div className="bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
+                        Format: <span className="text-emerald-300">{validationState.meta.formatVersion}</span>
+                      </div>
+                      <div className="bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
+                        TF Version: <span className="text-emerald-300">{validationState.meta.tfVersion}</span>
+                      </div>
+                    </div>
+                    {validationState.meta.resourceCount > 0 && (
+                      <div className="text-[11px] text-emerald-400/90 mt-1.5">
+                        Detected {validationState.meta.resourceCount} resource changes in plan.
+                      </div>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1">
-                    {selectedFile
-                      ? `${formatBytes(selectedFile.size)} • Click to replace`
-                      : "Terraform plan output (.json format)"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pre-Flight Validation State */}
-          {validationState && (
-            <div>
-              {validationState.valid ? (
-                <div className="p-3 rounded-lg bg-emerald-950/30 border border-emerald-800/40 text-xs">
-                  <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Valid Terraform Plan JSON</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-300 mt-2 font-mono">
-                    <div className="bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
-                      Format: <span className="text-emerald-300">{validationState.meta.formatVersion}</span>
-                    </div>
-                    <div className="bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
-                      TF Version: <span className="text-emerald-300">{validationState.meta.tfVersion}</span>
-                    </div>
-                  </div>
-                  {validationState.meta.resourceCount > 0 && (
-                    <div className="text-[11px] text-emerald-400/90 mt-1.5">
-                      Detected {validationState.meta.resourceCount} resource changes in plan.
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-800/50 text-xs">
-                  <div className="flex items-center gap-2 text-rose-400 font-semibold mb-1">
-                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      />
-                    </svg>
-                    <span>Validation Failed</span>
-                  </div>
-                  <div className="text-rose-200 leading-relaxed">
-                    {validationState.error}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* API Error Notification */}
-          {apiError && (
-            <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-800/50 text-xs text-rose-200">
-              <div className="font-semibold text-rose-400 mb-0.5">Go Server Error</div>
-              <div className="break-words">{apiError}</div>
-            </div>
-          )}
-
-          {/* Submit Action Button */}
-          {selectedFile && validationState && validationState.valid && (
-            <div className="flex gap-2">
-              <button
-                onClick={handleSubmit}
-                disabled={loading || disabled}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    <span>Parsing on Go Server...</span>
-                  </>
                 ) : (
-                  <>
-                    <span>Parse & Load Graph</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </>
+                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/50 text-xs">
+                    <div className="flex items-center gap-2 text-rose-400 font-semibold mb-1">
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                      <span>Validation Failed</span>
+                    </div>
+                    <div className="text-rose-200 leading-relaxed">
+                      {validationState.error}
+                    </div>
+                  </div>
                 )}
-              </button>
-
-              <button
-                onClick={handleReset}
-                disabled={loading}
-                className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
-                title="Clear file"
-              >
-                Clear
-              </button>
-            </div>
-          )}
-
-          {/* Post-Parse Success Card */}
-          {lastParsedSummary && (
-            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Graph Generated ({lastParsedSummary.total} resources)</span>
-                </div>
               </div>
+            )}
 
-              <div className="grid grid-cols-3 gap-1 text-center text-xs">
-                <div className="p-1 rounded bg-emerald-950/40 border border-emerald-900/40 text-emerald-400">
-                  <div className="font-bold">+{lastParsedSummary.create}</div>
-                  <div className="text-[9px] text-emerald-500/80">Create</div>
-                </div>
-                <div className="p-1 rounded bg-blue-950/40 border border-blue-900/40 text-blue-400">
-                  <div className="font-bold">~{lastParsedSummary.update}</div>
-                  <div className="text-[9px] text-blue-500/80">Update</div>
-                </div>
-                <div className="p-1 rounded bg-rose-950/40 border border-rose-900/40 text-rose-400">
-                  <div className="font-bold">-{lastParsedSummary.delete}</div>
-                  <div className="text-[9px] text-rose-500/80">Delete</div>
-                </div>
-                <div className="p-1 rounded bg-amber-950/40 border border-amber-900/40 text-amber-400">
-                  <div className="font-bold">±{lastParsedSummary.replace}</div>
-                  <div className="text-[9px] text-amber-500/80">Replace</div>
-                </div>
-                <div className="p-1 rounded bg-slate-900 border border-slate-800 text-slate-400">
-                  <div className="font-bold">={lastParsedSummary["no-op"]}</div>
-                  <div className="text-[9px] text-slate-500">No-op</div>
-                </div>
-                <div className="p-1 rounded bg-pink-950/40 border border-pink-900/40 text-pink-400">
-                  <div className="font-bold">?{lastParsedSummary.read}</div>
-                  <div className="text-[9px] text-pink-500/80">Read</div>
-                </div>
+            {/* API Error Notification */}
+            {apiError && (
+              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/50 text-xs text-rose-200">
+                <div className="font-semibold text-rose-400 mb-0.5">Go Server Error</div>
+                <div className="break-words">{apiError}</div>
               </div>
+            )}
 
-              <button
-                onClick={onClose}
-                className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950"
-              >
-                <span>View on Canvas</span>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+            {/* Submit Action Button */}
+            {selectedFile && validationState && validationState.valid && (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || disabled}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>Parsing on Go Server...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Parse & Load Graph</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleReset}
+                  disabled={loading}
+                  className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer"
+                  title="Clear file"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+
+            {/* Guidance Info */}
+            <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-1.5">
+              <div className="font-semibold text-slate-300">Exporting your Terraform Plan:</div>
+              <pre className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-indigo-300 font-mono text-[10px] overflow-x-auto select-all">
+                terraform plan -out=tfplan{"\n"}terraform show -json tfplan &gt; plan.json
+              </pre>
             </div>
-          )}
-
-          {/* Guidance Info */}
-          <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-1.5">
-            <div className="font-semibold text-slate-300">Exporting your Terraform Plan:</div>
-            <pre className="p-2 rounded bg-slate-950 border border-slate-800 text-indigo-300 font-mono text-[10px] overflow-x-auto select-all">
-              terraform plan -out=tfplan{"\n"}terraform show -json tfplan &gt; plan.json
-            </pre>
           </div>
-        </div>
+        )}
       </div>
-    </>
+
+      {/* Status Footer */}
+      <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-[11px] text-slate-400 shrink-0 select-none">
+        <span className="flex items-center gap-1.5">
+          <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-slate-800 border border-slate-700 rounded text-slate-300">
+            Esc
+          </kbd>
+          <span>to collapse</span>
+        </span>
+        <span className="text-[10px] text-slate-500 font-mono">
+          {hasGraph ? "Canvas Active" : "No Plan Loaded"}
+        </span>
+      </div>
+    </div>
   );
 }
-

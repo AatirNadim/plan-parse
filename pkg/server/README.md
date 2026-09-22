@@ -9,6 +9,14 @@ The `pkg/server` package implements the HTTP transport layer for `plan-parse`. I
 ## Architecture & Request Routing
 
 Incoming HTTP requests are routed through custom CORS middleware before entering an internal `http.ServeMux` router.
+Incoming HTTP requests are routed through custom CORS middleware before entering an internal `http.ServeMux` router that leverages Go's enhanced method-based route matching:
+```go
+s.router.HandleFunc("GET /api/health", s.handleHealth)
+s.router.HandleFunc("GET /api/status", s.handleStatus)
+s.router.HandleFunc("GET /api/graph", s.handleGraph)
+s.router.HandleFunc("POST /api/parse", s.handleParse)
+s.router.HandleFunc("/", s.handleStatic)
+```
 
 ```mermaid
 flowchart TD
@@ -72,6 +80,7 @@ stateDiagram-v2
   2. Constructs a new parser: `core.NewParser(plan, ".")`.
   3. Executes `parser.GenerateGraph()`.
   4. Serializes the generated graph JSON directly to the response writer.
+  4. Serializes the generated `*core.Graph` JSON payload directly to the response writer, containing nodes (with `changeDetails` attribute diffs), directed edges, and `PlanSummary` metric counters that populate the frontend's Resource Explorer, inspector panels, and action distribution bar.
 
 ---
 

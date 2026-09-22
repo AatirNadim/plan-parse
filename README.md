@@ -32,6 +32,7 @@ flowchart TD
     subgraph Frontend["Web UI (ui/ & pkg/server/ui/out)"]
         I --> J["Next.js Single-Page Application"]
         J --> K["InputDrawer (JSON Upload / Validation)"]
+        J --> K["InputDrawer (Plan Input & Resource Explorer)"]
         J --> L["Cytoscape Canvas (Klay Layout Engine)"]
         J --> M["NodeInspector & GraphSearchBar"]
     end
@@ -104,6 +105,8 @@ The Go server uses the `//go:embed all:ui/out` directive in `pkg/server/server.g
 ### Prerequisites
 - Go 1.27+
 - Node.js 18+ and pnpm (v12+)
+- Go 1.27+ (matching `go.mod` 1.27.1)
+- Node.js 20+ (Node.js 22 LTS recommended) and pnpm (v12.4+)
 
 ### Make Targets
 ```bash

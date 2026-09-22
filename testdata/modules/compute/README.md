@@ -53,9 +53,20 @@ flowchart TD
 | `outputs.tf` | Exposes instance ID lists, launch template IDs, and key pair names. |
 
 ### Inputs Consumed
+- `project`: Project name prefix.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `instance_count`: Number of EC2 instances to provision.
+- `instance_type`: EC2 instance type family (e.g. `t3.micro`).
 - `subnet_ids`: Public subnet IDs supplied by `networking`.
 - `security_group_id`: VPC security group supplied by `networking`.
 - `vpc_id`: Network container ID supplied by `networking`.
+- `tags`: Common metadata tags applied across compute resources.
+
+### Exported Outputs
+- `instance_ids`: List of simulated EC2 instance IDs consumed by the load balancer target group.
+- `ssh_public_key`: Generated 4096-bit RSA SSH public key.
+- `key_pair_id`: Logical identifier of the synthetic key pair resource.
+- `launch_template_id`: Logical identifier of the zero-downtime launch template.
 
 ---
 

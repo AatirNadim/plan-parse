@@ -80,6 +80,8 @@ Edges represent directional dependencies (`source -> target`, meaning `source` d
   - Converts module outputs (`module.networking.public_subnet_ids` $\to$ `module.networking.output.public_subnet_ids`).
   - Strips attribute accessors (`aws_instance.worker.id` $\to$ `aws_instance.worker`).
   - Removes index suffixes (`public_subnets[0]` $\to$ `public_subnets`).
+- **Deterministic Key Traversal**:
+  Leverages modern Go standard library utilities (`maps.Keys` and `slices.Sorted`) across `graph.go` to guarantee strictly deterministic ordering when iterating through module calls, variable collections, output definitions, and resource expressions across plan executions.
 - **Gradient Color Mapping**:
   Each edge computes a CSS linear gradient from the source node action/type color to the target node action/type color:
   ```go

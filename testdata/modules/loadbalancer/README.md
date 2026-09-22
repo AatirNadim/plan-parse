@@ -70,7 +70,6 @@ flowchart TD
 | `outputs.tf` | Exposes ALB DNS names, ARNs, target group ARNs, and listener identifiers. |
 
 ### Inputs Consumed
-- `subnet_ids`: Public subnets supplied by `networking`.
 - `project`: Project name prefix.
 - `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
 - `subnet_ids`: Public subnet IDs supplied by `networking`.

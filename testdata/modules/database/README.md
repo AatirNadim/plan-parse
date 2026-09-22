@@ -50,9 +50,6 @@ flowchart TD
 | `outputs.tf` | Exposes RDS endpoints, connection ports, and parameter group identifiers. |
 
 ### Inputs Consumed
-- `subnet_ids`: Private subnets from `networking`.
-- `security_group_id`: VPC security group from `networking`.
-- `vpc_id`: VPC identifier from `networking`.
 - `project`: Project name prefix.
 - `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
 - `db_engine`: Database engine type (`postgres`).

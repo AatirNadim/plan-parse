@@ -15,6 +15,7 @@ build-ui:
 	mkdir -p pkg/server/ui
 	rm -rf pkg/server/ui/out
 	cp -r ui/out pkg/server/ui/out
+	find pkg/server/ui/out -name "*.md" -delete
 
 build: build-ui
 	@echo "Building plan-parse Go binary..."

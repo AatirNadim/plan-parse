@@ -2,8 +2,9 @@ package core
 
 import (
 	"fmt"
+	"maps"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
@@ -136,11 +137,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 
 	// 2. Add Variables from config or planned values
 	if p.plan.Config != nil && p.plan.Config.RootModule != nil {
-		vNames := make([]string, 0, len(p.plan.Config.RootModule.Variables))
-		for vName := range p.plan.Config.RootModule.Variables {
-			vNames = append(vNames, vName)
-		}
-		sort.Strings(vNames)
+		vNames := slices.Sorted(maps.Keys(p.plan.Config.RootModule.Variables))
 		for _, vName := range vNames {
 			vID := "var." + vName
 			fileID := ensureFileNode("", "variables.tf")
@@ -156,11 +153,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 			})
 		}
 	} else if p.plan.Variables != nil {
-		vNames := make([]string, 0, len(p.plan.Variables))
-		for vName := range p.plan.Variables {
-			vNames = append(vNames, vName)
-		}
-		sort.Strings(vNames)
+		vNames := slices.Sorted(maps.Keys(p.plan.Variables))
 		for _, vName := range vNames {
 			vID := "var." + vName
 			fileID := ensureFileNode("", "variables.tf")
@@ -179,11 +172,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 
 	// 3. Add Outputs from output changes or config
 	if p.plan.OutputChanges != nil {
-		oNames := make([]string, 0, len(p.plan.OutputChanges))
-		for oName := range p.plan.OutputChanges {
-			oNames = append(oNames, oName)
-		}
-		sort.Strings(oNames)
+		oNames := slices.Sorted(maps.Keys(p.plan.OutputChanges))
 		for _, oName := range oNames {
 			oc := p.plan.OutputChanges[oName]
 			oID := "output." + oName
@@ -456,11 +445,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 		}
 
 		if modAddr != "" {
-			varNames := make([]string, 0, len(cfgMod.Variables))
-			for vName := range cfgMod.Variables {
-				varNames = append(varNames, vName)
-			}
-			sort.Strings(varNames)
+			varNames := slices.Sorted(maps.Keys(cfgMod.Variables))
 			for _, vName := range varNames {
 				vID := modAddr + ".var." + vName
 				fileID := ensureFileNode(modAddr, "variables.tf")
@@ -476,11 +461,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 				})
 			}
 
-			outNames := make([]string, 0, len(cfgMod.Outputs))
-			for oName := range cfgMod.Outputs {
-				outNames = append(outNames, oName)
-			}
-			sort.Strings(outNames)
+			outNames := slices.Sorted(maps.Keys(cfgMod.Outputs))
 			for _, oName := range outNames {
 				oID := modAddr + ".output." + oName
 				fileID := ensureFileNode(modAddr, "outputs.tf")
@@ -519,11 +500,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 			}
 		}
 
-		mNames := make([]string, 0, len(cfgMod.ModuleCalls))
-		for mName := range cfgMod.ModuleCalls {
-			mNames = append(mNames, mName)
-		}
-		sort.Strings(mNames)
+		mNames := slices.Sorted(maps.Keys(cfgMod.ModuleCalls))
 		for _, mName := range mNames {
 			mCall := cfgMod.ModuleCalls[mName]
 			if mCall == nil {
@@ -562,11 +539,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 
 		// When modAddr != "" (child modules): evaluate submodule output expressions
 		if modAddr != "" {
-			outNames := make([]string, 0, len(cfgMod.Outputs))
-			for oName := range cfgMod.Outputs {
-				outNames = append(outNames, oName)
-			}
-			sort.Strings(outNames)
+			outNames := slices.Sorted(maps.Keys(cfgMod.Outputs))
 			for _, oName := range outNames {
 				out := cfgMod.Outputs[oName]
 				oID := modAddr + ".output." + oName
@@ -582,11 +555,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 			}
 		} else {
 			// modAddr == "": Root module outputs
-			outNames := make([]string, 0, len(cfgMod.Outputs))
-			for oName := range cfgMod.Outputs {
-				outNames = append(outNames, oName)
-			}
-			sort.Strings(outNames)
+			outNames := slices.Sorted(maps.Keys(cfgMod.Outputs))
 			for _, oName := range outNames {
 				out := cfgMod.Outputs[oName]
 				srcAddr := "output." + oName
@@ -633,14 +602,10 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 					srcNodes = append(srcNodes, nodeID)
 				}
 			}
-			sort.Strings(srcNodes)
+			slices.Sort(srcNodes)
 
 			// Check expressions references
-			exprKeys := make([]string, 0, len(res.Expressions))
-			for k := range res.Expressions {
-				exprKeys = append(exprKeys, k)
-			}
-			sort.Strings(exprKeys)
+			exprKeys := slices.Sorted(maps.Keys(res.Expressions))
 			for _, k := range exprKeys {
 				expr := res.Expressions[k]
 				if expr == nil {
@@ -670,11 +635,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 		}
 
 		// Process child modules
-		mNames := make([]string, 0, len(cfgMod.ModuleCalls))
-		for mName := range cfgMod.ModuleCalls {
-			mNames = append(mNames, mName)
-		}
-		sort.Strings(mNames)
+		mNames := slices.Sorted(maps.Keys(cfgMod.ModuleCalls))
 		for _, mName := range mNames {
 			mCall := cfgMod.ModuleCalls[mName]
 			if mCall == nil {
@@ -687,11 +648,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 			ensureModuleHierarchy(childModAddr)
 
 			// Process module call expressions
-			exprKeys := make([]string, 0, len(mCall.Expressions))
-			for k := range mCall.Expressions {
-				exprKeys = append(exprKeys, k)
-			}
-			sort.Strings(exprKeys)
+			exprKeys := slices.Sorted(maps.Keys(mCall.Expressions))
 			for _, k := range exprKeys {
 				expr := mCall.Expressions[k]
 				if expr == nil {

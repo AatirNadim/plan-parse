@@ -76,10 +76,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // routes registers API handlers and SPA static file serving.
 func (s *Server) routes() {
-	s.router.HandleFunc("/api/health", s.handleHealth)
-	s.router.HandleFunc("/api/status", s.handleStatus)
-	s.router.HandleFunc("/api/graph", s.handleGraph)
-	s.router.HandleFunc("/api/parse", s.handleParse)
+	s.router.HandleFunc("GET /api/health", s.handleHealth)
+	s.router.HandleFunc("GET /api/status", s.handleStatus)
+	s.router.HandleFunc("GET /api/graph", s.handleGraph)
+	s.router.HandleFunc("POST /api/parse", s.handleParse)
 	s.router.HandleFunc("/", s.handleStatic)
 }
 

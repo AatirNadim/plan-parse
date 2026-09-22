@@ -39,7 +39,7 @@ func FindModulesJSON(startPath string) (manifestPath string, baseDir string) {
 		cur = filepath.Dir(cur)
 	}
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		candidate := filepath.Join(cur, ".terraform", "modules", "modules.json")
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate, cur

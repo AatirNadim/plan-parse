@@ -1,3 +1,6 @@
+PNPM_VERSION ?= 12.4.2
+PNPM ?= pnpm
+
 .PHONY: all build build-ui test clean
 
 all: build
@@ -5,10 +8,10 @@ all: build
 build-ui:
 	@echo "Building UI..."
 	@if [ ! -d "ui/node_modules" ]; then \
-		echo "Installing UI dependencies with pnpm..."; \
-		cd ui && pnpm install --frozen-lockfile; \
+		echo "Installing UI dependencies with $(PNPM)..."; \
+		cd ui && $(PNPM) install --frozen-lockfile; \
 	fi
-	cd ui && pnpm run build
+	cd ui && $(PNPM) run build
 	mkdir -p pkg/server/ui
 	rm -rf pkg/server/ui/out
 	cp -r ui/out pkg/server/ui/out

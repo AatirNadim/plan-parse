@@ -103,7 +103,7 @@ The Go server uses the `//go:embed all:ui/out` directive in `pkg/server/server.g
 
 ### Prerequisites
 - Go 1.27+
-- Node.js 18+ and pnpm
+- Node.js 18+ and pnpm (v12+)
 
 ### Make Targets
 ```bash

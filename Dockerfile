@@ -6,8 +6,8 @@ FROM node:22-alpine AS ui-builder
 WORKDIR /app/ui
 
 # Install dependencies first for better layer caching
-RUN corepack enable && corepack prepare pnpm@9.1.3 --activate
-COPY ui/package.json ui/pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@12.4.2 --activate
+COPY ui/package.json ui/pnpm-lock.yaml ui/.npmrc* ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
 
 # Copy UI source files and generate static export

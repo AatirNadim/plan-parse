@@ -79,7 +79,6 @@ flowchart TD
 ### 3. Global Styles (`globals.css`)
 - Imports Tailwind CSS standard directives (`@tailwind base`, `@tailwind components`, `@tailwind utilities`).
 - Defines custom canvas styles (`.canvas-bg`), configuring an SVG dot-matrix grid pattern inspired by React Flow.
-- Customizes dark-mode scrollbars for inspector panels and drawers.
 - Implements custom dark-mode scrollbar utilities (`.custom-scrollbar` and Webkit scrollbars) for glassmorphic inspector panels, modals, and the `InputDrawer` resource list.
 
 ---

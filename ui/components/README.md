@@ -34,7 +34,6 @@ flowchart TD
 ## Component Catalog & Internal Mechanics
 
 ### 1. `InputDrawer.js`
-A slide-out collapsible panel dedicated to uploading and validating Terraform plan JSON files.
 A floating, collapsible glassmorphic panel functioning as both an interactive plan overview / resource explorer and a plan file ingestion workflow. Designed with a dual-tab architecture:
 
 #### Overview Tab (`activeTab === "overview"`)
@@ -55,14 +54,7 @@ Rendered when a graph is loaded or actively explored:
 #### Source Tab (`activeTab === "source"`)
 Dedicated to uploading, validating, and submitting Terraform plan JSON files:
 - **Client-Side Pre-Flight Validation**:
-  Before making any network request to the Go backend, `validateFileContent()` performs 4 verification checks:
-  1. *Extension Validation*: Enforces `.json` extension.
-  2. *Payload Bound Check*: Rejects files exceeding the 50MB ceiling.
-  3. *JSON Syntax Verification*: Parses file text using `JSON.parse` to catch malformed payloads.
-  4. *Terraform Schema Assertion*: Validates presence of non-empty `format_version` and `terraform_version` fields.
-- **Submission**: Sends valid files via `multipart/form-data` to `POST /api/parse`.
-- **Change Breakdown**: Displays a summary matrix of creates, updates, deletes, replaces, no-ops, and data reads upon successful generation.
-  Before dispatching network requests to the Go backend, `validateFileContent()` performs 5 pre-flight checks:
+  Before dispatching network requests to the Go backend, `validateFileContent()` performs 5 pre-flight verification checks:
   1. *Extension Validation*: Enforces `.json` file extension.
   2. *Payload Bound Check*: Rejects payloads exceeding the 50MB ceiling.
   3. *Empty File Guard*: Rejects zero-byte files.
@@ -81,22 +73,14 @@ sequenceDiagram
     participant Page as app/page.js
     participant Cy as Cytoscape Canvas
 
-    User->>Drawer: Drag & Drop plan.json
-    Drawer->>Drawer: Pre-flight validation (Format, TF Version, JSON)
-    alt Validation Failure
-        Drawer-->>User: Display validation error card
-    else Validation Success
-        Drawer-->>User: Display plan metadata (versions, resource count)
     alt Uploading New Plan (Source Tab)
         User->>Drawer: Drag & drop plan.json
         Drawer->>Drawer: Client pre-flight checks (Size, JSON syntax, TF versions)
         Drawer-->>User: Display plan metadata preview
         User->>Drawer: Click "Parse & Load Graph"
         Drawer->>Server: POST /api/parse (FormData)
-        Server-->>Drawer: 200 OK (Cytoscape JSON Graph)
         Server-->>Drawer: 200 OK (Cytoscape Graph JSON)
         Drawer->>Page: onPlanParsed(graph)
-        Page->>Page: Render Cytoscape DAG
         Page->>Cy: Render hierarchical DAG
         Drawer->>Drawer: Switch activeTab to "overview"
     else Exploring Resources (Overview Tab)
@@ -144,7 +128,6 @@ A collapsible bottom-right overlay documenting the color palette used for graph 
 
 | Component File | Export | Primary Role |
 | :--- | :--- | :--- |
-| `InputDrawer.js` | `default InputDrawer` | Slide-out panel for plan JSON file uploads, pre-flight validation, and change summary cards. |
 | `InputDrawer.js` | `default InputDrawer` | Floating dual-tab panel providing plan JSON ingestion/validation and interactive resource exploration with action metrics. |
 | `CanvasControls.js` | `default CanvasControls` | Floating React Flow-style viewport controls (zoom, fit, 1:1, lock, percentage HUD). |
 | `GraphSearchBar.js` | `default GraphSearchBar` | Autocomplete resource finder with global `⌘K` hotkey and camera focus callbacks. |

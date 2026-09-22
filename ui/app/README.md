@@ -69,11 +69,18 @@ flowchart TD
   When canvas lock is toggled, `userPanningEnabled` and `userZoomingEnabled` are updated dynamically.
 - **Keyboard Shortcut Listener**:
   Registers global event handlers for `f` (fit), `+` (zoom in), `-` (zoom out), `0` (reset 1:1), and `Escape` (clear selection or close drawer).
+- **Bidirectional Drawer Synchronization**:
+  `page.js` coordinates state with `InputDrawer` by passing `graphData`, `selectedNode`, and the `onNavigateToNode` callback:
+  - *Canvas to Drawer*: Tapping a node on the Cytoscape canvas updates `selectedNode`, which notifies `InputDrawer` to highlight the corresponding item and scroll it into view in the Resource Explorer list (`#res-item-${selectedNode.id}`).
+  - *Drawer to Canvas*: Selecting or clicking a resource card in the `InputDrawer` invokes `handleNavigateToNode(nodeId)`, automatically panning the Cytoscape camera to the node, applying `.highlighted` and `.dimmed` styles, and opening the `NodeInspector`.
+- **Empty Canvas Guidance State**:
+  When no plan is loaded (`!hasGraph`) and the `InputDrawer` is collapsed (`!isDrawerOpen`), an onboarding glassmorphic guidance card is rendered in the center of the canvas offering a direct "Open Plan Input" button.
 
 ### 3. Global Styles (`globals.css`)
 - Imports Tailwind CSS standard directives (`@tailwind base`, `@tailwind components`, `@tailwind utilities`).
 - Defines custom canvas styles (`.canvas-bg`), configuring an SVG dot-matrix grid pattern inspired by React Flow.
 - Customizes dark-mode scrollbars for inspector panels and drawers.
+- Implements custom dark-mode scrollbar utilities (`.custom-scrollbar` and Webkit scrollbars) for glassmorphic inspector panels, modals, and the `InputDrawer` resource list.
 
 ---
 

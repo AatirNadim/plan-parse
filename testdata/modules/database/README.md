@@ -53,6 +53,22 @@ flowchart TD
 - `subnet_ids`: Private subnets from `networking`.
 - `security_group_id`: VPC security group from `networking`.
 - `vpc_id`: VPC identifier from `networking`.
+- `project`: Project name prefix.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `db_engine`: Database engine type (`postgres`).
+- `db_engine_version`: Database engine version (e.g. `15.3`).
+- `db_instance_class`: Compute and memory footprint (e.g. `db.t3.micro`).
+- `subnet_ids`: Private subnet IDs from `networking`.
+- `security_group_id`: VPC security group identifier from `networking`.
+- `vpc_id`: Network container identifier from `networking`.
+- `tags`: Common metadata tags applied across database resources.
+
+### Exported Outputs
+- `db_endpoint`: Simulated RDS connection string endpoint with port 5432.
+- `db_instance_id`: Logical identifier of the synthetic RDS instance resource.
+- `db_password`: Generated 24-character cryptographically random master password.
+- `db_subnet_group_id`: Logical identifier of the multi-AZ DB subnet group.
+- `db_parameter_group_id`: Logical identifier of the blue-green DB parameter group.
 
 ---
 

@@ -52,6 +52,12 @@ flowchart TD
 | `variables.tf` | Declares project identifiers, environment, deployment region, and tags. |
 | `outputs.tf` | Exposes bucket names, bucket ARNs, and IAM policy identifiers. |
 
+### Inputs Consumed
+- `project`: Project name prefix for naming the S3 bucket and IAM roles.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `region`: Simulated AWS region for the bucket (e.g. `us-east-1`).
+- `tags`: Common metadata tags applied across storage resources.
+
 ### Exported Outputs
 - `bucket_name`: Unique pet-generated bucket name.
 - `bucket_arn`: Synthetic ARN (`arn:aws:s3:::<bucket_name>`) consumed by downstream modules.

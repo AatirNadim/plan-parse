@@ -55,8 +55,21 @@ flowchart TD
 | `outputs.tf` | Exposes function names, function ARNs, and log group names. |
 
 ### Inputs Consumed
+- `project`: Project name prefix.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `runtime`: Lambda execution runtime (e.g. `nodejs18.x`, `python3.11`).
+- `memory_size`: Memory allocation in megabytes (e.g. `256`).
+- `timeout`: Execution timeout in seconds (e.g. `30`).
 - `bucket_name`: Name of the S3 bucket from `storage`.
 - `bucket_arn`: ARN of the S3 bucket from `storage`.
+- `tags`: Common metadata tags applied across lambda resources.
+
+### Exported Outputs
+- `function_name`: Logical name of the synthetic Lambda function.
+- `function_id`: Resource identifier of the synthetic Lambda function.
+- `log_group_name`: CloudWatch log group name created with explicit retention.
+- `execution_role_id`: IAM execution role identifier with CloudWatch and S3 permissions.
+- `lambda_permission_id`: API Gateway invocation permission identifier.
 
 ---
 

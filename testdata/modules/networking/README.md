@@ -73,6 +73,13 @@ flowchart TD
 | `variables.tf` | Declares input parameters (`vpc_cidr`, `availability_zones`, `project`, `environment`, `tags`). |
 | `outputs.tf` | Exposes VPC IDs, CIDR blocks, subnet arrays, and security group identifiers. |
 
+### Inputs Consumed
+- `project`: Project name prefix for naming synthetic resources.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `vpc_cidr`: Baseline IPv4 CIDR block for the VPC (e.g. `10.0.0.0/16`).
+- `availability_zones`: List of availability zones for public and private subnet distribution.
+- `tags`: Common metadata tags applied across resources.
+
 ### Exported Outputs
 - `vpc_id`: Logical identifier of the synthetic VPC.
 - `public_subnet_ids`: List of public subnet IDs consumed by compute and load balancer modules.

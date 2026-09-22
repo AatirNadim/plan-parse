@@ -71,8 +71,20 @@ flowchart TD
 
 ### Inputs Consumed
 - `subnet_ids`: Public subnets supplied by `networking`.
+- `project`: Project name prefix.
+- `environment`: Deployment tier environment (`dev`, `staging`, `prod`).
+- `subnet_ids`: Public subnet IDs supplied by `networking`.
 - `vpc_id`: Network container ID supplied by `networking`.
 - `instance_ids`: EC2 instance fleet IDs supplied by `compute`.
+- `tags`: Common metadata tags applied across load balancer resources.
+
+### Exported Outputs
+- `alb_dns_name`: Fully qualified synthetic ALB DNS hostname.
+- `alb_arn`: Canonical ARN string of the Application Load Balancer.
+- `alb_id`: Resource identifier of the synthetic ALB.
+- `target_group_id`: Resource identifier of the HTTP target group on port 8080.
+- `listener_http_id`: HTTP port 80 redirect listener identifier.
+- `listener_https_id`: HTTPS port 443 TLS termination listener identifier.
 
 ---
 

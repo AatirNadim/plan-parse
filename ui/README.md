@@ -23,6 +23,7 @@ flowchart TD
 
         subgraph FloatingOverlays["Floating UI Controls & Panels"]
             Page --> InputDrawer["InputDrawer<br/>(Drag-and-Drop & Pre-flight Validation)"]
+            Page --> InputDrawer["InputDrawer<br/>(Dual-Tab: Plan Ingest & Resource Explorer)"]
             Page --> CanvasControls["CanvasControls<br/>(React Flow-style Viewport Nav)"]
             Page --> GraphSearchBar["GraphSearchBar<br/>(Autocomplete & ⌘K Quick Nav)"]
             Page --> Legend["Legend<br/>(Collapsible Action Color Map)"]
@@ -73,6 +74,7 @@ Running `pnpm run build` generates pure static HTML, CSS, and JS bundles into `u
 | :--- | :--- | :--- |
 | [`app/`](./app/README.md) | Next.js App Router | Contains the root layout (`layout.js`), global CSS (`globals.css`), and the core canvas page (`page.js`). |
 | [`components/`](./components/README.md) | React Components | Floating UI overlays: `CanvasControls`, `GraphSearchBar`, `Legend`, `NodeInspector`, and `InputDrawer`. |
+| [`components/`](./components/README.md) | React Components | Floating UI overlays: `CanvasControls`, `GraphSearchBar`, `Legend`, `NodeInspector`, and `InputDrawer` (Resource Explorer & Plan Ingestion). |
 | [`public/`](./public/README.md) | Static Assets | Pre-bundled Cytoscape and Klay layout library (`cytoscape-bundle.js`). |
 | `next.config.js` | Config | Configures Next.js static export settings. |
 | `package.json` | Dependencies | Specifies dependencies (`next`, `react`, `react-dom`, `tailwindcss`, etc.). |

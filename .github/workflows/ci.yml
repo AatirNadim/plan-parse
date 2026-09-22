@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  lint:
+    uses: ./.github/workflows/golangci-lint.yml
+
+  build-test:
+    needs: [lint]
+    uses: ./.github/workflows/build-test.yml
+
+  docker:
+    needs: [build-test]
+    uses: ./.github/workflows/docker-image.yml
+    with:
+      push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    secrets: inherit

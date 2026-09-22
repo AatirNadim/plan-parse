@@ -32,6 +32,6 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          # Go version in go.mod is 1.23.1; golangci-lint v1.61+ provides official Go 1.23 support
-          version: v1.61
+          # Go version in go.mod is 1.27.1; golangci-lint provides official Go 1.27 support
+          version: latest
           args: --timeout=5m --disable-all --enable=gofmt --enable=goimports

@@ -17,7 +17,7 @@ RUN pnpm run build
 # ==============================================================================
 # Stage 2: Build Go Backend Binary
 # ==============================================================================
-FROM golang:1.23-alpine AS go-builder
+FROM golang:1.27.1-alpine AS go-builder
 
 WORKDIR /app
 

@@ -1,59 +1,30 @@
 name: Docker Image
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  workflow_call:
+    inputs:
+      push:
+        description: 'Whether to push Docker image to registry'
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      push:
+        description: 'Whether to push Docker image to registry'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
-  test:
-    name: Test Server
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12.4.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-          cache-dependency-path: 'ui/pnpm-lock.yaml'
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-
-      - name: Build frontend UI
-        run: make build-ui
-
-      - name: Run tests
-        run: go test -v ./...
-
   docker:
     name: Build and Push Docker Image
-    needs: [test]
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,19 +37,28 @@ jobs:
 
       - name: Determine Docker Hub repository
         id: image-name
+        env:
+          DOCKERHUB_REPO: ${{ vars.DOCKERHUB_REPOSITORY }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          EVENT_REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          REPO="${{ vars.DOCKERHUB_REPOSITORY }}"
+          REPO="$DOCKERHUB_REPO"
           if [ -z "$REPO" ]; then
-            USER="${{ secrets.DOCKERHUB_USERNAME }}"
+            USER="$DOCKERHUB_USER"
             if [ -z "$USER" ]; then
-              USER="${{ github.repository_owner }}"
+              USER="$REPO_OWNER"
             fi
-            REPO="$USER/${{ github.event.repository.name }}"
+            REPO_NAME="$EVENT_REPO_NAME"
+            if [ -z "$REPO_NAME" ]; then
+              REPO_NAME="${GITHUB_REPOSITORY#*/}"
+            fi
+            REPO="$USER/$REPO_NAME"
           fi
           echo "image=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Docker Hub
-        if: github.event_name != 'pull_request'
+        if: ${{ inputs.push }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -90,7 +70,7 @@ jobs:
         with:
           images: ${{ steps.image-name.outputs.image }}
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+            type=raw,value=latest,enable=${{ inputs.push }}
             type=sha,format=long,prefix=,enable=true
             type=sha,format=short,prefix=,enable=true
 
@@ -99,7 +79,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

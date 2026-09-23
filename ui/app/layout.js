@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
       <head>
         <script src="/cytoscape-bundle.js" async={false}></script>
       </head>
-      <body className="bg-slate-950 text-slate-100 overflow-hidden w-screen h-screen">
+      <body className="bg-slate-950 text-slate-100 overflow-hidden w-screen h-screen antialiased">
         {children}
       </body>
     </html>

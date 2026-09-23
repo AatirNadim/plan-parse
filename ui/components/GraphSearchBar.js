@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { ACTION_CONFIG } from "../lib/action-theme";
 
 /**
  * GraphSearchBar: Quick resource finder & navigator.
@@ -94,9 +95,12 @@ export default function GraphSearchBar({ nodes = [], onSelectNode }) {
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition focus:outline-none focus-visible:text-white"
+            title="Clear search"
           >
-            ✕
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         )}
       </div>
@@ -110,24 +114,31 @@ export default function GraphSearchBar({ nodes = [], onSelectNode }) {
               const label = n.data?.label || id;
               const change = n.data?.change;
               const type = n.data?.type;
+              const cfg = change ? ACTION_CONFIG[change.toLowerCase()] : null;
 
               return (
                 <button
                   key={id}
                   onClick={() => handleSelect(n)}
-                  className="w-full text-left px-3 py-2 hover:bg-slate-800/80 transition flex items-center justify-between gap-2 border-b border-slate-800/40 last:border-0"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-800/80 focus:bg-slate-800/80 focus:outline-none transition flex items-center justify-between gap-2 border-b border-slate-800/40 last:border-0"
                 >
                   <div className="truncate flex-1">
                     <div className="text-xs font-semibold text-slate-200 truncate">
                       {label}
                     </div>
-                    <div className="text-[10px] font-mono text-slate-500 truncate">
+                    <div className="text-[10px] font-mono text-slate-400 truncate">
                       {id}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {change && (
-                      <span className="px-1.5 py-0.2 text-[9px] font-bold rounded uppercase bg-slate-800 text-slate-300">
+                      <span
+                        className={`px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider ${
+                          cfg
+                            ? `${cfg.bg} ${cfg.text} border ${cfg.border}`
+                            : "bg-slate-800 text-slate-300 border border-slate-700"
+                        }`}
+                      >
                         {change}
                       </span>
                     )}

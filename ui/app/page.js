@@ -6,18 +6,7 @@ import CanvasControls from "../components/CanvasControls";
 import GraphSearchBar from "../components/GraphSearchBar";
 import NodeInspector from "../components/NodeInspector";
 import Legend from "../components/Legend";
-
-const ACTION_COLORS = {
-  create: "#22c55e",
-  delete: "#ef4444",
-  update: "#3b82f6",
-  replace: "#f59e0b",
-  "no-op": "#64748b",
-  data: "#ec4899",
-  module: "#a855f7",
-  variable: "#0ea5e9",
-  output: "#eab308",
-};
+import { ACTION_COLORS, ACTION_TEXT_COLORS } from "../lib/action-theme";
 
 export default function Home() {
   const [graphData, setGraphData] = useState(null);
@@ -251,7 +240,7 @@ export default function Home() {
             style: {
               label: "data(label)",
               color: "#f8fafc",
-              "font-family": "ui-sans-serif, system-ui, -apple-system, sans-serif",
+              "font-family": "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
               "font-size": "13px",
               "text-valign": "center",
               "text-halign": "center",
@@ -365,28 +354,44 @@ export default function Home() {
           },
           {
             selector: ".create",
-            style: { "background-color": ACTION_COLORS.create },
+            style: {
+              "background-color": ACTION_COLORS.create,
+              color: ACTION_TEXT_COLORS.create,
+            },
           },
           {
             selector: ".delete",
-            style: { "background-color": ACTION_COLORS.delete },
+            style: {
+              "background-color": ACTION_COLORS.delete,
+              color: ACTION_TEXT_COLORS.delete,
+            },
           },
           {
             selector: ".update",
-            style: { "background-color": ACTION_COLORS.update },
+            style: {
+              "background-color": ACTION_COLORS.update,
+              color: ACTION_TEXT_COLORS.update,
+            },
           },
           {
             selector: ".replace",
-            style: { "background-color": ACTION_COLORS.replace, color: "#000" },
+            style: {
+              "background-color": ACTION_COLORS.replace,
+              color: ACTION_TEXT_COLORS.replace,
+            },
           },
           {
             selector: ".no-op",
-            style: { "background-color": ACTION_COLORS["no-op"] },
+            style: {
+              "background-color": ACTION_COLORS["no-op"],
+              color: ACTION_TEXT_COLORS["no-op"],
+            },
           },
           {
             selector: ".variable",
             style: {
               "background-color": ACTION_COLORS.variable,
+              color: ACTION_TEXT_COLORS.variable,
               shape: "roundrectangle",
               "font-size": "12px",
               padding: "8px",
@@ -396,7 +401,7 @@ export default function Home() {
             selector: ".output",
             style: {
               "background-color": ACTION_COLORS.output,
-              color: "#000",
+              color: ACTION_TEXT_COLORS.output,
               shape: "roundrectangle",
               "font-size": "12px",
               padding: "8px",

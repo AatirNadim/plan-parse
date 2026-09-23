@@ -8,36 +8,39 @@
 
 The project is structured as a unified Go and Next.js hybrid application:
 1. **Core Parser Engine (`pkg/core`)**: Validates Terraform plan schemas, resolves `.terraform/modules/modules.json` manifests, associates resources with source code locations, and builds a Cytoscape-compatible hierarchical graph model.
-2. **Embedded HTTP Server (`pkg/server`)**: Serves a RESTful API for plan parsing and status checks while bundling and hosting the pre-compiled frontend distribution via Go's `embed.FS`.
-3. **Interactive Frontend (`ui`)**: A Next.js 14 single-page application powered by React 18, Tailwind CSS, and Cytoscape.js with Klay hierarchical layout rendering.
-4. **Mock Infrastructure Fixtures (`testdata`)**: A multi-tier AWS reference infrastructure setup containing 6 interrelated modules, root orchestration manifests, and a 66-resource plan fixture.
+2. **Programmatic Terraform Runner (`pkg/runner`)**: Validates Terraform directories, detects installed Terraform/OpenTofu CLI binaries, generates isolated temporary plans in `/tmp`, and categorizes operational failures into actionable diagnostic CLI errors.
+3. **Embedded HTTP Server (`pkg/server`)**: Serves a RESTful API for plan parsing and status checks while bundling and hosting the pre-compiled frontend distribution via Go's `embed.FS`.
+4. **Interactive Frontend (`ui`)**: A Next.js 14 single-page application powered by React 18, Tailwind CSS, and Cytoscape.js with Klay hierarchical layout rendering.
+5. **Mock Infrastructure Fixtures (`testdata`)**: A multi-tier AWS reference infrastructure setup containing 6 interrelated modules, root orchestration manifests, and a 66-resource plan fixture.
 
 ```mermaid
 flowchart TD
     subgraph CLI["CLI Entrypoint (main.go)"]
-        A["CLI Flags (--plan, --port, --addr, --no-browser)"] --> B{"--plan provided?"}
-        B -->|Yes| C["core.ValidatePlanFile()"]
-        C --> D["core.NewParser().GenerateGraph()"]
-        B -->|No| E["server.NewServer(nil)"]
-        D --> F["server.NewServer(cliGraph)"]
+        A["CLI Flags (-plan, -dir, -port, -addr, -no-browser)"] --> B{"Input Mode"}
+        B -->|"-plan <file>"| C["core.ValidatePlanFile()"]
+        B -->|"-dir <path>"| D["runner.GeneratePlanJSON()"]
+        B -->|"None (Upload Mode)"| E["server.NewServer(nil)"]
+        D -->|Validates dir, runs terraform plan/show| C2["core.ValidatePlanBytes()"]
+        C2 --> F["core.NewParser().GenerateGraph()"]
+        C --> F
+        F --> G["server.NewServer(cliGraph)"]
     end
 
     subgraph Backend["Go Backend (pkg/)"]
-        F --> G["server.Server"]
-        E --> G
-        G --> H["REST Endpoints (/api/status, /api/graph, /api/parse, /api/health)"]
-        G --> I["SPA Static File Server (go:embed ui/out)"]
+        G --> H["server.Server"]
+        E --> H
+        H --> I["REST Endpoints (/api/status, /api/graph, /api/parse, /api/health)"]
+        H --> J["SPA Static File Server (go:embed ui/out)"]
     end
 
     subgraph Frontend["Web UI (ui/ & pkg/server/ui/out)"]
-        I --> J["Next.js Single-Page Application"]
-        J --> K["InputDrawer (JSON Upload / Validation)"]
-        J --> K["InputDrawer (Plan Input & Resource Explorer)"]
-        J --> L["Cytoscape Canvas (Klay Layout Engine)"]
-        J --> M["NodeInspector & GraphSearchBar"]
+        J --> K["Next.js Single-Page Application"]
+        K --> L["InputDrawer (JSON Upload / Validation)"]
+        K --> M["Cytoscape Canvas (Klay Layout Engine)"]
+        K --> N["NodeInspector & GraphSearchBar"]
     end
 
-    H <-->|JSON Payloads| J
+    I <-->|JSON Payloads| K
 ```
 
 ---
@@ -46,44 +49,87 @@ flowchart TD
 
 ### 1. CLI Execution Lifecycle
 The CLI entry point is implemented in `main.go`. When invoked, the binary parses command-line flags:
-- `-plan string`: Path to an exported Terraform plan JSON file.
+- `-plan string`: Path to an existing Terraform plan JSON file.
+- `-dir string`: Path to a directory containing Terraform configuration files (`.tf` / `.tf.json`).
 - `-port int`: TCP port to bind the HTTP listener (default: `9000`).
 - `-addr string`: Interface address to bind the listener (default: `127.0.0.1`).
 - `-no-browser bool`: Suppresses automatic browser launch when set to `true`.
 
-If `-plan` is specified:
-1. The path is resolved to an absolute filesystem path.
+> [!NOTE]
+> The `-plan` and `-dir` flags are mutually exclusive. Specify either a pre-rendered JSON plan file or a Terraform configuration directory, or omit both to launch in browser-based upload mode.
+
+#### Mode A: Plan File (`-plan`)
+1. Resolves path to an absolute filesystem location.
 2. `core.ValidatePlanFile` verifies file existence, enforces the `.json` extension, checks schema versions (`format_version` and `terraform_version`), and validates against HashiCorp's `terraform-json` structure.
 3. `core.NewParser` scans the plan directory for `.terraform/modules/modules.json` to load source configuration mappings.
-4. `parser.GenerateGraph()` produces a fully resolved Cytoscape DAG with action color gradients and summary statistics.
-5. The pre-parsed graph is injected into `server.NewServer(addr, port, cliGraph)`.
-6. A background goroutine waits 200ms for listener binding before spawning the system browser using OS-specific commands (`open` on macOS, `rundll32` on Windows, `xdg-open` on Linux).
+4. `parser.GenerateGraph()` produces a fully resolved Cytoscape DAG.
+
+#### Mode B: Terraform Directory (`-dir`)
+1. **Directory & Permissions Validation**:
+   - Verifies the directory path exists, is a directory, and is accessible.
+   - Verifies filesystem read and execute permissions on the directory.
+   - Ensures the directory contains at least one `.tf` or `.tf.json` file.
+   - Verifies each `.tf` / `.tf.json` file is readable.
+2. **Binary Discovery**:
+   - Searches `PATH` for `terraform` (or `tofu` fallback) via `runner.CheckTerraformBinary()` and tests executable availability (`terraform version`).
+3. **Plan Generation (`runner.GeneratePlanJSON`)**:
+   - Creates a temporary binary plan file in the system temp directory (`os.CreateTemp("", "plan-parse-*.tfplan")`). Writing to `/tmp` allows target directories to be mounted completely read-only (`:ro`).
+   - Executes `terraform plan -input=false -no-color -out=<tempPlan>` within the target directory, passing along active environment variables.
+   - Converts the plan to JSON via `terraform show -json <tempPlan>`.
+   - Cleans up the temporary plan file upon completion.
+4. **Schema Parsing & Graph Generation**:
+   - Parses the JSON bytes with `core.ValidatePlanBytes`.
+   - Initializes `core.NewParser` targeting the directory to load root and child module schemas.
+   - Calls `parser.GenerateGraph()` to generate the DAG.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
     participant CLI as CLI (main.go)
+    participant Runner as Runner (pkg/runner)
     participant Core as Engine (pkg/core)
     participant Server as HTTP Server (pkg/server)
     participant Browser as Client Browser (ui)
 
-    User->>CLI: plan-parse --plan testdata/tf_plan.json
-    CLI->>Core: ValidatePlanFile(path)
-    Core-->>CLI: *tfjson.Plan
-    CLI->>Core: NewParser(plan, dir).GenerateGraph()
+    User->>CLI: plan-parse -dir ./infra
+    CLI->>Runner: GeneratePlanJSON("./infra")
+    Runner->>Runner: ValidateTerraformDir() & CheckTerraformBinary()
+    Runner->>Runner: terraform plan -out=/tmp/plan.tfplan
+    Runner->>Runner: terraform show -json /tmp/plan.tfplan
+    Runner-->>CLI: []byte (Plan JSON)
+    CLI->>Core: ValidatePlanBytes(json)
+    CLI->>Core: NewParser(plan, "./infra").GenerateGraph()
     Core-->>CLI: *core.Graph (Nodes, Edges, Summary)
     CLI->>Server: NewServer(addr, port, graph)
     CLI->>Server: Start()
     CLI->>Browser: openBrowser("http://127.0.0.1:9000")
-    Browser->>Server: GET /api/status
-    Server-->>Browser: {"cli_loaded": true, "disabled": true}
-    Browser->>Server: GET /api/graph
-    Server-->>Browser: *core.Graph (single-use consumption)
-    Browser->>Browser: Cytoscape Klay Layout Render
 ```
 
-### 2. Embedded Production Distribution
+### 2. Diagnostic CLI Error Classification
+
+When executing against a Terraform directory via `-dir`, errors from directory inspection, binary checks, or Terraform CLI execution are captured, classified, and formatted with visual distinction into human-readable diagnostic messages:
+
+| Error Category | Detected Triggers | Actionable Hint |
+| :--- | :--- | :--- |
+| **`INITIALIZATION_REQUIRED`** | `Backend initialization required`, `run "terraform init"`, `Plugin reinitialization required`, `Module not installed`, `Could not load plugin` | Run `terraform init` in the configuration directory before generating a plan. |
+| **`AUTHENTICATION`** | AWS (`NoCredentialProviders`, `ExpiredToken`, `AccessDenied`), GCP (`could not find default credentials`, `oauth2 token`), Azure (`az login`, `ARM_CLIENT_SECRET`), HTTP (`401`, `403`, `TFC_TOKEN`) | Check cloud credentials and environment variables (`AWS_PROFILE`, `AWS_ACCESS_KEY_ID`, `GOOGLE_APPLICATION_CREDENTIALS`, `ARM_*`). |
+| **`VERSION_INCOMPATIBILITY`** | `Unsupported Terraform Core version`, `required_version`, `Incompatible provider version`, `version constraint` | Check installed Terraform/OpenTofu version against `required_version` constraints. |
+| **`PERMISSION`** | `permission denied`, `EACCES`, `Access is denied`, `operation not permitted` | Check directory/file filesystem permissions or IAM role policies. |
+| **`CONFIGURATION`** | Empty directory, missing `.tf` files, `No value for required variable`, `Reference to undeclared`, syntax errors | Provide required variables via `TF_VAR_*` or `terraform.tfvars`, and verify `.tf` syntax. |
+| **`EXECUTION`** | Unclassified runtime failures, binary missing from `PATH` | Review Terraform output or verify Terraform CLI installation. |
+
+Example diagnostic CLI output:
+```
+================================================================================
+[INITIALIZATION_REQUIRED ERROR] Terraform directory requires initialization
+--------------------------------------------------------------------------------
+Details: Error: Backend initialization required, please run "terraform init"
+Hint:    Run 'terraform init' in the configuration directory before generating a plan.
+================================================================================
+```
+
+### 3. Embedded Production Distribution
 The Go server uses the `//go:embed all:ui/out` directive in `pkg/server/server.go` to package the static Next.js export directly into the compiled executable. This produces a zero-dependency standalone binary capable of running in CI/CD pipelines, remote bastion hosts, or local workstations.
 
 ---
@@ -92,21 +138,21 @@ The Go server uses the `//go:embed all:ui/out` directive in `pkg/server/server.g
 
 | File | Type | Description |
 | :--- | :--- | :--- |
-| `main.go` | Go Source | Application entrypoint, CLI flag parsing, browser launcher, and server bootstrap. |
+| `main.go` | Go Source | Application entrypoint, CLI flag parsing (`-dir`, `-plan`), browser launcher, and server bootstrap. |
+| `pkg/runner` | Go Package | Directory validation, Terraform binary checks, plan generation, and error classification. |
+| `pkg/core` | Go Package | Schema validation, DAG generation, module parsing, and action summarization. |
+| `pkg/server` | Go Package | HTTP router, REST API handlers, CORS support, and embedded static asset distribution. |
+| `Dockerfile` | Container Build | Multi-stage build packaging UI static export, static Go backend, and HashiCorp Terraform CLI. |
 | `Makefile` | Build Automation | Orchestrates Next.js static compilation, asset copying, Go binary compilation, testing, and cleanup. |
-| `go.mod` | Go Dependency | Declares Go module dependencies (`terraform-json`, `terraform-config-inspect`). |
-| `go.sum` | Checksums | Cryptographic hashes of all direct and transitive Go dependencies. |
-| `plan-parse` | Executable | Compiled Go binary packaging the HTTP backend and embedded static frontend. |
 
 ---
 
 ## Build & Usage
 
 ### Prerequisites
-- Go 1.27+
-- Node.js 18+ and pnpm (v12+)
 - Go 1.27+ (matching `go.mod` 1.27.1)
 - Node.js 20+ (Node.js 22 LTS recommended) and pnpm (v12.4+)
+- Terraform CLI (v1.5+) or OpenTofu (v1.6+) in `PATH` (required for `-dir` execution)
 
 ### Make Targets
 ```bash
@@ -127,13 +173,56 @@ make clean
 ```
 
 ### Launching the Visualizer
-```bash
-# Launch with pre-loaded plan and automatic browser launch
-./plan-parse --plan testdata/tf_plan.json
 
-# Launch in headless server mode on custom port
-./plan-parse --addr 0.0.0.0 --port 8080 --no-browser
+```bash
+# Option 1: Execute against a local Terraform directory
+./plan-parse -dir /path/to/terraform/project
+
+# Option 2: Pre-load an existing plan JSON file
+./plan-parse -plan testdata/tf_plan.json
+
+# Option 3: Headless mode on custom port (suitable for remote servers & containers)
+./plan-parse -dir /path/to/terraform/project -addr 0.0.0.0 -port 8080 -no-browser
+
+# Option 4: Browser-based upload mode (no initial plan or directory)
+./plan-parse -port 9000
 ```
+
+---
+
+## Running with Docker
+
+`plan-parse` provides a production-grade multi-stage `Dockerfile` that packages the compiled binary, embedded UI, and HashiCorp Terraform CLI into a lightweight Alpine container running as a non-root user (`appuser:appgroup`).
+
+### Docker Bind-Mount Execution
+
+You can run `plan-parse` against any local Terraform project using a read-only Docker bind mount:
+
+```bash
+docker run --rm -it \
+  -p 9000:9000 \
+  -v /path/to/tf/project:/infra:ro \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_REGION=$AWS_REGION \
+  plan-parse:latest -dir /infra -addr 0.0.0.0 -no-browser
+```
+
+### Why Read-Only (`:ro`) Works
+When generating plans with `-dir`, `plan-parse` writes the temporary binary plan file to `/tmp` (outside the target configuration directory). Because no files need to be written to the target directory, mounting your project as read-only (`:ro`) ensures that your source code and `.terraform` lockfiles remain completely untouched and protected.
+
+### Passing Provider Credentials
+When running inside Docker, provide cloud credentials to Terraform using either environment variables or credential directory volume mounts:
+
+- **AWS**:
+  - Environment variables: `-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN -e AWS_REGION`
+  - Mount credentials: `-v ~/.aws:/home/appuser/.aws:ro`
+- **Google Cloud**:
+  - Service account key: `-v /path/to/key.json:/app/key.json:ro -e GOOGLE_APPLICATION_CREDENTIALS=/app/key.json`
+  - gcloud config: `-v ~/.config/gcloud:/home/appuser/.config/gcloud:ro`
+- **Azure**:
+  - Service principal: `-e ARM_CLIENT_ID -e ARM_CLIENT_SECRET -e ARM_SUBSCRIPTION_ID -e ARM_TENANT_ID`
+  - Azure CLI tokens: `-v ~/.azure:/home/appuser/.azure:ro`
 
 ---
 
@@ -148,28 +237,22 @@ flowchart TD
     ROOT["plan-parse (Repository Root)"]:::current
     PKG["pkg/ (Backend Architecture)"]:::node
     CORE["pkg/core/ (Parser & DAG Generator)"]:::node
+    RUNNER["pkg/runner/ (Terraform Execution & Errors)"]:::node
     SERVER["pkg/server/ (HTTP REST & Router)"]:::node
     SERVER_UI["pkg/server/ui/ (Embedded SPA Assets)"]:::node
     UI["ui/ (Next.js Application)"]:::node
-    UI_APP["ui/app/ (App Router & Canvas Page)"]:::node
-    UI_COMPONENTS["ui/components/ (React UI Controls)"]:::node
-    UI_PUBLIC["ui/public/ (Cytoscape Bundle)"]:::node
     TESTDATA["testdata/ (Test Infrastructure)"]:::node
-    TESTDATA_MODS["testdata/modules/ (AWS Modules)"]:::node
 
     ROOT --> PKG
     ROOT --> UI
     ROOT --> TESTDATA
 
     PKG --> CORE
+    PKG --> RUNNER
     PKG --> SERVER
     SERVER --> SERVER_UI
 
-    UI --> UI_APP
-    UI --> UI_COMPONENTS
-    UI --> UI_PUBLIC
-
-    TESTDATA --> TESTDATA_MODS
+    RUNNER -.->|produces plan JSON for| CORE
 
     classDef current fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
     classDef node fill:#1e293b,stroke:#475569,stroke-width:1px,color:#f8fafc;

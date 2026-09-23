@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { ACTION_CONFIG, METRIC_KEYS } from "../lib/action-theme";
 
 /**
  * Format bytes into human-readable string (KB, MB).
@@ -13,59 +14,6 @@ function formatBytes(bytes, decimals = 1) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
-
-const ACTION_CONFIG = {
-  create: {
-    label: "Create",
-    color: "#22c55e",
-    text: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/30",
-    symbol: "+",
-  },
-  update: {
-    label: "Update",
-    color: "#3b82f6",
-    text: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/30",
-    symbol: "~",
-  },
-  delete: {
-    label: "Delete",
-    color: "#ef4444",
-    text: "text-rose-400",
-    bg: "bg-rose-500/10",
-    border: "border-rose-500/30",
-    symbol: "-",
-  },
-  replace: {
-    label: "Replace",
-    color: "#f59e0b",
-    text: "text-amber-400",
-    bg: "bg-amber-500/10",
-    border: "border-amber-500/30",
-    symbol: "±",
-  },
-  "no-op": {
-    label: "No-op",
-    color: "#64748b",
-    text: "text-slate-400",
-    bg: "bg-slate-500/10",
-    border: "border-slate-500/30",
-    symbol: "=",
-  },
-  read: {
-    label: "Read",
-    color: "#ec4899",
-    text: "text-pink-400",
-    bg: "bg-pink-500/10",
-    border: "border-pink-500/30",
-    symbol: "?",
-  },
-};
-
-const METRIC_KEYS = ["create", "update", "delete", "replace", "no-op", "read"];
 
 /**
  * InputDrawer: Floating collapsible glassmorphic panel for Terraform plan input,
@@ -386,11 +334,11 @@ export default function InputDrawer({
           {hasGraph ? "Plan Overview" : "Plan Input"}
         </span>
         {cliLoaded ? (
-          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
             CLI
           </span>
         ) : totalCount > 0 ? (
-          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             {totalCount} res
           </span>
         ) : null}
@@ -424,11 +372,11 @@ export default function InputDrawer({
             <h2 className="text-xs font-bold text-white tracking-wide flex items-center gap-2">
               <span>Terraform Plan</span>
               {cliLoaded ? (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   CLI
                 </span>
               ) : totalCount > 0 ? (
-                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   {totalCount} resources
                 </span>
               ) : null}
@@ -437,7 +385,7 @@ export default function InputDrawer({
         </div>
         <button
           onClick={onClose}
-          className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition"
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           title="Collapse panel (Esc)"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -451,7 +399,7 @@ export default function InputDrawer({
         <div className="flex border-b border-slate-800/80 bg-slate-950/40 p-1.5 gap-1.5 select-none shrink-0">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === "overview"
                 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
@@ -470,7 +418,7 @@ export default function InputDrawer({
 
           <button
             onClick={() => setActiveTab("source")}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === "source"
                 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
@@ -518,7 +466,6 @@ export default function InputDrawer({
                         width: `${Math.max(seg.percent, 1.5)}%`,
                         backgroundColor: seg.color,
                       }}
-                      title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%)`}
                       title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%) • Click to filter`}
                       className="h-full rounded-sm transition-all duration-300 hover:brightness-125 cursor-pointer"
                       onClick={() =>
@@ -568,10 +515,10 @@ export default function InputDrawer({
                     <button
                       key={key}
                       onClick={() => setActionFilter(actionFilter === key ? "all" : key)}
-                      className={`p-2 rounded-xl border transition-all text-left flex flex-col justify-between cursor-pointer ${
+                      className={`p-2 rounded-lg border transition-all text-left flex flex-col justify-between cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         isCurrentFilter
                           ? "bg-slate-800/90 border-indigo-400/80 ring-1 ring-indigo-400/40"
-                          : "bg-slate-950/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700"
+                          : "bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/80 hover:border-slate-700"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -605,7 +552,7 @@ export default function InputDrawer({
 
               {/* Search input within panel */}
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -620,14 +567,17 @@ export default function InputDrawer({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter resources by name, type, module..."
-                  className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-950/80 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/70 shadow-inner"
+                  className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-950/80 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50 shadow-inner"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-500 hover:text-slate-300"
+                    className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-200 transition focus:outline-none focus-visible:text-white"
+                    title="Clear filter"
                   >
-                    ✕
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 )}
               </div>
@@ -640,7 +590,7 @@ export default function InputDrawer({
                     <button
                       key={act}
                       onClick={() => setActionFilter(act)}
-                      className={`px-2 py-0.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer ${
+                      className={`px-2 py-0.5 rounded-lg font-medium whitespace-nowrap transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         isActive
                           ? "bg-indigo-600 text-white font-bold shadow-sm"
                           : "bg-slate-950/80 border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800"
@@ -676,7 +626,7 @@ export default function InputDrawer({
                       >
                         <div className="flex items-center justify-between gap-1.5">
                           <span
-                            className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0"
+                            className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0"
                             style={{
                               backgroundColor: `${cfg.color}20`,
                               color: cfg.color,
@@ -687,7 +637,7 @@ export default function InputDrawer({
                           </span>
                           {n.data?.module && (
                             <span
-                              className="text-[9px] font-mono text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.5 rounded truncate max-w-[150px]"
+                              className="text-[10px] font-mono text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.5 rounded truncate max-w-[150px]"
                               title={n.data.module}
                             >
                               {n.data.module}
@@ -727,13 +677,13 @@ export default function InputDrawer({
                 </div>
                 <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono text-slate-300">
                   <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-500 block text-[9px] uppercase font-sans">
+                    <span className="text-slate-400 block text-[10px] uppercase font-sans tracking-wider">
                       Total Resources
                     </span>
                     <span className="text-white font-bold">{totalCount}</span>
                   </div>
                   <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-500 block text-[9px] uppercase font-sans">
+                    <span className="text-slate-400 block text-[10px] uppercase font-sans tracking-wider">
                       Source
                     </span>
                     <span className="text-white font-bold truncate block">
@@ -890,7 +840,7 @@ export default function InputDrawer({
                 <button
                   onClick={handleSubmit}
                   disabled={loading || disabled}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
                 >
                   {loading ? (
                     <>
@@ -924,7 +874,7 @@ export default function InputDrawer({
                 <button
                   onClick={handleReset}
                   disabled={loading}
-                  className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer"
+                  className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   title="Clear file"
                 >
                   Clear
@@ -946,12 +896,12 @@ export default function InputDrawer({
       {/* Status Footer */}
       <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-[11px] text-slate-400 shrink-0 select-none">
         <span className="flex items-center gap-1.5">
-          <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-slate-800 border border-slate-700 rounded text-slate-300">
+          <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-slate-800 border border-slate-700 rounded text-slate-300">
             Esc
           </kbd>
           <span>to collapse</span>
         </span>
-        <span className="text-[10px] text-slate-500 font-mono">
+        <span className="text-[10px] text-slate-400 font-mono">
           {hasGraph ? "Canvas Active" : "No Plan Loaded"}
         </span>
       </div>

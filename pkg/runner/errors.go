@@ -58,6 +58,7 @@ func ClassifyTerraformError(output string, exitErr error) *RunnerError {
 	}
 
 	lower := strings.ToLower(output)
+	lower = strings.ToLower(details)
 
 	// 1. Initialization issues
 	if strings.Contains(lower, "backend initialization required") ||

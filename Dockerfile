@@ -46,7 +46,6 @@ RUN apk --no-cache add ca-certificates tzdata
 
 # Create dedicated non-root user and group
 RUN addgroup -g 10001 -S appgroup && \
-    adduser -u 10001 -S appuser -G appgroup
     adduser -u 10001 -S -h /home/appuser appuser -G appgroup && \
     mkdir -p /home/appuser && chown -R appuser:appgroup /home/appuser
 

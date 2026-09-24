@@ -412,6 +412,8 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 					modPart := cand[:lastDot]
 					outPart := cand[lastDot+1:]
 					outCand := modPart + ".output." + outPart
+					outPartClean := bracketRegex.ReplaceAllString(outPart, "")
+					outCand = modPart + ".output." + outPartClean
 					if _, ok := nodeMap[outCand]; ok {
 						return outCand
 					}
@@ -422,6 +424,16 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 			cur := cand
 			for strings.Contains(cur, ".") {
 				lastDot := strings.LastIndex(cur, ".")
+				if strings.HasPrefix(cur, "module.") {
+					modPart := cur[:lastDot]
+					outPart := cur[lastDot+1:]
+					outPartClean := bracketRegex.ReplaceAllString(outPart, "")
+					outCand := modPart + ".output." + outPartClean
+					if _, ok := nodeMap[outCand]; ok {
+						return outCand
+					}
+				}
+
 				cur = cur[:lastDot]
 				if _, ok := nodeMap[cur]; ok {
 					return cur

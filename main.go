@@ -81,12 +81,11 @@ func main() {
 		log.Printf("Validating Terraform directory: %s", absDir)
 		planData, err := runner.GeneratePlanJSON(absDir)
 		if err != nil {
-			if runnerErr, ok := err.(*runner.RunnerError); ok {
 			var runnerErr *runner.RunnerError
 			if errors.As(err, &runnerErr) {
 				fmt.Print(runnerErr.FormatCLI())
+				log.Fatalf("Plan generation failed")
 			}
-			log.Fatalf("Plan generation failed")
 			log.Fatalf("Plan generation failed: %v", err)
 		}
 

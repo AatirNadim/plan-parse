@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/AatirNadim/plan-parse/pkg/core"
 )
@@ -106,7 +107,7 @@ func (s *Server) handleParse(w http.ResponseWriter, r *http.Request) {
 
 	// Handle multipart form upload if present
 	contentType := r.Header.Get("Content-Type")
-	if contentType != "" && (contentType == "multipart/form-data" || len(contentType) > 19 && contentType[:19] == "multipart/form-data") {
+	if contentType != "" && strings.HasPrefix(strings.ToLower(contentType), "multipart/form-data") {
 		// Max 50MB
 		if err := r.ParseMultipartForm(50 << 20); err != nil {
 			w.Header().Set("Content-Type", "application/json")

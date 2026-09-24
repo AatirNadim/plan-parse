@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ACTION_CONFIG, ACTION_COLORS } from "../lib/action-theme";
+import { ACTION_CONFIG } from "../lib/action-theme";
 
 /**
  * NodeInspector: Slide-over details panel for examining selected resource nodes,
@@ -12,7 +12,6 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
 
   const changeKey = (node.change || "").toLowerCase();
   const cfg = ACTION_CONFIG[changeKey] || ACTION_CONFIG["no-op"];
-  const actionColor = cfg?.color || ACTION_COLORS[changeKey] || "#64748b";
 
   return (
     <div className="fixed top-0 right-0 h-full w-[400px] max-w-[92vw] z-30 bg-slate-900/95 backdrop-blur-xl border-l border-slate-800 shadow-2xl p-5 overflow-y-auto flex flex-col transition-all">

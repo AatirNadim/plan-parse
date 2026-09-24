@@ -56,14 +56,14 @@ module "database" {
 module "lambda" {
   source = "./modules/lambda"
 
-  project        = var.project
-  environment    = var.environment
-  runtime        = var.lambda_runtime
-  memory_size    = var.lambda_memory
-  timeout        = var.lambda_timeout
-  bucket_name    = module.storage.bucket_name
-  bucket_arn     = module.storage.bucket_arn
-  tags           = var.tags
+  project     = var.project
+  environment = var.environment
+  runtime     = var.lambda_runtime
+  memory_size = var.lambda_memory
+  timeout     = var.lambda_timeout
+  bucket_name = module.storage.bucket_name
+  bucket_arn  = module.storage.bucket_arn
+  tags        = var.tags
 }
 
 # --- Load Balancer (depends on compute + networking) ---

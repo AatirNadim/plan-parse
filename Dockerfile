@@ -46,9 +46,15 @@ RUN apk --no-cache add ca-certificates tzdata
 
 # Create dedicated non-root user and group
 RUN addgroup -g 10001 -S appgroup && \
-    adduser -u 10001 -S appuser -G appgroup
+    adduser -u 10001 -S -h /home/appuser appuser -G appgroup && \
+    mkdir -p /home/appuser && chown -R appuser:appgroup /home/appuser
+
+ENV HOME=/home/appuser
 
 WORKDIR /app
+
+# Copy Terraform CLI binary from official HashiCorp image
+COPY --from=hashicorp/terraform:1.16.2 /bin/terraform /usr/local/bin/terraform
 
 # Copy compiled binary from go-builder stage
 COPY --from=go-builder --chown=appuser:appgroup /app/plan-parse /app/plan-parse

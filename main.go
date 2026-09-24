@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/AatirNadim/plan-parse/pkg/core"
+	"github.com/AatirNadim/plan-parse/pkg/runner"
 	"github.com/AatirNadim/plan-parse/pkg/server"
 )
 
@@ -29,16 +31,22 @@ func openBrowser(url string) error {
 func main() {
 	var (
 		planPath  string
+		dirPath   string
 		port      int
 		addr      string
 		noBrowser bool
 	)
 
 	flag.StringVar(&planPath, "plan", "", "Path to Terraform plan JSON file")
+	flag.StringVar(&dirPath, "dir", "", "Path to directory containing Terraform configuration files")
 	flag.IntVar(&port, "port", 9000, "Port to listen on")
 	flag.StringVar(&addr, "addr", "127.0.0.1", "Address to bind to")
 	flag.BoolVar(&noBrowser, "no-browser", false, "Do not automatically open browser")
 	flag.Parse()
+
+	if planPath != "" && dirPath != "" {
+		log.Fatalf("Error: -plan and -dir flags are mutually exclusive. Please provide either a plan file or a directory, not both.")
+	}
 
 	var cliGraph *core.Graph
 
@@ -56,6 +64,37 @@ func main() {
 
 		planDir := filepath.Dir(absPlanPath)
 		parser := core.NewParser(plan, planDir)
+		graph, err := parser.GenerateGraph()
+		if err != nil {
+			log.Fatalf("Failed to generate DAG from plan: %v", err)
+		}
+
+		cliGraph = graph
+		log.Printf("Successfully loaded plan: %d resources (%d to create, %d to update, %d to delete, %d to replace)",
+			graph.Summary.Total, graph.Summary.Create, graph.Summary.Update, graph.Summary.Delete, graph.Summary.Replace)
+	} else if dirPath != "" {
+		absDir, err := filepath.Abs(dirPath)
+		if err != nil {
+			log.Fatalf("Error resolving directory path: %v", err)
+		}
+
+		log.Printf("Validating Terraform directory: %s", absDir)
+		planData, err := runner.GeneratePlanJSON(absDir)
+		if err != nil {
+			var runnerErr *runner.RunnerError
+			if errors.As(err, &runnerErr) {
+				fmt.Print(runnerErr.FormatCLI())
+				log.Fatalf("Plan generation failed")
+			}
+			log.Fatalf("Plan generation failed: %v", err)
+		}
+
+		plan, err := core.ValidatePlanBytes(planData)
+		if err != nil {
+			log.Fatalf("Plan validation failed: %v", err)
+		}
+
+		parser := core.NewParser(plan, absDir)
 		graph, err := parser.GenerateGraph()
 		if err != nil {
 			log.Fatalf("Failed to generate DAG from plan: %v", err)

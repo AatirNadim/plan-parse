@@ -7,6 +7,7 @@ import GraphSearchBar from "../components/GraphSearchBar";
 import NodeInspector from "../components/NodeInspector";
 import Legend from "../components/Legend";
 import { ACTION_COLORS, ACTION_TEXT_COLORS } from "../lib/action-theme";
+import { registerSvgExtension } from "../lib/export-graph";
 
 export default function Home() {
   const [graphData, setGraphData] = useState(null);
@@ -25,11 +26,13 @@ export default function Home() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.cytoscape) {
+      registerSvgExtension(window.cytoscape);
       setCyReady(true);
       return;
     }
     const interval = setInterval(() => {
       if (window.cytoscape) {
+        registerSvgExtension(window.cytoscape);
         setCyReady(true);
         clearInterval(interval);
       }
@@ -590,6 +593,7 @@ export default function Home() {
         graphData={graphData}
         selectedNode={selectedNode}
         onNavigateToNode={handleNavigateToNode}
+        cyRef={cyRef}
       />
 
       {/* Quick Search & Navigate Bar (Top-Right) */}

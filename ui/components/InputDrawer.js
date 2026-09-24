@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ACTION_CONFIG, METRIC_KEYS } from "../lib/action-theme";
+import { exportGraphToSvg, exportGraphToPng } from "../lib/export-graph";
 
 /**
  * Format bytes into human-readable string (KB, MB).
@@ -31,6 +32,7 @@ export default function InputDrawer({
   graphData,
   selectedNode,
   onNavigateToNode,
+  cyRef,
 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [validationState, setValidationState] = useState(null);
@@ -38,6 +40,71 @@ export default function InputDrawer({
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [lastParsedSummary, setLastParsedSummary] = useState(null);
+
+  const [exportingType, setExportingType] = useState(null); // 'svg' | 'png' | null
+  const [exportScale, setExportScale] = useState("auto"); // 'auto' | '3x' | '2x' | '1x'
+  const [exportFeedback, setExportFeedback] = useState(null); // { type: 'success' | 'error', message: string } | null
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef(null);
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setIsExportMenuOpen(false);
+      }
+    }
+    if (isExportMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isExportMenuOpen]);
+
+  const handleExportSvg = async () => {
+    if (!cyRef?.current) return;
+    setExportingType("svg");
+    setExportFeedback(null);
+    try {
+      const result = await exportGraphToSvg(cyRef.current);
+      setExportFeedback({
+        type: "success",
+        message: `Exported SVG (${result.filename})`,
+      });
+      setTimeout(() => setExportFeedback(null), 4000);
+    } catch (err) {
+      console.error("Export SVG error:", err);
+      setExportFeedback({
+        type: "error",
+        message: `SVG Export failed: ${err.message || "Unknown error"}`,
+      });
+    } finally {
+      setExportingType(null);
+      setIsExportMenuOpen(false);
+    }
+  };
+
+  const handleExportPng = async () => {
+    if (!cyRef?.current) return;
+    setExportingType("png");
+    setExportFeedback(null);
+    try {
+      const result = await exportGraphToPng(cyRef.current, { scale: exportScale });
+      setExportFeedback({
+        type: "success",
+        message: `Exported PNG (${result.filename}) at ${result.scale}x scale`,
+      });
+      setTimeout(() => setExportFeedback(null), 4000);
+    } catch (err) {
+      console.error("Export PNG error:", err);
+      setExportFeedback({
+        type: "error",
+        message: `PNG Export failed: ${err.message || "Unknown error"}`,
+      });
+    } finally {
+      setExportingType(null);
+      setIsExportMenuOpen(false);
+    }
+  };
 
   const summary = graphData?.summary || currentSummary || lastParsedSummary;
   const hasGraph = Boolean(
@@ -383,15 +450,88 @@ export default function InputDrawer({
             </h2>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-          title="Collapse panel (Esc)"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1.5">
+          {hasGraph && (
+            <div className="relative" ref={exportMenuRef}>
+              <button
+                onClick={() => setIsExportMenuOpen((prev) => !prev)}
+                disabled={Boolean(exportingType)}
+                className="py-1 px-2.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-[11px] font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                title="Export Diagram"
+              >
+                {exportingType ? (
+                  <svg className="animate-spin h-3.5 w-3.5 text-indigo-300" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                )}
+                <span>{exportingType ? "Exporting..." : "Export"}</span>
+                <svg className="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isExportMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-56 rounded-xl bg-slate-900 border border-slate-700/80 shadow-2xl py-1.5 z-50 text-xs">
+                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Export Diagram
+                  </div>
+                  <button
+                    onClick={handleExportSvg}
+                    disabled={Boolean(exportingType)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-800 text-slate-200 hover:text-white flex items-center justify-between transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold">Vector SVG</div>
+                        <div className="text-[10px] text-slate-400">Infinite zoom fidelity</div>
+                      </div>
+                    </div>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+                      SVG
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={handleExportPng}
+                    disabled={Boolean(exportingType)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-800 text-slate-200 hover:text-white flex items-center justify-between transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold">Raster PNG</div>
+                        <div className="text-[10px] text-slate-400">{exportScale === "auto" ? "Ultra-HD auto scale" : `${exportScale} resolution`}</div>
+                      </div>
+                    </div>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">
+                      PNG
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            title="Collapse panel (Esc)"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Dual Tabs Navigation when Graph is Loaded */}
@@ -536,6 +676,141 @@ export default function InputDrawer({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Dedicated Export Diagram Card */}
+            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/90 space-y-2.5 shadow-lg select-none">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-white tracking-wide">
+                      Export Diagram
+                    </h3>
+                    <p className="text-[10px] text-slate-400">
+                      Export entire DAG with dark canvas theme
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Status Feedback Banner */}
+              {exportFeedback && (
+                <div
+                  className={`p-2.5 rounded-lg text-xs flex items-center gap-2 ${
+                    exportFeedback.type === "success"
+                      ? "bg-emerald-950/60 border border-emerald-800/60 text-emerald-300"
+                      : "bg-rose-950/60 border border-rose-800/60 text-rose-300"
+                  }`}
+                >
+                  {exportFeedback.type === "success" ? (
+                    <svg className="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  )}
+                  <span className="truncate">{exportFeedback.message}</span>
+                </div>
+              )}
+
+              {/* Export Action Buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* SVG Export Button */}
+                <button
+                  onClick={handleExportSvg}
+                  disabled={Boolean(exportingType)}
+                  className="group relative p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col justify-between text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-50"
+                >
+                  <div className="flex items-center justify-between w-full mb-1.5">
+                    <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Vector • Infinite Zoom
+                    </span>
+                    <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-400 group-hover:translate-y-[-1px] transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    {exportingType === "svg" ? (
+                      <>
+                        <svg className="animate-spin h-3.5 w-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Generating SVG...</span>
+                      </>
+                    ) : (
+                      <span>Export SVG</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                    Pure vector paths & text
+                  </div>
+                </button>
+
+                {/* PNG Export Button */}
+                <button
+                  onClick={handleExportPng}
+                  disabled={Boolean(exportingType)}
+                  className="group relative p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-sky-500/50 transition-all flex flex-col justify-between text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-50"
+                >
+                  <div className="flex items-center justify-between w-full mb-1.5">
+                    <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                      High-Res Raster
+                    </span>
+                    <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-400 group-hover:translate-y-[-1px] transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    {exportingType === "png" ? (
+                      <>
+                        <svg className="animate-spin h-3.5 w-3.5 text-sky-400" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Rendering PNG...</span>
+                      </>
+                    ) : (
+                      <span>Export PNG</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                    Razor-sharp image capture
+                  </div>
+                </button>
+              </div>
+
+              {/* PNG Resolution / Scale Selector */}
+              <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[11px]">
+                <span className="text-slate-400 font-medium">PNG Resolution:</span>
+                <div className="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-800">
+                  {[
+                    { id: "auto", label: "Auto (Ultra-HD)" },
+                    { id: "3x", label: "3x Super-Res" },
+                    { id: "2x", label: "2x High-Res" },
+                    { id: "1x", label: "1x Standard" },
+                  ].map((res) => (
+                    <button
+                      key={res.id}
+                      onClick={() => setExportScale(res.id)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition cursor-pointer ${
+                        exportScale === res.id
+                          ? "bg-indigo-600 text-white font-bold shadow-sm"
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      {res.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

@@ -107,68 +107,66 @@ func (s *Server) handleParse(w http.ResponseWriter, r *http.Request) {
 
 	// Handle multipart form upload if present
 	contentType := r.Header.Get("Content-Type")
-	if contentType != "" && (contentType == "multipart/form-data" || len(contentType) > 19 && contentType[:19] == "multipart/form-data") {
-		if contentType != "" && strings.HasPrefix(strings.ToLower(contentType), "multipart/form-data") {
-			// Max 50MB
-			if err := r.ParseMultipartForm(50 << 20); err != nil {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to parse multipart form: " + err.Error()})
-				return
-			}
-
-			file, _, fileErr := r.FormFile("file")
-			if fileErr != nil {
-				// Try "plan" field name
-				file, _, fileErr = r.FormFile("plan")
-			}
-			if fileErr != nil {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Form file missing (expected 'file' or 'plan' field)"})
-				return
-			}
-			defer file.Close()
-
-			data, err = io.ReadAll(file)
-			if err != nil {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to read uploaded file: " + err.Error()})
-				return
-			}
-		} else {
-			// Read raw request body
-			data, err = io.ReadAll(io.LimitReader(r.Body, 50<<20))
-			if err != nil {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusBadRequest)
-				_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to read request body: " + err.Error()})
-				return
-			}
-			defer r.Body.Close()
+	if contentType != "" && strings.HasPrefix(strings.ToLower(contentType), "multipart/form-data") {
+		// Max 50MB
+		if err := r.ParseMultipartForm(50 << 20); err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to parse multipart form: " + err.Error()})
+			return
 		}
 
-		// Validate plan JSON
-		plan, err := core.ValidatePlanBytes(data)
+		file, _, fileErr := r.FormFile("file")
+		if fileErr != nil {
+			// Try "plan" field name
+			file, _, fileErr = r.FormFile("plan")
+		}
+		if fileErr != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Form file missing (expected 'file' or 'plan' field)"})
+			return
+		}
+		defer file.Close()
+
+		data, err = io.ReadAll(file)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
+			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to read uploaded file: " + err.Error()})
 			return
 		}
-
-		// Generate DAG without session persistence
-		parser := core.NewParser(plan, ".")
-		graph, err := parser.GenerateGraph()
+	} else {
+		// Read raw request body
+		data, err = io.ReadAll(io.LimitReader(r.Body, 50<<20))
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to generate graph: " + err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to read request body: " + err.Error()})
 			return
 		}
-
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(graph)
+		defer r.Body.Close()
 	}
+
+	// Validate plan JSON
+	plan, err := core.ValidatePlanBytes(data)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	// Generate DAG without session persistence
+	parser := core.NewParser(plan, ".")
+	graph, err := parser.GenerateGraph()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to generate graph: " + err.Error()})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(graph)
 }

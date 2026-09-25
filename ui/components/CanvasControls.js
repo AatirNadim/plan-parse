@@ -6,7 +6,7 @@ import React from "react";
  * CanvasControls: React Flow-style floating viewport controls.
  * Features Zoom In, Zoom Out, Fit to View, 1:1 Reset, Dynamic Zoom % HUD, and Lock.
  */
-export default function CanvasControls({
+function CanvasControls({
   zoomLevel = 1,
   onZoomIn,
   onZoomOut,
@@ -97,4 +97,6 @@ export default function CanvasControls({
     </div>
   );
 }
+
+export default React.memo(CanvasControls);
 

@@ -7,7 +7,7 @@ import { ACTION_CONFIG } from "../lib/action-theme";
  * NodeInspector: Slide-over details panel for examining selected resource nodes,
  * dependencies, module links, and attribute diffs.
  */
-export default function NodeInspector({ node, onClose, onNavigateToNode }) {
+function NodeInspector({ node, onClose, onNavigateToNode }) {
   if (!node) return null;
 
   const changeKey = (node.change || "").toLowerCase();
@@ -149,3 +149,5 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
     </div>
   );
 }
+
+export default React.memo(NodeInspector);

@@ -21,7 +21,7 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
           <div className="text-[11px] uppercase font-bold text-indigo-400 tracking-wider">
             {node.type || "Resource"}
           </div>
-          <h2 className="text-base font-bold text-white break-words mt-0.5 leading-snug select-text">
+          <h2 className="text-base font-bold text-white break-words mt-0.5 leading-snug select-text tracking-tight">
             {node.label || node.id}
           </h2>
         </div>
@@ -56,7 +56,7 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
         {/* Address */}
         <div>
           <span className="text-slate-400 block mb-1 font-medium">Full Address:</span>
-          <div className="font-mono text-[11px] bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 text-slate-200 break-all select-text">
+          <div className="font-mono font-medium text-[11px] bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 text-slate-200 break-all select-text leading-relaxed tracking-tight">
             {node.id}
           </div>
         </div>
@@ -66,16 +66,16 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
           <div className="grid grid-cols-2 gap-2 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/60 select-text">
             {node.module && (
               <div>
-                <span className="text-slate-400 block text-[10px] font-medium uppercase tracking-wider">Module</span>
-                <span className="text-slate-200 font-mono text-[11px] truncate block mt-0.5" title={node.module}>
+                <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Module</span>
+                <span className="text-slate-200 font-mono font-medium text-[11px] truncate block mt-0.5" title={node.module}>
                   {node.module}
                 </span>
               </div>
             )}
             {node.file && (
               <div>
-                <span className="text-slate-400 block text-[10px] font-medium uppercase tracking-wider">File</span>
-                <span className="text-slate-200 font-mono text-[11px] truncate block mt-0.5" title={node.file}>
+                <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">File</span>
+                <span className="text-slate-200 font-mono font-medium text-[11px] truncate block mt-0.5" title={node.file}>
                   {node.file}
                   {node.line ? `:${node.line}` : ""}
                 </span>
@@ -95,11 +95,11 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
                 <button
                   key={id}
                   onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                  className="font-mono text-[11px] text-left bg-slate-950 hover:bg-slate-800/80 px-2.5 py-1.5 rounded-lg text-indigo-300 hover:text-indigo-200 border border-slate-800/60 truncate transition flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="font-mono font-medium text-[11px] text-left bg-slate-950 hover:bg-slate-800/80 px-2.5 py-1.5 rounded-lg text-indigo-300 hover:text-indigo-200 border border-slate-800/60 truncate transition flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 tracking-tight"
                   title={`Navigate to ${id}`}
                 >
                   <span className="truncate">→ {id}</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300 ml-1 shrink-0">view</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300 ml-1 shrink-0 font-sans font-medium">view</span>
                 </button>
               ))}
             </div>
@@ -117,11 +117,11 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
                 <button
                   key={id}
                   onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                  className="font-mono text-[11px] text-left bg-slate-950 hover:bg-slate-800/80 px-2.5 py-1.5 rounded-lg text-emerald-300 hover:text-emerald-200 border border-slate-800/60 truncate transition flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="font-mono font-medium text-[11px] text-left bg-slate-950 hover:bg-slate-800/80 px-2.5 py-1.5 rounded-lg text-emerald-300 hover:text-emerald-200 border border-slate-800/60 truncate transition flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 tracking-tight"
                   title={`Navigate to ${id}`}
                 >
                   <span className="truncate">← {id}</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-emerald-300 ml-1 shrink-0">view</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-emerald-300 ml-1 shrink-0 font-sans font-medium">view</span>
                 </button>
               ))}
             </div>
@@ -134,7 +134,7 @@ export default function NodeInspector({ node, onClose, onNavigateToNode }) {
             <span className="text-slate-400 block mb-1 font-medium">
               Attribute Changes:
             </span>
-            <pre className="font-mono text-[11px] bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 text-slate-300 overflow-x-auto max-h-60 select-text custom-scrollbar">
+            <pre className="font-mono text-[11px] bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 text-slate-300 overflow-x-auto max-h-60 select-text custom-scrollbar leading-relaxed">
               {JSON.stringify(
                 node.changeDetails.after ||
                   node.changeDetails.before ||

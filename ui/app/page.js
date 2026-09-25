@@ -240,7 +240,7 @@ export default function Home() {
             style: {
               label: "data(label)",
               color: "#f8fafc",
-              "font-family": "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              "font-family": "'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
               "font-size": "13px",
               "text-valign": "center",
               "text-halign": "center",
@@ -492,27 +492,49 @@ export default function Home() {
         }
       });
 
-      // Run layout
-      try {
-        const layout = cy.layout({
-          name: "klay",
-          nodeDimensionsIncludeLabels: true,
-          fit: true,
-          padding: 60,
-          klay: {
-            direction: "RIGHT",
-            borderSpacing: 40,
-            spacing: 30,
-            nodeLayering: "NETWORK_SIMPLEX",
-          },
-        });
-        layout.run();
-      } catch (e) {
-        console.warn("Klay layout error, falling back to breadthfirst:", e);
-        cy.layout({ name: "breadthfirst", directed: true, padding: 50 }).run();
+      // Helper to compute and apply DAG layout once font metrics are ready
+      const runLayout = () => {
+        if (!cy || cy.destroyed()) return;
+        try {
+          const layout = cy.layout({
+            name: "klay",
+            nodeDimensionsIncludeLabels: true,
+            fit: true,
+            padding: 60,
+            klay: {
+              direction: "RIGHT",
+              borderSpacing: 40,
+              spacing: 30,
+              nodeLayering: "NETWORK_SIMPLEX",
+            },
+          });
+          layout.run();
+        } catch (e) {
+          console.warn("Klay layout error, falling back to breadthfirst:", e);
+          cy.layout({ name: "breadthfirst", directed: true, padding: 50 }).run();
+        }
+        setZoomLevel(cy.zoom());
+      };
+
+      // Ensure Cytoscape rendering handles font loading gracefully:
+      // Wait for document.fonts.ready so node label bounding boxes and text widths are calculated accurately with DM Sans loaded
+      if (typeof document !== "undefined" && document.fonts && document.fonts.ready) {
+        document.fonts.ready
+          .then(() => {
+            if (!cy.destroyed()) {
+              runLayout();
+            }
+          })
+          .catch((err) => {
+            console.warn("Font loading wait failed, falling back to immediate layout:", err);
+            if (!cy.destroyed()) {
+              runLayout();
+            }
+          });
+      } else {
+        runLayout();
       }
 
-      setZoomLevel(cy.zoom());
       cyRef.current = cy;
     } catch (err) {
       console.error("Error setting up Cytoscape:", err);

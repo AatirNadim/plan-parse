@@ -18,7 +18,7 @@ function Legend() {
       >
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-indigo-400" />
-          <span className="text-xs font-bold text-slate-200">Legend</span>
+          <span className="text-xs font-semibold text-slate-200 tracking-tight">Legend</span>
         </div>
         <svg
           className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ml-3 ${
@@ -43,7 +43,7 @@ function Legend() {
                   className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-slate-300 truncate">{item.label}</span>
+                <span className="text-slate-300 truncate font-medium">{item.label}</span>
               </div>
             );
           })}

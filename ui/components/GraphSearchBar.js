@@ -124,10 +124,10 @@ function GraphSearchBar({ nodes = [], onSelectNode }) {
                   className="w-full text-left px-3 py-2 hover:bg-slate-800/80 focus:bg-slate-800/80 focus:outline-none transition flex items-center justify-between gap-2 border-b border-slate-800/40 last:border-0"
                 >
                   <div className="truncate flex-1">
-                    <div className="text-xs font-semibold text-slate-200 truncate">
+                    <div className="text-xs font-semibold text-slate-200 truncate tracking-tight">
                       {label}
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400 truncate">
+                    <div className="text-[10px] font-mono font-normal text-slate-400 truncate tracking-tight">
                       {id}
                     </div>
                   </div>
@@ -144,7 +144,7 @@ function GraphSearchBar({ nodes = [], onSelectNode }) {
                       </span>
                     )}
                     {type && (
-                      <span className="text-[10px] text-slate-400 capitalize">
+                      <span className="text-[10px] text-slate-400 capitalize font-medium">
                         {type}
                       </span>
                     )}
@@ -153,7 +153,7 @@ function GraphSearchBar({ nodes = [], onSelectNode }) {
               );
             })
           ) : (
-            <div className="px-3 py-3 text-center text-xs text-slate-500">
+            <div className="px-3 py-3 text-center text-xs text-slate-500 font-medium">
               No matching resources found
             </div>
           )}

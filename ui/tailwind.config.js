@@ -8,6 +8,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-dm-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-dm-mono)", "ui-monospace", "monospace"],
+      },
       colors: {
         action: {
           create: "#22c55e",

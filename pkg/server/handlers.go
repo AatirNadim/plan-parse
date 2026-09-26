@@ -27,10 +27,6 @@ type ErrorResponse struct {
 
 // handleHealth responds with {"alive": true}.
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(HealthResponse{Alive: true})
@@ -39,10 +35,6 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 // handleStatus returns whether the CLI plan is active for initial display.
 // Subsequent calls after the initial view return cli_loaded: false, disabled: false.
 func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -69,10 +61,6 @@ func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 // On the initial request with a CLI plan, it returns the pre-parsed graph.
 // On subsequent calls (e.g. reload), it returns a blank graph.
 func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -97,10 +85,6 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 // handleParse handles plan file upload via multipart/form-data or raw JSON body.
 // Validates schema, parses the DAG with pkg/core, and returns graph JSON without storing session.
 func (s *Server) handleParse(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	var data []byte
 	var err error

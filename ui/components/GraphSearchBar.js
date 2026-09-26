@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 
 /**
  * GraphSearchBar: Quick resource finder & navigator.
  * Searches graph nodes by address, label, or type, and smoothly navigates camera to it.
  */
-export default function GraphSearchBar({ nodes = [], onSelectNode }) {
+function GraphSearchBar({ nodes = [], onSelectNode }) {
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -39,8 +40,8 @@ export default function GraphSearchBar({ nodes = [], onSelectNode }) {
 
   // Filter leaf and module nodes
   const filteredNodes = useMemo(() => {
-    if (!query.trim() || !nodes || nodes.length === 0) return [];
-    const q = query.toLowerCase();
+    if (!deferredQuery.trim() || !nodes || nodes.length === 0) return [];
+    const q = deferredQuery.toLowerCase();
 
     return nodes
       .filter((n) => {
@@ -50,15 +51,15 @@ export default function GraphSearchBar({ nodes = [], onSelectNode }) {
         return id.includes(q) || label.includes(q) || type.includes(q);
       })
       .slice(0, 8);
-  }, [query, nodes]);
+  }, [deferredQuery, nodes]);
 
-  const handleSelect = (node) => {
+  const handleSelect = useCallback((node) => {
     if (onSelectNode) {
       onSelectNode(node.data?.id || node.id);
     }
     setIsOpen(false);
     setQuery("");
-  };
+  }, [onSelectNode]);
 
   if (!nodes || nodes.length === 0) return null;
 
@@ -161,4 +162,6 @@ export default function GraphSearchBar({ nodes = [], onSelectNode }) {
     </div>
   );
 }
+
+export default React.memo(GraphSearchBar);
 

@@ -6,7 +6,7 @@ import { ACTION_CONFIG, LEGEND_KEYS } from "../lib/action-theme";
 /**
  * Legend: Collapsible graph action colors reference.
  */
-export default function Legend() {
+function Legend() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -52,3 +52,5 @@ export default function Legend() {
     </div>
   );
 }
+
+export default React.memo(Legend);

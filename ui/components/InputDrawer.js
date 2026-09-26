@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from "react";
 import { ACTION_CONFIG, METRIC_KEYS } from "../lib/action-theme";
 
 /**
@@ -20,7 +20,7 @@ function formatBytes(bytes, decimals = 1) {
  * action distribution metrics, and interactive resource exploration.
  * Designed with a Figma/tldraw/React Flow floating workspace architecture.
  */
-export default function InputDrawer({
+function InputDrawer({
   isOpen,
   onToggle,
   onClose,
@@ -47,6 +47,7 @@ export default function InputDrawer({
 
   const [activeTab, setActiveTab] = useState(hasGraph ? "overview" : "source");
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [actionFilter, setActionFilter] = useState("all");
 
   const fileInputRef = useRef(null);
@@ -122,8 +123,8 @@ export default function InputDrawer({
       if (actionFilter !== "all" && change !== actionFilter) {
         return false;
       }
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
+      if (!deferredSearchQuery.trim()) return true;
+      const q = deferredSearchQuery.toLowerCase();
       const id = (n.data?.id || "").toLowerCase();
       const label = (n.data?.label || "").toLowerCase();
       const rType = (n.data?.resourceType || "").toLowerCase();
@@ -137,7 +138,7 @@ export default function InputDrawer({
         mod.includes(q)
       );
     });
-  }, [resourceNodes, actionFilter, searchQuery]);
+  }, [resourceNodes, actionFilter, deferredSearchQuery]);
 
   // Validate file content on client-side before submission
   const validateFileContent = useCallback(async (file) => {
@@ -234,27 +235,27 @@ export default function InputDrawer({
     }
   }, []);
 
-  const handleFileSelect = async (file) => {
+  const handleFileSelect = useCallback(async (file) => {
     if (!file) return;
     setSelectedFile(file);
     setApiError("");
     setLastParsedSummary(null);
     await validateFileContent(file);
-  };
+  }, [validateFileContent]);
 
-  const handleDragOver = (e) => {
+  const handleDragOver = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!disabled) setIsDragging(true);
-  };
+  }, [disabled]);
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-  };
+  }, []);
 
-  const handleDrop = async (e) => {
+  const handleDrop = useCallback(async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -264,9 +265,9 @@ export default function InputDrawer({
     if (files && files.length > 0) {
       await handleFileSelect(files[0]);
     }
-  };
+  }, [disabled, handleFileSelect]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!selectedFile || (validationState && !validationState.valid)) return;
 
     setLoading(true);
@@ -297,9 +298,9 @@ export default function InputDrawer({
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedFile, validationState, onPlanParsed]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSelectedFile(null);
     setValidationState(null);
     setApiError("");
@@ -307,7 +308,7 @@ export default function InputDrawer({
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
+  }, []);
 
   // If collapsed, display sleek floating pill
   if (!isOpen) {
@@ -908,3 +909,5 @@ export default function InputDrawer({
     </div>
   );
 }
+
+export default React.memo(InputDrawer);

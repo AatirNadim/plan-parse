@@ -331,15 +331,15 @@ function InputDrawer({
             d="M4 6h16M4 12h16M4 18h7"
           />
         </svg>
-        <span className="text-xs font-semibold tracking-wide">
+        <span className="text-sm font-semibold tracking-wide">
           {hasGraph ? "Plan Overview" : "Plan Input"}
         </span>
         {cliLoaded ? (
-          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <span className="px-1.5 py-0.5 text-[11px] font-semibold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
             CLI
           </span>
         ) : totalCount > 0 ? (
-          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span className="px-1.5 py-0.5 text-[11px] font-semibold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             {totalCount} res
           </span>
         ) : null}
@@ -370,14 +370,14 @@ function InputDrawer({
         <div className="flex items-center gap-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500 animate-pulse" />
           <div>
-            <h2 className="text-xs font-bold text-white tracking-wide flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
               <span>Terraform Plan</span>
               {cliLoaded ? (
-                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="px-1.5 py-0.5 text-[11px] font-semibold rounded uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   CLI
                 </span>
               ) : totalCount > 0 ? (
-                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="px-1.5 py-0.5 text-[11px] font-semibold rounded uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   {totalCount} resources
                 </span>
               ) : null}
@@ -400,7 +400,7 @@ function InputDrawer({
         <div className="flex border-b border-slate-800/80 bg-slate-950/40 p-1.5 gap-1.5 select-none shrink-0">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === "overview"
                 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
@@ -419,7 +419,7 @@ function InputDrawer({
 
           <button
             onClick={() => setActiveTab("source")}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === "source"
                 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent"
@@ -452,9 +452,9 @@ function InputDrawer({
           <div className="space-y-4">
             {/* a. Multi-segment Action Distribution Bar */}
             <div className="space-y-2 bg-slate-950/50 p-3 rounded-xl border border-slate-800/70">
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-300 tracking-tight">Action Distribution</span>
-                <span className="text-slate-400 font-mono font-medium text-[11px]">{totalCount} Changes</span>
+                <span className="text-slate-400 font-mono font-medium">{totalCount} Changes</span>
               </div>
 
               {/* Horizontal Bar */}
@@ -480,7 +480,7 @@ function InputDrawer({
               </div>
 
               {/* Proportional percentages readout */}
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] pt-1">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] pt-1">
                 {distributionSegments.map((seg) => (
                   <div
                     key={seg.action}
@@ -504,7 +504,7 @@ function InputDrawer({
 
             {/* b. Metric Cards */}
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+              <div className="text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
                 Change Metrics
               </div>
               <div className="grid grid-cols-3 gap-1.5 select-none">
@@ -523,7 +523,7 @@ function InputDrawer({
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`text-[10px] font-bold ${cfg.text} tracking-wider`}>
+                        <span className={`text-[11px] font-semibold ${cfg.text} tracking-wider`}>
                           {cfg.symbol} {cfg.label}
                         </span>
                         <span
@@ -531,7 +531,7 @@ function InputDrawer({
                           style={{ backgroundColor: cfg.color }}
                         />
                       </div>
-                      <div className="text-sm font-medium text-white mt-1 font-mono tracking-tight">
+                      <div className="text-sm font-bold text-white mt-1 font-mono tracking-tight">
                         {count}
                       </div>
                     </button>
@@ -546,7 +546,7 @@ function InputDrawer({
                 <span className="text-xs font-semibold text-slate-300 tracking-tight">
                   Resource Explorer
                 </span>
-                <span className="text-[11px] text-slate-400 font-mono font-medium">
+                <span className="text-xs text-slate-400 font-mono font-medium">
                   {filteredResources.length} of {resourceNodes.length}
                 </span>
               </div>
@@ -584,7 +584,7 @@ function InputDrawer({
               </div>
 
               {/* Action Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar text-[10px]">
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar text-[11px]">
                 {["all", "create", "update", "delete", "replace", "no-op", "read"].map((act) => {
                   const isActive = actionFilter === act;
                   return (
@@ -627,7 +627,7 @@ function InputDrawer({
                       >
                         <div className="flex items-center justify-between gap-1.5">
                           <span
-                            className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0"
+                            className="text-[11px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0"
                             style={{
                               backgroundColor: `${cfg.color}20`,
                               color: cfg.color,
@@ -638,7 +638,7 @@ function InputDrawer({
                           </span>
                           {n.data?.module && (
                             <span
-                              className="text-[10px] font-mono font-medium text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.5 rounded truncate max-w-[150px] tracking-tight"
+                              className="text-[11px] font-mono font-medium text-purple-300 bg-purple-950/50 border border-purple-800/50 px-1.5 py-0.5 rounded truncate max-w-[150px] tracking-tight"
                               title={n.data.module}
                             >
                               {n.data.module}
@@ -651,7 +651,7 @@ function InputDrawer({
                         </div>
 
                         {n.data?.resourceType && (
-                          <div className="text-[10px] text-slate-400 font-mono font-normal truncate tracking-tight">
+                          <div className="text-[11px] text-slate-400 font-mono font-normal truncate tracking-tight">
                             {n.data.resourceType}
                           </div>
                         )}
@@ -672,19 +672,19 @@ function InputDrawer({
               <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-slate-200">Loaded Plan Details</span>
-                  <span className="text-[10px] text-emerald-400 font-medium bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] text-emerald-400 font-medium bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
                     Active on Canvas
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono font-medium text-slate-300">
+                <div className="grid grid-cols-2 gap-1.5 text-xs font-mono font-medium text-slate-300">
                   <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-400 block text-[10px] uppercase font-sans font-semibold tracking-wider">
+                    <span className="text-slate-400 block text-[11px] uppercase font-sans font-semibold tracking-wider">
                       Total Resources
                     </span>
                     <span className="text-white font-medium">{totalCount}</span>
                   </div>
                   <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-400 block text-[10px] uppercase font-sans font-semibold tracking-wider">
+                    <span className="text-slate-400 block text-[11px] uppercase font-sans font-semibold tracking-wider">
                       Source
                     </span>
                     <span className="text-white font-medium truncate block">
@@ -752,7 +752,7 @@ function InputDrawer({
                   </div>
 
                   <div>
-                    <div className="text-xs font-semibold text-slate-200">
+                    <div className="text-sm font-semibold text-slate-200">
                       {selectedFile ? (
                         <span className="text-emerald-300 font-mono font-medium break-all tracking-tight">
                           {selectedFile.name}
@@ -766,7 +766,7 @@ function InputDrawer({
                         </>
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1">
+                    <div className="text-xs text-slate-400 mt-1">
                       {selectedFile
                         ? `${formatBytes(selectedFile.size)} • Click to replace`
                         : "Terraform plan output (.json format)"}
@@ -792,7 +792,7 @@ function InputDrawer({
                       </svg>
                       <span>Valid Terraform Plan JSON</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-300 mt-2 font-mono font-medium">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-300 mt-2 font-mono font-medium">
                       <div className="bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
                         Format: <span className="text-emerald-300">{validationState.meta.formatVersion}</span>
                       </div>
@@ -801,7 +801,7 @@ function InputDrawer({
                       </div>
                     </div>
                     {validationState.meta.resourceCount > 0 && (
-                      <div className="text-[11px] text-emerald-400/90 mt-1.5 font-medium">
+                      <div className="text-xs text-emerald-400/90 mt-1.5 font-medium">
                         Detected {validationState.meta.resourceCount} resource changes in plan.
                       </div>
                     )}
@@ -841,7 +841,7 @@ function InputDrawer({
                 <button
                   onClick={handleSubmit}
                   disabled={loading || disabled}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
                 >
                   {loading ? (
                     <>
@@ -875,7 +875,7 @@ function InputDrawer({
                 <button
                   onClick={handleReset}
                   disabled={loading}
-                  className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   title="Clear file"
                 >
                   Clear
@@ -884,9 +884,9 @@ function InputDrawer({
             )}
 
             {/* Guidance Info */}
-            <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-1.5">
+            <div className="pt-2 border-t border-slate-800/80 text-xs text-slate-400 space-y-1.5">
               <div className="font-semibold text-slate-300">Exporting your Terraform Plan:</div>
-              <pre className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-indigo-300 font-mono text-[10px] overflow-x-auto select-all leading-relaxed">
+              <pre className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-indigo-300 font-mono text-[11px] overflow-x-auto select-all leading-relaxed">
                 terraform plan -out=tfplan{"\n"}terraform show -json tfplan &gt; plan.json
               </pre>
             </div>
@@ -895,14 +895,14 @@ function InputDrawer({
       </div>
 
       {/* Status Footer */}
-      <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-[11px] text-slate-400 shrink-0 select-none">
+      <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400 shrink-0 select-none">
         <span className="flex items-center gap-1.5">
-          <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-medium bg-slate-800 border border-slate-700 rounded text-slate-300">
+          <kbd className="px-1.5 py-0.5 text-[11px] font-mono font-medium bg-slate-800 border border-slate-700 rounded text-slate-300">
             Esc
           </kbd>
           <span>to collapse</span>
         </span>
-        <span className="text-[10px] text-slate-400 font-mono font-medium">
+        <span className="text-[11px] text-slate-400 font-mono font-medium">
           {hasGraph ? "Canvas Active" : "No Plan Loaded"}
         </span>
       </div>

@@ -7,6 +7,7 @@ import WorkbenchSidebar from "../components/WorkbenchSidebar";
 import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
 import { CYTOSCAPE_STYLES } from "../lib/cytoscape-styles";
+import { exportGraphAsPng } from "../lib/export-image";
 
 export default function Home() {
   const [graphData, setGraphData] = useState(null);
@@ -21,6 +22,7 @@ export default function Home() {
   const [isLocked, setIsLocked] = useState(false);
   const [cyReady, setCyReady] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const cyContainerRef = useRef(null);
   const cyRef = useRef(null);
@@ -138,6 +140,18 @@ export default function Home() {
       duration: 250,
     });
   }, []);
+
+  const handleExportPng = useCallback(async () => {
+    if (!cyRef.current || isExporting) return;
+    setIsExporting(true);
+    try {
+      await exportGraphAsPng(cyRef.current, planName);
+    } catch (err) {
+      console.error("Failed to export graph PNG:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [planName, isExporting]);
 
   // Navigate to and select a specific node
   const handleNavigateToNode = useCallback((nodeId) => {
@@ -411,6 +425,8 @@ export default function Home() {
         onOpenUpload={handleOpenUpload}
         onFit={handleFit}
         onResetZoom={handleResetZoom}
+        onExportPng={handleExportPng}
+        isExporting={isExporting}
       />
 
       {/* Main Workbench Middle Area */}

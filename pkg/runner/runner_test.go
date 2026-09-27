@@ -442,7 +442,7 @@ func TestCheckTerraformBinary(t *testing.T) {
 	t.Run("binary present on host", func(t *testing.T) {
 		binPath, err := CheckTerraformBinary()
 		if err != nil {
-			t.Fatalf("expected binary check to pass on host with terraform installed, got: %v", err)
+			t.Skipf("skipping test: terraform or tofu binary not found on host: %v", err)
 		}
 		if binPath == "" {
 			t.Fatal("expected non-empty binary path")
@@ -500,6 +500,9 @@ func TestGeneratePlanJSON(t *testing.T) {
 	})
 
 	t.Run("end-to-end pipeline against testdata produces classified error", func(t *testing.T) {
+		if _, err := CheckTerraformBinary(); err != nil {
+			t.Skipf("skipping test: terraform or tofu binary not found on host: %v", err)
+		}
 		testdataDir := filepath.Join("..", "..", "testdata")
 		_, err := GeneratePlanJSON(testdataDir)
 		if err == nil {

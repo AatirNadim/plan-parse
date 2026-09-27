@@ -2,156 +2,227 @@
 
 > **Parent Documentation**: For the higher-level architecture, see [Frontend Application](../README.md)
 
-The `ui/components` directory contains the modular React UI components that comprise the head-up display (HUD), navigation controls, inspectors, and modal drawers of `plan-parse`. Designed with Tailwind CSS and glassmorphism styling, each component encapsulates a specific user interaction pattern while communicating state changes upward to the canvas orchestrator in `ui/app/page.js`.
+The `ui/components` directory contains the modular React components that construct the Developer Workbench for `plan-parse`. The interface utilizes a docked, IDE-style workbench layout consisting of a grounded top navigation header, docked collapsible side panels, an interactive Cytoscape canvas, a bottom engineering status bar, and a global command palette.
 
 ---
 
-## Component Architecture & HUD Layout
+## Workbench Architecture & Layout Model
 
-The UI components float above the Cytoscape canvas layer using fixed CSS coordinates and distinct z-index layers.
+The workbench replaces legacy floating drawers with docked, high-density panels designed for deep architectural inspection:
 
 ```mermaid
 flowchart TD
-    subgraph ViewportHUD["Canvas Viewport & HUD Overlays"]
-        TopLeft["Fixed Top-Left (z-40)<br/>InputDrawer Toggle Button"]
-        TopRight["Fixed Top-Right (z-20)<br/>GraphSearchBar (⌘K)"]
-        BottomLeft["Fixed Bottom-Left (z-20)<br/>CanvasControls"]
-        BottomRight["Fixed Bottom-Right (z-20)<br/>Legend (Collapsible)"]
-        SlideRight["Fixed Full-Right (z-30)<br/>NodeInspector (Slide-over)"]
-        SlideLeft["Fixed Full-Left (z-30)<br/>InputDrawer (Slide-out)"]
-    end
+    subgraph Workbench["Developer Workbench Layout (ui/app/page.js)"]
+        Header["AppHeader (Top Bar: Context, Blast Radius, Viewport Controls)"]
+        
+        subgraph MiddleArea["Main Workspace"]
+            LeftSidebar["WorkbenchSidebar (Docked Left)<br/>Tabs: Resources | Source"]
+            CenterCanvas["Cytoscape DAG Viewport (#cy)"]
+            RightInspector["NodeInspector (Docked Right)<br/>Tabs: Diff | Lineage | JSON"]
+        end
 
-    Page["ui/app/page.js"] --> TopLeft
-    Page --> TopRight
-    Page --> BottomLeft
-    Page --> BottomRight
-    Page --> SlideRight
-    Page --> SlideLeft
+        Footer["StatusBar (Bottom Bar: Metrics, Zoom HUD, Lock, Legend)"]
+        Palette["CommandPalette (Global Modal: ⌘K Quick Jump)"]
+
+        Header --> MiddleArea
+        MiddleArea --> Footer
+        LeftSidebar -.-> CenterCanvas
+        CenterCanvas -.-> RightInspector
+    end
 ```
 
 ---
 
-## Component Catalog & Internal Mechanics
+## Component Catalog & Detailed Specifications
 
-### 1. `InputDrawer.js`
-A floating, collapsible glassmorphic panel functioning as both an interactive plan overview / resource explorer and a plan file ingestion workflow. Designed with a dual-tab architecture:
+### 1. `AppHeader.js`
+The persistent top navigation bar of the workbench. It anchors application branding, active plan context, blast-radius counters, and primary canvas action triggers.
 
-#### Overview Tab (`activeTab === "overview"`)
-Rendered when a graph is loaded or actively explored:
-- **Action Distribution Bar**: A proportional segmented bar displaying visual percentages and counts across all 6 Terraform change action types with distinctive colors and symbols:
-  - Create (`#22c55e`, `+`)
-  - Update (`#3b82f6`, `~`)
-  - Delete (`#ef4444`, `-`)
-  - Replace (`#f59e0b`, `±`)
-  - No-op (`#64748b`, `=`)
-  - Read (`#ec4899`, `?`)
-- **Metric Cards Grid**: Quick-summary counter cards for each action type with color-coded badges and totals.
-- **Resource Explorer**:
-  - *Real-Time Filter & Search*: Instant filtering across resource leaf nodes by text query (matching ID, label, resource type, resource name, or module origin) and action category dropdown (`all`, `create`, `update`, `delete`, `replace`, `no-op`, `read`).
-  - *Click-to-Navigate*: Clicking any resource card triggers `onNavigateToNode(nodeId)`, centering the Cytoscape camera viewport and focusing on the target node.
-  - *Active Node Synchronization*: Automatically tracks `selectedNode` from canvas taps, highlighting the active resource card and smoothly scrolling it into view (`res-item-${selectedNode.id}`).
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `cliLoaded` | `boolean` | Flag indicating whether the plan was pre-loaded via CLI (`-plan` or `-dir`). |
+  | `planName` | `string` | Display name of the active plan or uploaded filename. |
+  | `summary` | `PlanSummary` | Plan summary object containing action counts (`create`, `update`, `delete`, `replace`). |
+  | `hasGraph` | `boolean` | Indicates whether graph nodes are currently rendered. |
+  | `isSidebarOpen` | `boolean` | Controls sidebar visibility state. |
+  | `onToggleSidebar` | `function` | Toggles left sidebar (`[` shortcut). |
+  | `isInspectorOpen` | `boolean` | Controls right inspector panel visibility. |
+  | `onToggleInspector` | `function` | Toggles right inspector panel (`]` shortcut). |
+  | `onOpenCommandPalette` | `function` | Triggers the Command Palette modal (`⌘K`). |
+  | `onOpenUpload` | `function` | Switches sidebar to the "source" ingestion tab. |
+  | `onFit` | `function` | Re-centers and fits graph to canvas padding (`f`). |
+  | `onResetZoom` | `function` | Resets canvas zoom to 100% (`0`). |
 
-#### Source Tab (`activeTab === "source"`)
-Dedicated to uploading, validating, and submitting Terraform plan JSON files:
-- **Client-Side Pre-Flight Validation**:
-  Before dispatching network requests to the Go backend, `validateFileContent()` performs 5 pre-flight verification checks:
-  1. *Extension Validation*: Enforces `.json` file extension.
-  2. *Payload Bound Check*: Rejects payloads exceeding the 50MB ceiling.
-  3. *Empty File Guard*: Rejects zero-byte files.
-  4. *JSON Syntax Verification*: Parses payload text with `JSON.parse` to trap malformed syntax.
-  5. *Terraform Schema Assertion*: Asserts the presence of non-empty `format_version` and `terraform_version` fields.
-- **Plan File Metadata Summary**: Displays inspected plan attributes including file size, format version, Terraform version, and total `resource_changes` count before submission.
-- **CLI Preloaded State Management**: When the backend starts with `--plan`, displays an active CLI status badge, locks file inputs to prevent accidental overwrites, and exposes an unlock button to switch into custom upload mode.
-- **Submission**: Sends valid files via `multipart/form-data` to `POST /api/parse`, passing the returned graph to `onPlanParsed(graph)`.
+- **UI Elements**:
+  - **Context & Badges**: Displays `PLAN-PARSE` logo, `CLI Mode` amber badge (when pre-loaded), or plan filename.
+  - **Blast Radius Micro-Chips**: Color-coded pill counters showing `+create` (green), `~update` (blue), `-delete` (red), and `±replace` (amber).
+  - **Command Search Trigger**: Quick-access search input pill with `⌘K` badge.
+  - **Controls**: `Fit`, `1:1`, `Load Plan`/`Replace Plan`, and inspector toggle buttons.
+
+---
+
+### 2. `WorkbenchSidebar.js`
+The docked left-hand navigation and ingestion sidebar. Built with a dual-tab architecture to support both active resource exploration and drag-and-drop plan ingestion.
+
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `isOpen` | `boolean` | Sidebar visibility toggle. |
+  | `onClose` | `function` | Closes the sidebar panel. |
+  | `graphData` | `Graph` | The Cytoscape graph data object containing nodes, edges, and summary. |
+  | `summary` | `PlanSummary` | Plan summary metrics. |
+  | `cliLoaded` | `boolean` | Indicates if plan originated from CLI. |
+  | `disabled` | `boolean` | Disables upload inputs when CLI plan is locked. |
+  | `selectedNode` | `NodeData` | Currently selected node for two-way synchronization. |
+  | `onNavigateToNode` | `function` | Callback to focus, center, and highlight a node on canvas. |
+  | `onPlanParsed` | `function` | Callback invoked upon successful plan ingestion `(graph, fileName)`. |
+  | `activeTab` | `string` | Active tab: `"resources"` or `"source"`. |
+  | `onTabChange` | `function` | Callback to switch sidebar tabs. |
+
+- **Dual-Tab Modes**:
+  1. **Resources Tab (`"resources"`)**:
+     - *Blast Radius Distribution Bar*: Segmented proportional bar visualizing action percentages across create, update, delete, replace, no-op, and read.
+     - *Real-Time Filter*: Text query filter matching node ID, label, resource type, and module origin using `useDeferredValue` for smooth typing.
+     - *Action Filter Chips*: Pill buttons filtering resources by action type (`all`, `create`, `update`, `delete`, `replace`, `no-op`, `read`).
+     - *Module Grouping*: Toggle to group resources hierarchically by Terraform module origin.
+     - *Two-Way Node Synchronization*: Automatically scrolls the matching resource card into view (`#tree-item-${selectedNode.id}`) when selected on the canvas.
+  2. **Source Tab (`"source"`)**:
+     - *Drag-and-Drop Dropzone*: Ingests raw `.json` plan files.
+     - *Client-Side Pre-Flight Validation*:
+       - File extension must end in `.json`.
+       - Maximum payload ceiling of 50MB.
+       - Rejects empty files.
+       - Validates JSON syntax via `JSON.parse`.
+       - Asserts non-empty `format_version` and `terraform_version` fields.
+     - *Plan Metadata Card*: Previews inspected format version, Terraform version, and resource count before submitting.
+     - *Stateless Upload*: Dispatches `POST /api/parse` via `FormData` and feeds returned DAG directly into canvas state.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
-    participant Drawer as InputDrawer.js
+    participant Sidebar as WorkbenchSidebar.js
     participant Server as Go Backend (/api/parse)
     participant Page as app/page.js
     participant Cy as Cytoscape Canvas
 
-    alt Uploading New Plan (Source Tab)
-        User->>Drawer: Drag & drop plan.json
-        Drawer->>Drawer: Client pre-flight checks (Size, JSON syntax, TF versions)
-        Drawer-->>User: Display plan metadata preview
-        User->>Drawer: Click "Parse & Load Graph"
-        Drawer->>Server: POST /api/parse (FormData)
-        Server-->>Drawer: 200 OK (Cytoscape Graph JSON)
-        Drawer->>Page: onPlanParsed(graph)
+    alt Ingesting Plan (Source Tab)
+        User->>Sidebar: Drop plan.json
+        Sidebar->>Sidebar: Client Pre-Flight Validation (JSON syntax, TF versions)
+        Sidebar-->>User: Display plan metadata preview
+        User->>Sidebar: Click "Parse & Load Graph"
+        Sidebar->>Server: POST /api/parse (FormData)
+        Server-->>Sidebar: 200 OK (Cytoscape Graph JSON)
+        Sidebar->>Page: onPlanParsed(graph, fileName)
         Page->>Cy: Render hierarchical DAG
-        Drawer->>Drawer: Switch activeTab to "overview"
-    else Exploring Resources (Overview Tab)
-        User->>Drawer: Filter by action or search query
-        Drawer-->>User: Display filtered resource list
-        User->>Drawer: Click resource item
-        Drawer->>Page: onNavigateToNode(nodeId)
-        Page->>Cy: Center camera & apply node selection (.highlighted)
+        Sidebar->>Sidebar: Switch activeTab to "resources"
+    else Exploring Resources (Resources Tab)
+        User->>Sidebar: Enter filter query or action pill
+        Sidebar-->>User: Render filtered resource tree
+        User->>Sidebar: Click resource item
+        Sidebar->>Page: onNavigateToNode(nodeId)
+        Page->>Cy: Center camera & apply .highlighted styles
     end
 ```
 
-### 2. `CanvasControls.js`
-A React Flow-inspired floating control bar positioned at the bottom-left of the viewport.
+---
+
+### 3. `NodeInspector.js`
+The docked right slide-over inspector panel. Provides deep architectural insight and attribute change verification for any selected node.
+
 - **Props**:
-  - `zoomLevel` (*number*): Current Cytoscape viewport zoom factor.
-  - `onZoomIn` / `onZoomOut` (*function*): Zoom callbacks with smooth cubic animations.
-  - `onFit` (*function*): Fits all elements within screen bounds with 50px padding.
-  - `onResetZoom` (*function*): Restores zoom factor to 1.0 (1:1 scale).
-  - `isLocked` (*boolean*): Toggles panning and mousewheel zooming on the canvas.
-  - `onToggleLock` (*function*): Disables or enables canvas user interactions.
-- **Dynamic HUD**: Renders a live zoom percentage badge (e.g. `125%`).
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `node` | `NodeData` | Selected node object containing ID, label, action, changeDetails, incomers, outgoers. |
+  | `onClose` | `function` | Closes the inspector (`Escape` or close button). |
+  | `onNavigateToNode` | `function` | Callback to jump camera focus to an upstream or downstream dependency node. |
 
-### 3. `GraphSearchBar.js`
-A high-efficiency resource locator positioned at the top-right of the viewport.
-- **Keyboard Shortcut**: Automatically captures `⌘K` or `Ctrl+K` to focus the search input.
-- **Fuzzy Search & Autocomplete**: Filters through all leaf and module nodes matching `id`, `label`, or `type`.
-- **Navigation Dispatch**: Selecting an entry invokes `onSelectNode(nodeId)`, which animates the canvas camera to center on the target node.
-
-### 4. `NodeInspector.js`
-A slide-over drawer anchored to the right edge of the screen that opens when any node is tapped.
-- **Node Metadata**: Displays resource type, logical label, full Terraform address, and source code location (`file:line`).
-- **Action Badge**: Color-coded badge reflecting the change action (`create`, `update`, `delete`, `replace`, etc.).
-- **Dependency Navigation**:
-  - *Depends On (`outgoers`)*: Lists upstream resources this node depends upon with clickable "view" buttons that jump to each target.
-  - *Referenced By (`incomers`)*: Lists downstream resources dependent upon this node.
-- **Attribute Diff Inspector**: Formats `before` and `after` attribute state as syntax-highlighted JSON.
-
-### 5. `Legend.js`
-A collapsible bottom-right overlay documenting the color palette used for graph nodes and gradient edges:
-- `create` (`#22c55e`), `update` (`#3b82f6`), `delete` (`#ef4444`), `replace` (`#f59e0b`), `no-op` (`#64748b`), `data` (`#ec4899`), `module` (`#a855f7`), `variable` (`#0ea5e9`), `output` (`#eab308`).
+- **Subsystem Tabs**:
+  1. **Attribute Diff Tab (`"diff"`)**:
+     - Compares `before` and `after` resource configurations from Terraform's `changeDetails`.
+     - Displays line-by-line colored diff rows:
+       - `+ ADDED` (Emerald, green background)
+       - `- REMOVED` (Rose, red background)
+       - `~ MODIFIED` (Amber, yellow background with strikethrough before-values)
+       - `= SAME` (Slate, unchanged properties)
+  2. **Lineage Tab (`"lineage"`)**:
+     - *Upstream Dependencies (`Depends On`)*: Lists all nodes that the active resource depends on (`outgoers`), with one-click `focus` navigation buttons.
+     - *Blast Radius (`Referenced By`)*: Lists all downstream nodes that depend on the active resource (`incomers`), displaying blast-radius risk.
+  3. **Raw JSON Tab (`"json"`)**:
+     - Displays formatted, syntax-highlighted raw JSON attributes with a one-click "Copy Address" utility.
 
 ---
 
-## Key Files & Exports
+### 4. `StatusBar.js`
+The grounded engineering status strip docked at the bottom of the viewport.
 
-| Component File | Export | Primary Role |
-| :--- | :--- | :--- |
-| `InputDrawer.js` | `default InputDrawer` | Floating dual-tab panel providing plan JSON ingestion/validation and interactive resource exploration with action metrics. |
-| `CanvasControls.js` | `default CanvasControls` | Floating React Flow-style viewport controls (zoom, fit, 1:1, lock, percentage HUD). |
-| `GraphSearchBar.js` | `default GraphSearchBar` | Autocomplete resource finder with global `⌘K` hotkey and camera focus callbacks. |
-| `NodeInspector.js` | `default NodeInspector` | Detail slide-over panel displaying resource diffs, module origins, and dependency links. |
-| `Legend.js` | `default Legend` | Collapsible reference card explaining graph node and edge action colors. |
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `nodeCount` | `number` | Count of total nodes in the loaded graph. |
+  | `edgeCount` | `number` | Count of total edges in the loaded graph. |
+  | `zoomLevel` | `number` | Active Cytoscape camera zoom level (ratio). |
+  | `onZoomIn` | `function` | Zoom in callback (+30%). |
+  | `onZoomOut` | `function` | Zoom out callback (-25%). |
+  | `isLocked` | `boolean` | Flag indicating whether viewport panning and zooming are locked. |
+  | `onToggleLock` | `function` | Callback to toggle canvas navigation lock. |
+
+- **Sections**:
+  - **Left HUD**: Active graph metrics (`N nodes • N edges`), inline zoom percentage HUD (`100%`), inline `-`/`+` step zoom buttons, and `LOCKED`/`UNLOCKED` navigation toggle.
+  - **Right HUD**: Color-coded action legend dots (create `#22c55e`, update `#3b82f6`, delete `#ef4444`, replace `#f59e0b`, no-op `#64748b`) and global shortcut hints (`⌘K search`, `f fit`).
+
+---
+
+### 5. `CommandPalette.js`
+A global modal dialog triggered by `Cmd+K` / `Ctrl+K` for rapid keyboard-driven navigation across large infrastructure graphs.
+
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `isOpen` | `boolean` | Modal visibility state. |
+  | `onClose` | `function` | Callback to dismiss the palette (`Escape` or backdrop click). |
+  | `nodes` | `Array<Node>` | Complete array of graph nodes to search. |
+  | `onSelectNode` | `function` | Callback invoked when an item is selected `(nodeId)`. |
+
+- **Features**:
+  - **Keyboard Navigation**: Fully operable via `ArrowUp`, `ArrowDown`, `Enter` (select), and `Escape` (dismiss).
+  - **Real-Time Fuzzy Matching**: Evaluates user queries against resource IDs, labels, resource types, action changes, and module names using `useDeferredValue`.
+  - **Item Visualization**: Each result displays the resource action pill, resource label, module breadcrumb, and resource type badge.
+  - **Auto-Scroll**: Keeps the active highlighted keyboard selection centered within view.
+
+```mermaid
+flowchart TD
+    Hotkey["User presses Cmd+K / Ctrl+K"] --> Open["CommandPalette Opens (Input Focused)"]
+    Open --> Type["User Types Search Query"]
+    Type --> Deferred["useDeferredValue(query)"]
+    Deferred --> Filter["Filter nodes (ID, label, type, module, action)"]
+    Filter --> Display["Display Top 12 Results"]
+    Display --> Nav{"Keyboard Input"}
+    Nav -->|ArrowUp / ArrowDown| Move["Cycle selectedIndex & Scroll into View"]
+    Nav -->|Enter| Select["onSelectNode(nodeId)"]
+    Nav -->|Escape| Close["onClose()"]
+    Select --> Animate["Cytoscape animates camera & highlights node"]
+    Select --> Close
+```
 
 ---
 
 ## Hierarchy & Reference Graph
 
-This section connects to [Canvas Page](../app/README.md) which mounts and coordinates these components, and [Public Static Assets](../public/README.md) for supporting bundle resources.
+This package is coordinated directly by [App Router & Canvas Orchestration](../app/README.md) and renders graphs provided by [HTTP Server Package](../../pkg/server/README.md).
 
 ```mermaid
 flowchart TD
     UI["ui/ (Frontend Project)"]:::node
-    UI_COMPONENTS["ui/components/ (React Overlays)"]:::current
-    UI_APP["ui/app/ (App Router & Canvas)"]:::node
-    UI_PUBLIC["ui/public/ (Cytoscape Bundle)"]:::node
+    COMPONENTS["ui/components/ (Component Library)"]:::current
+    APP["ui/app/ (App Router & Orchestrator)"]:::node
+    SERVER["pkg/server/ (HTTP Transport)"]:::node
 
-    UI --> UI_COMPONENTS
-    UI --> UI_APP
-    UI --> UI_PUBLIC
-
-    UI_APP -->|imports and renders| UI_COMPONENTS
+    UI --> APP
+    UI --> COMPONENTS
+    APP -->|imports & orchestrates| COMPONENTS
+    APP -.->|fetches graph from| SERVER
 
     classDef current fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
     classDef node fill:#1e293b,stroke:#475569,stroke-width:1px,color:#f8fafc;

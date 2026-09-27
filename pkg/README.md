@@ -55,9 +55,10 @@ The `runner` package encapsulates interaction with the host environment and the 
 
 ### 3. `pkg/server`
 The `server` package consumes `pkg/core` to fulfill web requests. It handles:
-- Serving pre-parsed CLI plans or accepting on-the-fly file uploads via `POST /api/parse`.
-- Single-use consumption semantics: safeguarding initial plan loads against page reloads or stale state.
-- Embedded static asset delivery: serving pre-compiled HTML, JavaScript bundles, CSS, and Next.js static chunks directly from memory.
+- **Stateless Architecture**: `POST /api/parse` is completely functional and stateless. It validates incoming plan bytes, constructs an ephemeral parser with `core.NewParser`, and streams the resulting DAG JSON back to the client. No plan state, session data, cookies, or files are retained on the server.
+- **Goroutine Concurrency Model**: Leveraging Go's `net/http` server, every incoming HTTP connection is dispatched in its own goroutine. Ingestion requests run concurrently in parallel with zero mutex contention, enabling multiple users and browser tabs to visualize different plans simultaneously without cross-talk.
+- **Single-Use CLI Lifecycle Semantics**: When started with `--plan` or `--dir`, initial plan delivery via `GET /api/status` and `GET /api/graph` is guarded by a lightweight `sync.Mutex` (`s.mu`). Single-use consumption flags (`statusServedOnce`, `graphServedOnce`) deliver the pre-loaded plan to the first browser tab, while subsequent requests or reloads automatically unlock into the interactive ingestion workbench.
+- **Embedded Static Asset Delivery**: Serves pre-compiled HTML, JavaScript bundles, CSS, and Next.js static chunks directly from memory via Go's `embed.FS`.
 
 ---
 
@@ -66,7 +67,7 @@ The `server` package consumes `pkg/core` to fulfill web requests. It handles:
 | Subpackage | Purpose | Primary Responsibilities |
 | :--- | :--- | :--- |
 | [`pkg/core`](./core/README.md) | Domain Parser & DAG Generator | Schema validation, modules manifest lookup, dependency resolution, Cytoscape node/edge generation, change action summaries. |
-| `pkg/runner` | Programmatic Runner | Directory validation, binary discovery, plan extraction, and diagnostic error classification. |
+| [`pkg/runner`](./runner/README.md) | Programmatic Runner | Directory validation, binary discovery, plan extraction, and diagnostic error classification. |
 | [`pkg/server`](./server/README.md) | HTTP Transport & Asset Hosting | REST routing (`/api/status`, `/api/graph`, `/api/parse`, `/api/health`), CORS middleware, SPA fallback routing, embedded static files. |
 | [`pkg/server/ui`](./server/ui/README.md) | Embedded Static Web Artifacts | Directory holding pre-compiled production output (`ui/out`) for Go embedding via `//go:embed all:ui/out`. |
 

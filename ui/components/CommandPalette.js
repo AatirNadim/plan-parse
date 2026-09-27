@@ -1,0 +1,190 @@
+"use client";
+
+import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue } from "react";
+import { ACTION_CONFIG } from "../lib/action-theme";
+
+/**
+ * CommandPalette: Global ⌘K quick switcher & node navigation.
+ * High-performance, keyboard-first, zero layout interference.
+ */
+function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
+  const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen) {
+      setQuery("");
+      setSelectedIndex(0);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [isOpen]);
+
+  // Filter nodes
+  const filteredNodes = useMemo(() => {
+    if (!nodes || nodes.length === 0) return [];
+    if (!deferredQuery.trim()) {
+      return nodes.slice(0, 12);
+    }
+    const q = deferredQuery.toLowerCase().trim();
+    return nodes
+      .filter((n) => {
+        const id = (n.data?.id || "").toLowerCase();
+        const label = (n.data?.label || "").toLowerCase();
+        const type = (n.data?.resourceType || n.data?.type || "").toLowerCase();
+        const change = (n.data?.change || "").toLowerCase();
+        const mod = (n.data?.module || "").toLowerCase();
+        return (
+          id.includes(q) ||
+          label.includes(q) ||
+          type.includes(q) ||
+          change.includes(q) ||
+          mod.includes(q)
+        );
+      })
+      .slice(0, 12);
+  }, [deferredQuery, nodes]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredNodes.length));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev - 1 + filteredNodes.length) % Math.max(1, filteredNodes.length));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filteredNodes[selectedIndex]) {
+          const target = filteredNodes[selectedIndex];
+          onSelectNode(target.data?.id || target.id);
+          onClose();
+        }
+      }
+    },
+    [filteredNodes, selectedIndex, onSelectNode, onClose]
+  );
+
+  // Keep selected item in view
+  useEffect(() => {
+    if (listRef.current) {
+      const activeEl = listRef.current.children[selectedIndex];
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedIndex]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-xs select-none">
+      <div
+        className="w-full max-w-xl bg-workbench-panel border border-workbench-border rounded shadow-2xl overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Search Input Bar */}
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-workbench-border bg-workbench-header">
+          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Jump to resource, module, or type..."
+            className="flex-1 bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none font-mono"
+          />
+          <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-workbench-subpanel border border-workbench-border rounded">
+            ESC
+          </kbd>
+        </div>
+
+        {/* Results List */}
+        <div ref={listRef} className="max-h-80 overflow-y-auto p-1 space-y-0.5 custom-scrollbar">
+          {filteredNodes.length === 0 ? (
+            <div className="p-6 text-center text-xs text-slate-500 font-mono">
+              No matching resources found for "{query}"
+            </div>
+          ) : (
+            filteredNodes.map((n, idx) => {
+              const data = n.data || {};
+              const change = (data.change || "no-op").toLowerCase();
+              const cfg = ACTION_CONFIG[change] || ACTION_CONFIG["no-op"];
+              const isSelected = idx === selectedIndex;
+
+              return (
+                <button
+                  key={data.id || idx}
+                  onClick={() => {
+                    onSelectNode(data.id);
+                    onClose();
+                  }}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                  className={`w-full flex items-center justify-between gap-3 px-2.5 py-1.5 text-left rounded transition-colors ${
+                    isSelected
+                      ? "bg-workbench-hover text-white"
+                      : "text-slate-300 hover:bg-workbench-subpanel"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate flex-1 min-w-0">
+                    <span
+                      className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase"
+                      style={{
+                        backgroundColor: `${cfg.color}15`,
+                        color: cfg.color,
+                        border: `1px solid ${cfg.color}30`,
+                      }}
+                    >
+                      {cfg.symbol} {change}
+                    </span>
+                    <div className="truncate flex-1 min-w-0">
+                      <div className="text-xs font-mono text-slate-200 truncate">
+                        {data.label || data.id}
+                      </div>
+                      {data.resourceType && (
+                        <div className="text-[10px] font-mono text-slate-500 truncate">
+                          {data.resourceType}
+                          {data.module ? ` • ${data.module}` : ""}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {isSelected && (
+                    <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                      Jump ↵
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Palette Footer */}
+        <div className="px-3.5 py-1.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <div className="flex items-center gap-3">
+            <span><kbd className="text-slate-400">↑↓</kbd> navigate</span>
+            <span><kbd className="text-slate-400">↵</kbd> select</span>
+            <span><kbd className="text-slate-400">esc</kbd> close</span>
+          </div>
+          <span>{filteredNodes.length} results</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default React.memo(CommandPalette);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { usePlatformModifier } from "../lib/use-platform";
 
 /**
  * AppHeader: Persistent Developer Workbench top navigation bar.
@@ -33,6 +34,8 @@ function AppHeader({
     delete: summary?.delete || 0,
     replace: summary?.replace || 0,
   };
+
+  const { paletteKey } = usePlatformModifier();
 
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const exportMenuRef = useRef(null);
@@ -157,7 +160,7 @@ function AppHeader({
             <span className="truncate">Quick jump to resource...</span>
           </div>
           <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-400 shrink-0">
-            ⌘K
+            {paletteKey}
           </kbd>
         </button>
       )}

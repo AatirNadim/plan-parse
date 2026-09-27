@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
-import { ACTION_CONFIG, LEGEND_KEYS } from "../lib/action-theme";
+import { ACTION_CONFIG } from "../lib/action-theme";
+
+const STATUS_ACTIONS = ["create", "update", "delete", "replace"];
 
 /**
  * StatusBar: Persistent bottom workbench status strip.
@@ -61,21 +63,44 @@ function StatusBar({ nodeCount = 0, edgeCount = 0, zoomLevel = 1, onZoomIn, onZo
         )}
       </div>
 
-      {/* Right: Integrated Action Legend */}
-      <div className="hidden sm:flex items-center gap-3">
-        {LEGEND_KEYS.slice(0, 5).map((key) => {
-          const cfg = ACTION_CONFIG[key];
-          if (!cfg) return null;
-          return (
-            <div key={key} className="flex items-center gap-1">
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: cfg.color }}
-              />
-              <span className="text-slate-400">{cfg.label}</span>
-            </div>
-          );
-        })}
+      {/* Right: Integrated Action & Entity Legend */}
+      <div className="hidden sm:flex items-center gap-2.5">
+        {/* Actions */}
+        <div className="flex items-center gap-2.5">
+          {STATUS_ACTIONS.map((key) => {
+            const cfg = ACTION_CONFIG[key];
+            if (!cfg) return null;
+            return (
+              <div key={key} className="flex items-center gap-1">
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: cfg.color }}
+                />
+                <span className="text-slate-400">{cfg.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="h-3 w-px bg-workbench-border" />
+
+        {/* Entities */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1">
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: ACTION_CONFIG.variable?.color || "#6366f1" }}
+            />
+            <span className="text-slate-400">Var</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: ACTION_CONFIG.output?.color || "#d946ef" }}
+            />
+            <span className="text-slate-400">Output</span>
+          </div>
+        </div>
 
         <div className="h-3 w-px bg-workbench-border" />
 

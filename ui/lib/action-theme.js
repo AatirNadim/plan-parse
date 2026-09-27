@@ -13,8 +13,8 @@ export const ACTION_COLORS = {
   data: "#ec4899",      // Pink
   read: "#ec4899",
   module: "#8b5cf6",    // Violet
-  variable: "#0ea5e9",  // Cyan
-  output: "#eab308",    // Yellow
+  variable: "#6366f1",  // Indigo
+  output: "#d946ef",    // Fuchsia
 };
 
 export const ACTION_CONFIG = {
@@ -110,35 +110,28 @@ export const ACTION_CONFIG = {
   },
   variable: {
     label: "Variable",
-    color: "#0ea5e9",
-    textColor: "#090a0f",
-    text: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/30",
+    color: "#6366f1",
+    textColor: "#ffffff",
+    text: "text-indigo-400",
+    bg: "bg-indigo-500/10",
+    border: "border-indigo-500/30",
     symbol: "V",
-    badge: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
+    badge: "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20",
   },
   output: {
     label: "Output",
-    color: "#eab308",
-    textColor: "#090a0f",
-    text: "text-yellow-400",
-    bg: "bg-yellow-500/10",
-    border: "border-yellow-500/30",
+    color: "#d946ef",
+    textColor: "#ffffff",
+    text: "text-fuchsia-400",
+    bg: "bg-fuchsia-500/10",
+    border: "border-fuchsia-500/30",
     symbol: "O",
-    badge: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
+    badge: "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20",
   },
 };
 
-export const METRIC_KEYS = ["create", "update", "delete", "replace", "no-op", "read"];
-
-export const LEGEND_KEYS = [
-  "create",
-  "update",
-  "delete",
-  "replace",
-  "no-op",
-  "data",
-  "module",
-];
+export const ACTION_KEYS = ["create", "update", "delete", "replace", "no-op", "read"];
+export const METRIC_KEYS = ACTION_KEYS;
+export const ENTITY_KEYS = ["variable", "output", "module", "data"];
+export const LEGEND_KEYS = [...ACTION_KEYS, ...ENTITY_KEYS];
 

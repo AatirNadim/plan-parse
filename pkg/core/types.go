@@ -40,8 +40,8 @@ const (
 	ColorNoop     string = "#64748b" // slate
 	ColorData     string = "#ec4899" // pink
 	ColorModule   string = "#a855f7" // purple
-	ColorVariable string = "#0ea5e9" // sky
-	ColorOutput   string = "#eab308" // yellow
+	ColorVariable string = "#6366f1" // indigo
+	ColorOutput   string = "#d946ef" // fuchsia
 	ColorLocal    string = "#000000" // black
 	ColorResource string = "#94a3b8" // slate-400
 )

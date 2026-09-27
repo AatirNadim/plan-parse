@@ -22,6 +22,9 @@ function AppHeader({
   onExportPng,
   onExportSvg,
   isExporting = null,
+  isCollapsed = false,
+  onToggleCollapse,
+  collapsedCount = 0,
 }) {
   const counts = {
     create: summary?.create || 0,
@@ -162,6 +165,31 @@ function AppHeader({
       <div className="flex items-center gap-1.5">
         {hasGraph && (
           <>
+            {/* Collapse / Mutations Only Toggle */}
+            <button
+              onClick={onToggleCollapse}
+              title={
+                isCollapsed
+                  ? "Expand all intermediate nodes (C)"
+                  : "Collapse intermediate nodes / Mutations only (C)"
+              }
+              className={`px-2 py-1 rounded text-xs font-mono transition flex items-center gap-1.5 cursor-pointer ${
+                isCollapsed
+                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-xs font-medium"
+                  : "text-slate-300 hover:text-white bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span>{isCollapsed ? "Mutations Only" : "Collapse"}</span>
+              {isCollapsed && collapsedCount > 0 && (
+                <span className="px-1.5 py-0.2 text-[10px] rounded bg-sky-500/30 text-sky-200 border border-sky-500/40 font-mono">
+                  ({collapsedCount})
+                </span>
+              )}
+            </button>
+
             <button
               onClick={onFit}
               title="Fit to view (F)"

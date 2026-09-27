@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import AppHeader from "../components/AppHeader";
 import StatusBar from "../components/StatusBar";
 import WorkbenchSidebar from "../components/WorkbenchSidebar";
@@ -8,6 +8,7 @@ import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
 import { CYTOSCAPE_STYLES } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
+import { collapseGraph } from "../lib/graph-collapse";
 
 export default function Home() {
   const [graphData, setGraphData] = useState(null);
@@ -23,9 +24,30 @@ export default function Home() {
   const [cyReady, setCyReady] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Compute collapsed graph representation with transitive edge bridging
+  const collapsedGraph = useMemo(() => {
+    if (!graphData) return null;
+    return collapseGraph(graphData);
+  }, [graphData]);
+
+  // Compute active elements to feed Cytoscape canvas
+  const activeGraphData = useMemo(() => {
+    if (!graphData) return null;
+    if (isCollapsed && collapsedGraph) {
+      return collapsedGraph;
+    }
+    return graphData;
+  }, [graphData, isCollapsed, collapsedGraph]);
+
+  const handleToggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
 
   const cyContainerRef = useRef(null);
   const cyRef = useRef(null);
+  const pendingNavigateNodeIdRef = useRef(null);
 
   // Check for window.cytoscape loaded via layout.js script tag
   useEffect(() => {
@@ -165,63 +187,93 @@ export default function Home() {
     if (!cyRef.current || isExporting) return;
     setIsExporting("png");
     try {
-      await exportGraphAsPng(cyRef.current, planName);
+      const cleanName = (planName || "terraform-plan").replace(/\.[^/.]+$/, "");
+      const exportName = isCollapsed ? `${cleanName}-collapsed` : cleanName;
+      await exportGraphAsPng(cyRef.current, exportName);
     } catch (err) {
       console.error("Failed to export graph PNG:", err);
     } finally {
       setIsExporting(null);
     }
-  }, [planName, isExporting]);
+  }, [planName, isExporting, isCollapsed]);
 
   const handleExportSvg = useCallback(async () => {
     if (!cyRef.current || isExporting) return;
     setIsExporting("svg");
     try {
-      await exportGraphAsSvg(cyRef.current, planName);
+      const cleanName = (planName || "terraform-plan").replace(/\.[^/.]+$/, "");
+      const exportName = isCollapsed ? `${cleanName}-collapsed` : cleanName;
+      await exportGraphAsSvg(cyRef.current, exportName);
     } catch (err) {
       console.error("Failed to export graph SVG:", err);
     } finally {
       setIsExporting(null);
     }
-  }, [planName, isExporting]);
+  }, [planName, isExporting, isCollapsed]);
+
+  // Clear selected node if it was hidden in current collapsed view
+  useEffect(() => {
+    if (selectedNode && activeGraphData) {
+      const exists = (activeGraphData.nodes || []).some((n) => n.data?.id === selectedNode.id);
+      if (!exists) {
+        setSelectedNode(null);
+      }
+    }
+  }, [activeGraphData, selectedNode]);
+
+  // Helper to focus, highlight, and smoothly zoom to a node in Cytoscape
+  const selectAndFocusNode = useCallback((cy, targetNodeId) => {
+    if (!cy || cy.destroyed() || !targetNodeId) return;
+    const node = cy.$id(targetNodeId);
+    if (!node || node.length === 0) return;
+
+    const data = node.data();
+    const incomers = node.incomers("node").map((n) => n.data().id);
+    const outgoers = node.outgoers("node").map((n) => n.data().id);
+
+    setSelectedNode({
+      ...data,
+      incomers,
+      outgoers,
+    });
+    setIsInspectorOpen(true);
+
+    // Highlight connections
+    cy.elements().removeClass("dimmed highlighted highlighted-edge");
+    cy.elements().addClass("dimmed");
+
+    node.removeClass("dimmed").addClass("highlighted");
+    node.ancestors().removeClass("dimmed");
+    node.descendants().removeClass("dimmed");
+    node.connectedEdges().removeClass("dimmed").addClass("highlighted-edge");
+    node.incomers().removeClass("dimmed").addClass("highlighted");
+    node.outgoers().removeClass("dimmed").addClass("highlighted");
+
+    // Smoothly animate camera to center & zoom onto the node
+    cy.animate({
+      center: { eles: node },
+      zoom: Math.max(cy.zoom(), 1.25),
+      duration: 400,
+    });
+  }, []);
 
   // Navigate to and select a specific node
   const handleNavigateToNode = useCallback((nodeId) => {
-    if (!cyRef.current || !nodeId) return;
+    if (!nodeId) return;
     const cy = cyRef.current;
-    const node = cy.$id(nodeId);
+    const node = cy ? cy.$id(nodeId) : null;
 
-    if (node && node.length > 0) {
-      const data = node.data();
-      const incomers = node.incomers("node").map((n) => n.data().id);
-      const outgoers = node.outgoers("node").map((n) => n.data().id);
-
-      setSelectedNode({
-        ...data,
-        incomers,
-        outgoers,
-      });
-      setIsInspectorOpen(true);
-
-      // Highlight connections
-      cy.elements().removeClass("dimmed highlighted highlighted-edge");
-      cy.elements().addClass("dimmed");
-
-      node.removeClass("dimmed").addClass("highlighted");
-      node.ancestors().removeClass("dimmed");
-      node.descendants().removeClass("dimmed");
-      node.connectedEdges().removeClass("dimmed").addClass("highlighted-edge");
-      node.incomers().removeClass("dimmed").addClass("highlighted");
-      node.outgoers().removeClass("dimmed").addClass("highlighted");
-
-      // Smoothly animate camera to center & zoom onto the node
-      cy.animate({
-        center: { eles: node },
-        zoom: Math.max(cy.zoom(), 1.25),
-        duration: 400,
-      });
+    // If node is not on canvas because graph is collapsed, expand first and queue smooth navigation
+    if ((!node || node.length === 0) && isCollapsed) {
+      pendingNavigateNodeIdRef.current = nodeId;
+      setIsCollapsed(false);
+      return;
     }
-  }, []);
+
+    if (cy && node && node.length > 0) {
+      selectAndFocusNode(cy, nodeId);
+    }
+  }, [isCollapsed, selectAndFocusNode]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -234,16 +286,13 @@ export default function Home() {
         return;
       }
 
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
-      } else if (e.key === "[") {
-        e.preventDefault();
-        setIsSidebarOpen((prev) => !prev);
-      } else if (e.key === "]") {
-        e.preventDefault();
-        setIsInspectorOpen((prev) => !prev);
-      } else if (e.key === "Escape") {
+        return;
+      }
+
+      if (e.key === "Escape") {
         if (isCommandPaletteOpen) {
           setIsCommandPaletteOpen(false);
         } else if (selectedNode) {
@@ -252,13 +301,39 @@ export default function Home() {
             cyRef.current.elements().removeClass("dimmed highlighted highlighted-edge");
           }
         }
+        return;
+      }
+
+      // Single-character shortcuts: MUST ensure no modifier keys (Cmd/Ctrl/Alt) are pressed.
+      // This guarantees native OS shortcuts like Cmd+C / Ctrl+C (clipboard copy),
+      // Cmd+F (find in page), Cmd+0 (reset browser zoom), etc. are NEVER intercepted.
+      const isPlainKey = !e.metaKey && !e.ctrlKey && !e.altKey;
+      if (!isPlainKey) {
+        return;
+      }
+
+      if (e.key === "[") {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+      } else if (e.key === "]") {
+        e.preventDefault();
+        setIsInspectorOpen((prev) => !prev);
+      } else if (e.key === "c" || e.key === "C") {
+        if (graphData && graphData.nodes && graphData.nodes.length > 0) {
+          e.preventDefault();
+          handleToggleCollapse();
+        }
       } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
         handleFit();
       } else if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
         handleZoomIn();
       } else if (e.key === "-") {
+        e.preventDefault();
         handleZoomOut();
       } else if (e.key === "0") {
+        e.preventDefault();
         handleResetZoom();
       }
     }
@@ -268,15 +343,17 @@ export default function Home() {
   }, [
     isCommandPaletteOpen,
     selectedNode,
+    graphData,
+    handleToggleCollapse,
     handleFit,
     handleZoomIn,
     handleZoomOut,
     handleResetZoom,
   ]);
 
-  // Render Cytoscape graph when graphData changes
+  // Render Cytoscape graph when activeGraphData changes
   useEffect(() => {
-    if (!graphData || !cyContainerRef.current) return;
+    if (!activeGraphData || !cyContainerRef.current) return;
     if (typeof window === "undefined" || !window.cytoscape) return;
 
     try {
@@ -289,7 +366,7 @@ export default function Home() {
       const nodeIds = new Set();
 
       // Add nodes
-      (graphData.nodes || []).forEach((n) => {
+      (activeGraphData.nodes || []).forEach((n) => {
         nodeIds.add(n.data.id);
         elements.push({
           group: "nodes",
@@ -299,7 +376,7 @@ export default function Home() {
       });
 
       // Add edges (ensure both ends exist)
-      (graphData.edges || []).forEach((e) => {
+      (activeGraphData.edges || []).forEach((e) => {
         if (nodeIds.has(e.data.source) && nodeIds.has(e.data.target)) {
           elements.push({
             group: "edges",
@@ -373,7 +450,7 @@ export default function Home() {
         }
       });
 
-      // Run Klay DAG layout
+      // Run Klay DAG layout with breadthfirst fallback
       const runLayout = () => {
         if (!cy || cy.destroyed()) return;
         try {
@@ -389,10 +466,35 @@ export default function Home() {
               nodeLayering: "NETWORK_SIMPLEX",
             },
           });
+          layout.one("layoutstop", () => {
+            if (!cy.destroyed()) {
+              if (pendingNavigateNodeIdRef.current) {
+                const targetId = pendingNavigateNodeIdRef.current;
+                pendingNavigateNodeIdRef.current = null;
+                selectAndFocusNode(cy, targetId);
+              } else {
+                cy.fit(undefined, 50);
+                setZoomLevel(cy.zoom());
+              }
+            }
+          });
           layout.run();
         } catch (e) {
           console.warn("Klay layout error, falling back to breadthfirst:", e);
-          cy.layout({ name: "breadthfirst", directed: true, padding: 50 }).run();
+          const bf = cy.layout({ name: "breadthfirst", directed: true, padding: 50 });
+          bf.one("layoutstop", () => {
+            if (!cy.destroyed()) {
+              if (pendingNavigateNodeIdRef.current) {
+                const targetId = pendingNavigateNodeIdRef.current;
+                pendingNavigateNodeIdRef.current = null;
+                selectAndFocusNode(cy, targetId);
+              } else {
+                cy.fit(undefined, 50);
+                setZoomLevel(cy.zoom());
+              }
+            }
+          });
+          bf.run();
         }
         setZoomLevel(cy.zoom());
       };
@@ -420,13 +522,14 @@ export default function Home() {
         cyRef.current = null;
       }
     };
-  }, [graphData, cyReady]);
+  }, [activeGraphData, cyReady, selectAndFocusNode]);
 
   const handlePlanParsed = useCallback((newGraph, fileName) => {
     setGraphData(newGraph);
     setCliLoaded(false);
     setDisabled(false);
     setSelectedNode(null);
+    setIsCollapsed(false);
     if (fileName) {
       setPlanName(fileName);
     }
@@ -438,8 +541,19 @@ export default function Home() {
   }, []);
 
   const hasGraph = Boolean(graphData && graphData.nodes && graphData.nodes.length > 0);
-  const nodeCount = graphData?.nodes?.length || 0;
-  const edgeCount = graphData?.edges?.length || 0;
+  const originalNodeCount = graphData?.nodes?.length || 0;
+  const originalEdgeCount = graphData?.edges?.length || 0;
+
+  const collapsedCount = collapsedGraph?.hiddenCount || 0;
+  const bridgedCount = collapsedGraph?.bridgedCount || 0;
+
+  const displayNodeCount = isCollapsed
+    ? (collapsedGraph?.mutatingCount ?? collapsedGraph?.nodes?.length ?? 0)
+    : originalNodeCount;
+
+  const displayEdgeCount = isCollapsed
+    ? (collapsedGraph?.edges?.length ?? 0)
+    : originalEdgeCount;
 
   return (
     <div className="w-screen h-screen flex flex-col bg-workbench-bg text-slate-200 overflow-hidden font-sans select-none">
@@ -460,6 +574,9 @@ export default function Home() {
         onExportPng={handleExportPng}
         onExportSvg={handleExportSvg}
         isExporting={isExporting}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
+        collapsedCount={collapsedCount}
       />
 
       {/* Main Workbench Middle Area */}
@@ -526,13 +643,16 @@ export default function Home() {
 
       {/* Grounded Engineering Status Bar */}
       <StatusBar
-        nodeCount={nodeCount}
-        edgeCount={edgeCount}
+        nodeCount={displayNodeCount}
+        edgeCount={displayEdgeCount}
         zoomLevel={zoomLevel}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         isLocked={isLocked}
         onToggleLock={() => setIsLocked((prev) => !prev)}
+        isCollapsed={isCollapsed}
+        collapsedCount={collapsedCount}
+        bridgedCount={bridgedCount}
       />
 
       {/* Global ⌘K Command Palette */}
@@ -541,6 +661,8 @@ export default function Home() {
         onClose={() => setIsCommandPaletteOpen(false)}
         nodes={graphData?.nodes || []}
         onSelectNode={handleNavigateToNode}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
     </div>
   );

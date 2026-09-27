@@ -166,6 +166,18 @@ export const CYTOSCAPE_STYLES = [
       color: "#f5d0fe",
     },
   },
+  // Bridged edges synthesized during intermediate node contraction
+  {
+    selector: ".collapsed-edge, edge.collapsed-edge",
+    style: {
+      "line-style": "dashed",
+      "line-dash-pattern": [6, 4],
+      width: 1.75,
+      "line-color": "#60a5fa",
+      "target-arrow-color": "#60a5fa",
+      opacity: 0.9,
+    },
+  },
   {
     selector: ".dimmed",
     style: {

@@ -20,6 +20,7 @@ function StatusBar({
   isCollapsed = false,
   collapsedCount = 0,
   bridgedCount = 0,
+  onOpenShortcuts,
 }) {
   const formattedPercent = Math.round(zoomLevel * 100);
 
@@ -125,12 +126,21 @@ function StatusBar({
 
         <div className="h-3 w-px bg-workbench-border" />
 
-        <div className="text-slate-500">
+        <div className="text-slate-500 flex items-center">
           <span><kbd className="text-slate-400">⌘K</kbd> search</span>
           <span className="mx-1">•</span>
           <span><kbd className="text-slate-400">c</kbd> collapse</span>
           <span className="mx-1">•</span>
           <span><kbd className="text-slate-400">f</kbd> fit</span>
+          <span className="mx-1">•</span>
+          <button
+            onClick={onOpenShortcuts}
+            title="Keyboard Shortcuts (?)"
+            className="hover:text-slate-300 transition-colors inline-flex items-center gap-1 cursor-pointer focus:outline-none"
+          >
+            <kbd className="text-slate-400">?</kbd>
+            <span>shortcuts</span>
+          </button>
         </div>
       </div>
     </footer>

@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --experimental-default-type=module --test lib/graph-collapse.test.js"
+    "test": "node --experimental-default-type=module --test lib/*.test.js"
   },
   "dependencies": {
     "cytoscape-svg": "^0.4.0",

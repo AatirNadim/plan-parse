@@ -9,7 +9,18 @@ const STATUS_ACTIONS = ["create", "update", "delete", "replace"];
  * StatusBar: Persistent bottom workbench status strip.
  * Replaces floating Lower-Left controls and Lower-Right legend with a unified engineering status bar.
  */
-function StatusBar({ nodeCount = 0, edgeCount = 0, zoomLevel = 1, onZoomIn, onZoomOut, isLocked, onToggleLock }) {
+function StatusBar({
+  nodeCount = 0,
+  edgeCount = 0,
+  zoomLevel = 1,
+  onZoomIn,
+  onZoomOut,
+  isLocked,
+  onToggleLock,
+  isCollapsed = false,
+  collapsedCount = 0,
+  bridgedCount = 0,
+}) {
   const formattedPercent = Math.round(zoomLevel * 100);
 
   return (
@@ -17,10 +28,20 @@ function StatusBar({ nodeCount = 0, edgeCount = 0, zoomLevel = 1, onZoomIn, onZo
       {/* Left: Viewport Metrics & Zoom HUD */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span>{nodeCount} nodes</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${isCollapsed ? "bg-sky-400" : "bg-emerald-500"}`} />
+          <span>
+            {nodeCount} nodes
+            {isCollapsed && collapsedCount > 0 ? (
+              <span className="text-slate-400 ml-1">({collapsedCount} collapsed)</span>
+            ) : null}
+          </span>
           <span className="text-slate-600">•</span>
-          <span>{edgeCount} edges</span>
+          <span>
+            {edgeCount} edges
+            {isCollapsed && bridgedCount > 0 ? (
+              <span className="text-sky-400 ml-1">({bridgedCount} bridged)</span>
+            ) : null}
+          </span>
         </div>
 
         <div className="h-3 w-px bg-workbench-border" />
@@ -106,6 +127,8 @@ function StatusBar({ nodeCount = 0, edgeCount = 0, zoomLevel = 1, onZoomIn, onZo
 
         <div className="text-slate-500">
           <span><kbd className="text-slate-400">⌘K</kbd> search</span>
+          <span className="mx-1">•</span>
+          <span><kbd className="text-slate-400">c</kbd> collapse</span>
           <span className="mx-1">•</span>
           <span><kbd className="text-slate-400">f</kbd> fit</span>
         </div>

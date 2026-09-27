@@ -7,7 +7,7 @@ import { ACTION_CONFIG } from "../lib/action-theme";
  * CommandPalette: Global ⌘K quick switcher & node navigation.
  * High-performance, keyboard-first, zero layout interference.
  */
-function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
+function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed = false, onToggleCollapse }) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -22,6 +22,40 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
+
+  // Action items
+  const actions = useMemo(() => {
+    if (!onToggleCollapse) return [];
+    return [
+      {
+        id: "action-toggle-collapse",
+        isAction: true,
+        label: isCollapsed
+          ? "Expand All Nodes (Show intermediate nodes)"
+          : "Collapse Intermediate Nodes (Mutations Only)",
+        description: isCollapsed
+          ? "Restore all variables, outputs, and non-mutating resources"
+          : "Contract graph to mutating resources and bridge transitive dependencies",
+        shortcut: "C",
+        run: onToggleCollapse,
+      },
+    ];
+  }, [isCollapsed, onToggleCollapse]);
+
+  const filteredActions = useMemo(() => {
+    if (!actions || actions.length === 0) return [];
+    if (!deferredQuery.trim()) return actions;
+    const q = deferredQuery.toLowerCase().trim();
+    return actions.filter(
+      (a) =>
+        a.label.toLowerCase().includes(q) ||
+        a.description.toLowerCase().includes(q) ||
+        "collapse".includes(q) ||
+        "expand".includes(q) ||
+        "mutation".includes(q) ||
+        "toggle".includes(q)
+    );
+  }, [actions, deferredQuery]);
 
   // Filter nodes
   const filteredNodes = useMemo(() => {
@@ -48,6 +82,10 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
       .slice(0, 12);
   }, [deferredQuery, nodes]);
 
+  const allFilteredItems = useMemo(() => {
+    return [...filteredActions, ...filteredNodes];
+  }, [filteredActions, filteredNodes]);
+
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e) => {
@@ -56,20 +94,24 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
         onClose();
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredNodes.length));
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, allFilteredItems.length));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredNodes.length) % Math.max(1, filteredNodes.length));
+        setSelectedIndex((prev) => (prev - 1 + allFilteredItems.length) % Math.max(1, allFilteredItems.length));
       } else if (e.key === "Enter") {
         e.preventDefault();
-        if (filteredNodes[selectedIndex]) {
-          const target = filteredNodes[selectedIndex];
-          onSelectNode(target.data?.id || target.id);
+        if (allFilteredItems[selectedIndex]) {
+          const target = allFilteredItems[selectedIndex];
+          if (target.isAction) {
+            target.run();
+          } else {
+            onSelectNode(target.data?.id || target.id);
+          }
           onClose();
         }
       }
     },
-    [filteredNodes, selectedIndex, onSelectNode, onClose]
+    [allFilteredItems, selectedIndex, onSelectNode, onClose]
   );
 
   // Keep selected item in view
@@ -114,16 +156,61 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
 
         {/* Results List */}
         <div ref={listRef} className="max-h-80 overflow-y-auto p-1 space-y-0.5 custom-scrollbar">
-          {filteredNodes.length === 0 ? (
+          {allFilteredItems.length === 0 ? (
             <div className="p-6 text-center text-xs text-slate-500 font-mono">
-              No matching resources found for "{query}"
+              No matching resources or commands found for "{query}"
             </div>
           ) : (
-            filteredNodes.map((n, idx) => {
-              const data = n.data || {};
+            allFilteredItems.map((item, idx) => {
+              const isSelected = idx === selectedIndex;
+
+              if (item.isAction) {
+                return (
+                  <button
+                    key={item.id || idx}
+                    onClick={() => {
+                      item.run();
+                      onClose();
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={`w-full flex items-center justify-between gap-3 px-2.5 py-2 text-left rounded transition-colors ${
+                      isSelected
+                        ? "bg-workbench-hover text-white"
+                        : "text-slate-300 hover:bg-workbench-subpanel"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                        ⚡ Action
+                      </span>
+                      <div className="truncate flex-1 min-w-0">
+                        <div className="text-xs font-mono text-slate-100 font-medium truncate">
+                          {item.label}
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400 truncate">
+                          {item.description}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {item.shortcut && (
+                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-workbench-panel border border-workbench-border rounded">
+                          {item.shortcut}
+                        </kbd>
+                      )}
+                      {isSelected && (
+                        <span className="text-[10px] font-mono text-slate-400">
+                          Execute ↵
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              }
+
+              const data = item.data || {};
               const change = (data.change || "no-op").toLowerCase();
               const cfg = ACTION_CONFIG[change] || ACTION_CONFIG["no-op"];
-              const isSelected = idx === selectedIndex;
 
               return (
                 <button
@@ -180,7 +267,7 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode }) {
             <span><kbd className="text-slate-400">↵</kbd> select</span>
             <span><kbd className="text-slate-400">esc</kbd> close</span>
           </div>
-          <span>{filteredNodes.length} results</span>
+          <span>{allFilteredItems.length} results</span>
         </div>
       </div>
     </div>

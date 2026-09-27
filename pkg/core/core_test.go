@@ -1,6 +1,7 @@
 package core_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -575,5 +576,26 @@ func TestEmptyWorkingDirFallback(t *testing.T) {
 
 	if resourceCount == 0 {
 		t.Fatal("expected at least one resource/data node in graph")
+	}
+}
+
+func TestExportPlanGraphFixture(t *testing.T) {
+	plan, err := core.ValidatePlanFile(getSamplePlanPath())
+	if err != nil {
+		t.Fatalf("failed to validate sample plan: %v", err)
+	}
+
+	parser := core.NewParser(plan, "")
+	graph, err := parser.GenerateGraph()
+	if err != nil {
+		t.Fatalf("GenerateGraph failed: %v", err)
+	}
+	data, err := json.MarshalIndent(graph, "", "  ")
+	if err != nil {
+		t.Fatalf("marshal failed: %v", err)
+	}
+	outPath := filepath.Join(getTestDataDir(), "tf_plan_graph.json")
+	if err := os.WriteFile(outPath, data, 0644); err != nil {
+		t.Fatalf("write failed: %v", err)
 	}
 }

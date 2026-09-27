@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { usePlatformModifier } from "../lib/use-platform";
 
 /**
  * AppHeader: Persistent Developer Workbench top navigation bar.
@@ -16,6 +17,7 @@ function AppHeader({
   isInspectorOpen,
   onToggleInspector,
   onOpenCommandPalette,
+  onOpenShortcuts,
   onOpenUpload,
   onFit,
   onResetZoom,
@@ -32,6 +34,8 @@ function AppHeader({
     delete: summary?.delete || 0,
     replace: summary?.replace || 0,
   };
+
+  const { paletteKey } = usePlatformModifier();
 
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const exportMenuRef = useRef(null);
@@ -156,7 +160,7 @@ function AppHeader({
             <span className="truncate">Quick jump to resource...</span>
           </div>
           <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-400 shrink-0">
-            ⌘K
+            {paletteKey}
           </kbd>
         </button>
       )}
@@ -319,6 +323,21 @@ function AppHeader({
             </div>
           </>
         )}
+
+        <button
+          onClick={onOpenShortcuts}
+          title="Keyboard Shortcuts (?)"
+          className="px-2 py-1 rounded text-xs font-mono text-slate-300 hover:text-white bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border transition flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="1.8" />
+            <path strokeLinecap="round" strokeWidth="1.8" d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 13h.01M17 13h.01M10 14h4" />
+          </svg>
+          <span>Shortcuts</span>
+          <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-400">
+            ?
+          </kbd>
+        </button>
 
         <button
           onClick={onOpenUpload}

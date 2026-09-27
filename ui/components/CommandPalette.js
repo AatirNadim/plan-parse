@@ -7,7 +7,7 @@ import { ACTION_CONFIG } from "../lib/action-theme";
  * CommandPalette: Global ⌘K quick switcher & node navigation.
  * High-performance, keyboard-first, zero layout interference.
  */
-function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed = false, onToggleCollapse }) {
+function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed = false, onToggleCollapse, onOpenShortcuts }) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -25,9 +25,9 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
 
   // Action items
   const actions = useMemo(() => {
-    if (!onToggleCollapse) return [];
-    return [
-      {
+    const list = [];
+    if (onToggleCollapse) {
+      list.push({
         id: "action-toggle-collapse",
         isAction: true,
         label: isCollapsed
@@ -38,9 +38,20 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
           : "Contract graph to mutating resources and bridge transitive dependencies",
         shortcut: "C",
         run: onToggleCollapse,
-      },
-    ];
-  }, [isCollapsed, onToggleCollapse]);
+      });
+    }
+    if (onOpenShortcuts) {
+      list.push({
+        id: "action-shortcuts",
+        isAction: true,
+        label: "Keyboard Shortcuts Cheat Sheet",
+        description: "View all keyboard navigation and canvas shortcuts",
+        shortcut: "?",
+        run: onOpenShortcuts,
+      });
+    }
+    return list;
+  }, [isCollapsed, onToggleCollapse, onOpenShortcuts]);
 
   const filteredActions = useMemo(() => {
     if (!actions || actions.length === 0) return [];
@@ -50,6 +61,12 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
       (a) =>
         a.label.toLowerCase().includes(q) ||
         a.description.toLowerCase().includes(q) ||
+        (a.shortcut && a.shortcut.toLowerCase().includes(q)) ||
+        "shortcuts".includes(q) ||
+        "cheat".includes(q) ||
+        "sheet".includes(q) ||
+        "help".includes(q) ||
+        "keys".includes(q) ||
         "collapse".includes(q) ||
         "expand".includes(q) ||
         "mutation".includes(q) ||

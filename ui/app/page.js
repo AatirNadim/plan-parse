@@ -6,6 +6,7 @@ import StatusBar from "../components/StatusBar";
 import WorkbenchSidebar from "../components/WorkbenchSidebar";
 import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
+import KeyboardShortcutsModal from "../components/KeyboardShortcutsModal";
 import { CYTOSCAPE_STYLES } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
@@ -23,6 +24,7 @@ export default function Home() {
   const [isLocked, setIsLocked] = useState(false);
   const [cyReady, setCyReady] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -293,14 +295,32 @@ export default function Home() {
       }
 
       if (e.key === "Escape") {
+        if (isShortcutsOpen) {
+          setIsShortcutsOpen(false);
+          return;
+        }
         if (isCommandPaletteOpen) {
           setIsCommandPaletteOpen(false);
-        } else if (selectedNode) {
+          return;
+        }
+        if (selectedNode) {
           setSelectedNode(null);
           if (cyRef.current) {
             cyRef.current.elements().removeClass("dimmed highlighted highlighted-edge");
           }
+          return;
         }
+        return;
+      }
+
+      if ((e.key === "?" || (e.shiftKey && e.key === "/")) && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setIsShortcutsOpen((prev) => !prev);
+        return;
+      }
+
+      // If a modal or palette is open, do not handle canvas/workbench single-character shortcuts
+      if (isShortcutsOpen || isCommandPaletteOpen) {
         return;
       }
 
@@ -341,6 +361,7 @@ export default function Home() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
+    isShortcutsOpen,
     isCommandPaletteOpen,
     selectedNode,
     graphData,
@@ -568,6 +589,7 @@ export default function Home() {
         isInspectorOpen={isInspectorOpen && Boolean(selectedNode)}
         onToggleInspector={() => setIsInspectorOpen((prev) => !prev)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onOpenUpload={handleOpenUpload}
         onFit={handleFit}
         onResetZoom={handleResetZoom}
@@ -653,6 +675,7 @@ export default function Home() {
         isCollapsed={isCollapsed}
         collapsedCount={collapsedCount}
         bridgedCount={bridgedCount}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
       {/* Global ⌘K Command Palette */}
@@ -663,6 +686,13 @@ export default function Home() {
         onSelectNode={handleNavigateToNode}
         isCollapsed={isCollapsed}
         onToggleCollapse={handleToggleCollapse}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+      />
+
+      {/* Dedicated Keyboard Shortcuts Cheat Sheet Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
       />
     </div>
   );

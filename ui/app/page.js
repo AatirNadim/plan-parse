@@ -7,6 +7,7 @@ import WorkbenchSidebar from "../components/WorkbenchSidebar";
 import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
 import { CYTOSCAPE_STYLES } from "../lib/cytoscape-styles";
+import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 
 export default function Home() {
   const [graphData, setGraphData] = useState(null);
@@ -21,6 +22,7 @@ export default function Home() {
   const [isLocked, setIsLocked] = useState(false);
   const [cyReady, setCyReady] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(null);
 
   const cyContainerRef = useRef(null);
   const cyRef = useRef(null);
@@ -28,17 +30,39 @@ export default function Home() {
   // Check for window.cytoscape loaded via layout.js script tag
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    let mounted = true;
+    const initCytoscape = async () => {
+      if (window.cytoscape) {
+        try {
+          await registerCytoscapeSvgPlugin(window.cytoscape);
+        } catch (e) {
+          console.warn("cytoscape-svg pre-registration warning:", e);
+        }
+        if (mounted) {
+          setCyReady(true);
+        }
+        return true;
+      }
+      return false;
+    };
+
     if (window.cytoscape) {
-      setCyReady(true);
+      initCytoscape();
       return;
     }
-    const interval = setInterval(() => {
+
+    const interval = setInterval(async () => {
       if (window.cytoscape) {
-        setCyReady(true);
+        await initCytoscape();
         clearInterval(interval);
       }
     }, 50);
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Initialize status and initial graph from Go server on mount
@@ -136,6 +160,30 @@ export default function Home() {
       duration: 250,
     });
   }, []);
+
+  const handleExportPng = useCallback(async () => {
+    if (!cyRef.current || isExporting) return;
+    setIsExporting("png");
+    try {
+      await exportGraphAsPng(cyRef.current, planName);
+    } catch (err) {
+      console.error("Failed to export graph PNG:", err);
+    } finally {
+      setIsExporting(null);
+    }
+  }, [planName, isExporting]);
+
+  const handleExportSvg = useCallback(async () => {
+    if (!cyRef.current || isExporting) return;
+    setIsExporting("svg");
+    try {
+      await exportGraphAsSvg(cyRef.current, planName);
+    } catch (err) {
+      console.error("Failed to export graph SVG:", err);
+    } finally {
+      setIsExporting(null);
+    }
+  }, [planName, isExporting]);
 
   // Navigate to and select a specific node
   const handleNavigateToNode = useCallback((nodeId) => {
@@ -409,6 +457,9 @@ export default function Home() {
         onOpenUpload={handleOpenUpload}
         onFit={handleFit}
         onResetZoom={handleResetZoom}
+        onExportPng={handleExportPng}
+        onExportSvg={handleExportSvg}
+        isExporting={isExporting}
       />
 
       {/* Main Workbench Middle Area */}

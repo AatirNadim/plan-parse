@@ -16,8 +16,10 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
 
   if (!node) return null;
 
-  const changeKey = (node.change || "no-op").toLowerCase();
-  const cfg = ACTION_CONFIG[changeKey] || ACTION_CONFIG["no-op"];
+  const isEntity = node.type === "variable" || node.type === "output";
+  const badgeKey = isEntity ? node.type : (node.change ? node.change.toLowerCase() : "no-op");
+  const cfg = ACTION_CONFIG[badgeKey] || ACTION_CONFIG["no-op"];
+  const badgeLabel = isEntity ? cfg.label : (node.change || "no-op");
 
   const handleCopyId = () => {
     if (node.id && typeof navigator !== "undefined") {
@@ -66,7 +68,7 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                 border: `1px solid ${cfg.color}30`,
               }}
             >
-              {cfg.symbol} {node.change || "no-op"}
+              {cfg.symbol} {badgeLabel}
             </span>
             {node.module && (
               <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]">
@@ -77,9 +79,9 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
           <h2 className="text-xs font-mono font-semibold text-white break-all leading-snug select-text">
             {node.label || node.id}
           </h2>
-          {node.resourceType && (
+          {(node.resourceType || isEntity) && (
             <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">
-              {node.resourceType}
+              {node.resourceType || cfg.label}
             </div>
           )}
         </div>

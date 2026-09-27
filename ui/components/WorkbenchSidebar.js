@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from "react";
-import { ACTION_CONFIG, METRIC_KEYS } from "../lib/action-theme";
+import { ACTION_CONFIG, METRIC_KEYS, ACTION_KEYS, ENTITY_KEYS } from "../lib/action-theme";
 
 function formatBytes(bytes, decimals = 1) {
   if (!bytes || bytes === 0) return "0 Bytes";
@@ -41,6 +41,16 @@ function WorkbenchSidebar({
   const [groupByModule, setGroupByModule] = useState(true);
 
   const fileInputRef = useRef(null);
+
+  // Compute entity counts from graphData.nodes
+  const { variableCount, outputCount, moduleCount, totalEntities } = useMemo(() => {
+    const nodes = graphData?.nodes || [];
+    const variableCount = nodes.filter((n) => n.data?.type === "variable").length;
+    const outputCount = nodes.filter((n) => n.data?.type === "output").length;
+    const moduleCount = nodes.filter((n) => n.data?.type === "module").length;
+    const totalEntities = variableCount + outputCount;
+    return { variableCount, outputCount, moduleCount, totalEntities };
+  }, [graphData]);
 
   // Compute counts for actions
   const counts = useMemo(() => {
@@ -90,10 +100,19 @@ function WorkbenchSidebar({
   // Filtered resources
   const filteredResources = useMemo(() => {
     return resourceNodes.filter((n) => {
+      const nodeType = n.data?.type;
+      const isEntity = nodeType === "variable" || nodeType === "output";
       const change = (n.data?.change || "no-op").toLowerCase();
-      if (actionFilter !== "all" && change !== actionFilter) {
-        return false;
+
+      if (actionFilter !== "all") {
+        if (actionFilter === "variable" || actionFilter === "output") {
+          if (nodeType !== actionFilter) return false;
+        } else {
+          if (isEntity && !n.data?.change) return false;
+          if (change !== actionFilter) return false;
+        }
       }
+
       if (!deferredSearchQuery.trim()) return true;
       const q = deferredSearchQuery.toLowerCase();
       const id = (n.data?.id || "").toLowerCase();
@@ -273,66 +292,109 @@ function WorkbenchSidebar({
       {/* Tab Content: Resources Explorer */}
       {activeTab === "resources" && (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          {/* Action Distribution Bar */}
-          {totalCount > 0 && (
-            <div className="p-2.5 border-b border-workbench-border bg-workbench-subpanel/40 space-y-1.5 shrink-0">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-400 font-medium">Distribution</span>
-                <span className="text-slate-300">{totalCount} Changes</span>
-              </div>
+          {/* Action Distribution Bar & Graph Entities Legend */}
+          {(totalCount > 0 || totalEntities > 0) && (
+            <div className="p-2.5 border-b border-workbench-border bg-workbench-subpanel/40 space-y-2 shrink-0">
+              {/* Plan Changes Section */}
+              {totalCount > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400 font-medium">Plan Changes</span>
+                    <span className="text-slate-300">{totalCount} Changes</span>
+                  </div>
 
-              {/* Progress Bar */}
-              <div className="h-1.5 w-full rounded bg-workbench-bg border border-workbench-border flex overflow-hidden p-0.2 gap-0.5">
-                {distributionSegments.map((seg) => (
-                  <div
-                    key={seg.action}
-                    style={{
-                      width: `${Math.max(seg.percent, 2)}%`,
-                      backgroundColor: seg.color,
-                    }}
-                    title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%)`}
-                    className="h-full rounded-xs transition-opacity hover:opacity-80 cursor-pointer"
-                    onClick={() =>
-                      setActionFilter((prev) => (prev === seg.action ? "all" : seg.action))
-                    }
-                  />
-                ))}
-              </div>
+                  {/* Progress Bar */}
+                  <div className="h-1.5 w-full rounded bg-workbench-bg border border-workbench-border flex overflow-hidden p-0.2 gap-0.5">
+                    {distributionSegments.map((seg) => (
+                      <div
+                        key={seg.action}
+                        style={{
+                          width: `${Math.max(seg.percent, 2)}%`,
+                          backgroundColor: seg.color,
+                        }}
+                        title={`${seg.label}: ${seg.count} (${seg.percent.toFixed(1)}%)`}
+                        className="h-full rounded-xs transition-opacity hover:opacity-80 cursor-pointer"
+                        onClick={() =>
+                          setActionFilter((prev) => (prev === seg.action ? "all" : seg.action))
+                        }
+                      />
+                    ))}
+                  </div>
 
-              {/* Action Filter Chips */}
-              <div className="flex flex-wrap gap-1 pt-0.5">
-                <button
-                  onClick={() => setActionFilter("all")}
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition ${
-                    actionFilter === "all"
-                      ? "bg-workbench-hover text-white border border-workbench-border font-bold"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  All ({totalCount})
-                </button>
-                {METRIC_KEYS.map((key) => {
-                  const cfg = ACTION_CONFIG[key];
-                  const count = counts[key] || 0;
-                  if (count === 0) return null;
-                  const isActive = actionFilter === key;
-                  return (
+                  {/* Action Filter Chips */}
+                  <div className="flex flex-wrap gap-1 pt-0.5">
                     <button
-                      key={key}
-                      onClick={() => setActionFilter(isActive ? "all" : key)}
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1 ${
-                        isActive
+                      onClick={() => setActionFilter("all")}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition ${
+                        actionFilter === "all"
                           ? "bg-workbench-hover text-white border border-workbench-border font-bold"
                           : "text-slate-400 hover:text-slate-200"
                       }`}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-                      <span>{cfg.label}</span>
-                      <span className="text-slate-500">{count}</span>
+                      All ({totalCount})
                     </button>
-                  );
-                })}
-              </div>
+                    {METRIC_KEYS.map((key) => {
+                      const cfg = ACTION_CONFIG[key];
+                      const count = counts[key] || 0;
+                      if (count === 0) return null;
+                      const isActive = actionFilter === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => setActionFilter(isActive ? "all" : key)}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1 ${
+                            isActive
+                              ? "bg-workbench-hover text-white border border-workbench-border font-bold"
+                              : "text-slate-400 hover:text-slate-200"
+                          }`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />
+                          <span>{cfg.label}</span>
+                          <span className="text-slate-500">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Graph Entities Section */}
+              {totalEntities > 0 && (
+                <div className={`${totalCount > 0 ? "pt-2 border-t border-workbench-border/60" : ""} space-y-1.5`}>
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-400 font-medium">Graph Entities</span>
+                    <span className="text-slate-400">{totalEntities} Entities</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {variableCount > 0 && (
+                      <button
+                        onClick={() => setActionFilter(actionFilter === "variable" ? "all" : "variable")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 ${
+                          actionFilter === "variable"
+                            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 font-bold"
+                            : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40"
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                        <span>Variables ({variableCount})</span>
+                      </button>
+                    )}
+                    {outputCount > 0 && (
+                      <button
+                        onClick={() => setActionFilter(actionFilter === "output" ? "all" : "output")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 ${
+                          actionFilter === "output"
+                            ? "bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/50 font-bold"
+                            : "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 hover:border-fuchsia-500/40"
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" />
+                        <span>Outputs ({outputCount})</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -367,7 +429,7 @@ function WorkbenchSidebar({
           <div className="flex-1 overflow-y-auto p-1.5 space-y-2.5 custom-scrollbar">
             {filteredResources.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-500 font-mono">
-                {totalCount === 0 ? "No plan loaded" : "No matching resources"}
+                {totalCount === 0 && totalEntities === 0 ? "No plan loaded" : "No matching resources"}
               </div>
             ) : (
               Object.entries(groupedResources).map(([groupName, items]) => (
@@ -381,8 +443,10 @@ function WorkbenchSidebar({
                   {items.map((n) => {
                     const data = n.data || {};
                     const isSelected = selectedNode?.id === data.id;
-                    const change = (data.change || "no-op").toLowerCase();
-                    const cfg = ACTION_CONFIG[change] || ACTION_CONFIG["no-op"];
+                    const nodeType = data.type;
+                    const isEntity = nodeType === "variable" || nodeType === "output";
+                    const key = isEntity && !data.change ? nodeType : (data.change || "no-op").toLowerCase();
+                    const cfg = ACTION_CONFIG[key] || ACTION_CONFIG["no-op"];
 
                     return (
                       <div
@@ -399,9 +463,9 @@ function WorkbenchSidebar({
                           <div className="text-xs font-mono truncate">
                             {data.label || data.id}
                           </div>
-                          {data.resourceType && (
+                          {(data.resourceType || isEntity) && (
                             <div className="text-[10px] font-mono text-slate-500 truncate">
-                              {data.resourceType}
+                              {data.resourceType || (isEntity ? cfg.label : "")}
                             </div>
                           )}
                         </div>

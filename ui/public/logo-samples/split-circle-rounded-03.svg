@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#F1F5F9"/>
+  <circle cx="256" cy="256" r="190" fill="#E2E8F0"/>
+  <path d="M256 66C360.934 66 446 151.066 446 256C446 360.934 360.934 446 256 446V66Z" fill="#D1FAE5"/>
+
+  <g>
+    <rect x="116" y="180" width="116" height="16" rx="8" fill="#334155"/>
+    <rect x="96" y="220" width="136" height="16" rx="8" fill="#475569"/>
+    <rect x="124" y="260" width="108" height="16" rx="8" fill="#64748B"/>
+    <rect x="106" y="300" width="126" height="16" rx="8" fill="#94A3B8"/>
+  </g>
+
+  <g>
+    <rect x="276" y="174" width="128" height="40" rx="10" fill="#10B981"/>
+    <rect x="276" y="224" width="86" height="40" rx="10" fill="#34D399"/>
+    <rect x="366" y="224" width="38" height="40" rx="10" fill="#6EE7B7"/>
+    <rect x="276" y="274" width="128" height="40" rx="10" fill="#059669"/>
+  </g>
+
+  <path d="M252 120C252 116.686 254.686 114 258 114V398C254.686 398 252 395.314 252 392V120Z" fill="#FFFFFF"/>
+  <circle cx="256" cy="256" r="190" stroke="#1E293B" stroke-width="12"/>
+</svg>

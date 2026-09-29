@@ -1,209 +1,218 @@
-import { ACTION_COLORS } from "./action-theme";
+import { ACTION_COLORS } from "./action-theme.js";
 
 /**
  * Precision Technical Schematic styling for Cytoscape DAG.
- * High-contrast dark engineering nodes with crisp 1px borders and semantic action badges.
+ * Supports both Dark and Light theme archetypes with crisp 1px borders and semantic action badges.
+ *
+ * @param {"dark" | "light"} theme
+ * @returns {Array<object>} Cytoscape stylesheet array
  */
-export const CYTOSCAPE_STYLES = [
-  {
-    selector: "node",
-    style: {
-      label: "data(label)",
-      color: "#e2e8f0",
-      "font-family": "'DM Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace",
-      "font-size": "11px",
-      "font-weight": "500",
-      "text-valign": "center",
-      "text-halign": "center",
-      width: "label",
-      height: "label",
-      padding: "8px 14px",
-      shape: "roundrectangle",
-      "background-color": "#151924",
-      "border-width": 1,
-      "border-color": "#2a3346",
-      cursor: "pointer",
+export function getCytoscapeStyles(theme = "dark") {
+  const isLight = theme === "light";
+
+  return [
+    {
+      selector: "node",
+      style: {
+        label: "data(label)",
+        color: isLight ? "#0f172a" : "#e2e8f0",
+        "font-family": "'DM Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace",
+        "font-size": "11px",
+        "font-weight": "500",
+        "text-valign": "center",
+        "text-halign": "center",
+        width: "label",
+        height: "label",
+        padding: "8px 14px",
+        shape: "roundrectangle",
+        "background-color": isLight ? "#ffffff" : "#151924",
+        "border-width": 1,
+        "border-color": isLight ? "#cbd5e1" : "#2a3346",
+        cursor: "pointer",
+      },
     },
-  },
-  {
-    selector: "edge",
-    style: {
-      "curve-style": "taxi",
-      "taxi-direction": "rightward",
-      width: 1.5,
-      "line-color": "#334155",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#334155",
-      "arrow-scale": 0.7,
-      opacity: 0.75,
+    {
+      selector: "edge",
+      style: {
+        "curve-style": "taxi",
+        "taxi-direction": "rightward",
+        width: 1.5,
+        "line-color": isLight ? "#94a3b8" : "#334155",
+        "target-arrow-shape": "triangle",
+        "target-arrow-color": isLight ? "#94a3b8" : "#334155",
+        "arrow-scale": 0.7,
+        opacity: isLight ? 0.85 : 0.75,
+      },
     },
-  },
-  // Compound Root / Base Container
-  {
-    selector: ".basename",
-    style: {
-      padding: "32px",
-      "font-family": "'DM Sans', sans-serif",
-      "font-weight": "600",
-      "font-size": "13px",
-      shape: "roundrectangle",
-      "border-width": 1,
-      "border-color": "#232936",
-      "background-color": "#0c0e14",
-      "background-opacity": 0.8,
-      color: "#94a3b8",
-      "text-valign": "top",
-      "text-margin-y": 14,
+    // Compound Root / Base Container
+    {
+      selector: ".basename",
+      style: {
+        padding: "32px",
+        "font-family": "'DM Sans', sans-serif",
+        "font-weight": "600",
+        "font-size": "13px",
+        shape: "roundrectangle",
+        "border-width": 1,
+        "border-color": isLight ? "#cbd5e1" : "#232936",
+        "background-color": isLight ? "#f1f5f9" : "#0c0e14",
+        "background-opacity": isLight ? 0.75 : 0.8,
+        color: isLight ? "#475569" : "#94a3b8",
+        "text-valign": "top",
+        "text-margin-y": 14,
+      },
     },
-  },
-  // Compound Module Containers
-  {
-    selector: ".module",
-    style: {
-      padding: "24px",
-      "font-family": "'DM Mono', monospace",
-      "font-weight": "500",
-      "font-size": "12px",
-      shape: "roundrectangle",
-      "border-width": 1,
-      "border-style": "dashed",
-      "border-color": "#323b4e",
-      "background-color": "#0f121a",
-      "background-opacity": 0.45,
-      color: "#c084fc",
-      "text-valign": "top",
-      "text-margin-y": 12,
+    // Compound Module Containers
+    {
+      selector: ".module",
+      style: {
+        padding: "24px",
+        "font-family": "'DM Mono', monospace",
+        "font-weight": "500",
+        "font-size": "12px",
+        shape: "roundrectangle",
+        "border-width": 1,
+        "border-style": "dashed",
+        "border-color": isLight ? "#cbd5e1" : "#323b4e",
+        "background-color": isLight ? "#f8fafc" : "#0f121a",
+        "background-opacity": isLight ? 0.65 : 0.45,
+        color: isLight ? "#7c3aed" : "#c084fc",
+        "text-valign": "top",
+        "text-margin-y": 12,
+      },
     },
-  },
-  // File scope compound container
-  {
-    selector: ".fname",
-    style: {
-      padding: "16px",
-      "font-family": "'DM Mono', monospace",
-      "font-weight": "400",
-      "font-size": "11px",
-      shape: "roundrectangle",
-      "border-width": 1,
-      "border-color": "#1e2638",
-      "background-color": "#0a0d14",
-      "background-opacity": 0.5,
-      color: "#64748b",
-      "text-valign": "top",
-      "text-margin-y": 10,
+    // File scope compound container
+    {
+      selector: ".fname",
+      style: {
+        padding: "16px",
+        "font-family": "'DM Mono', monospace",
+        "font-weight": "400",
+        "font-size": "11px",
+        shape: "roundrectangle",
+        "border-width": 1,
+        "border-color": isLight ? "#e2e8f0" : "#1e2638",
+        "background-color": isLight ? "#f1f5f9" : "#0a0d14",
+        "background-opacity": 0.5,
+        color: isLight ? "#64748b" : "#64748b",
+        "text-valign": "top",
+        "text-margin-y": 10,
+      },
     },
-  },
-  // Semantic Action styling for Leaf Nodes
-  {
-    selector: ".create",
-    style: {
-      "border-color": ACTION_COLORS.create,
-      "border-width": 1.5,
-      "background-color": "#064e3b",
-      "background-opacity": 0.35,
-      color: "#a7f3d0",
+    // Semantic Action styling for Leaf Nodes
+    {
+      selector: ".create",
+      style: {
+        "border-color": ACTION_COLORS.create,
+        "border-width": 1.5,
+        "background-color": isLight ? "#ecfdf5" : "#064e3b",
+        "background-opacity": isLight ? 0.95 : 0.35,
+        color: isLight ? "#065f46" : "#a7f3d0",
+      },
     },
-  },
-  {
-    selector: ".delete",
-    style: {
-      "border-color": ACTION_COLORS.delete,
-      "border-width": 1.5,
-      "background-color": "#881337",
-      "background-opacity": 0.35,
-      color: "#fecdd3",
+    {
+      selector: ".delete",
+      style: {
+        "border-color": ACTION_COLORS.delete,
+        "border-width": 1.5,
+        "background-color": isLight ? "#fff1f2" : "#881337",
+        "background-opacity": isLight ? 0.95 : 0.35,
+        color: isLight ? "#9f1239" : "#fecdd3",
+      },
     },
-  },
-  {
-    selector: ".update",
-    style: {
-      "border-color": ACTION_COLORS.update,
-      "border-width": 1.5,
-      "background-color": "#0c4a6e",
-      "background-opacity": 0.35,
-      color: "#bae6fd",
+    {
+      selector: ".update",
+      style: {
+        "border-color": ACTION_COLORS.update,
+        "border-width": 1.5,
+        "background-color": isLight ? "#f0f9ff" : "#0c4a6e",
+        "background-opacity": isLight ? 0.95 : 0.35,
+        color: isLight ? "#075985" : "#bae6fd",
+      },
     },
-  },
-  {
-    selector: ".replace",
-    style: {
-      "border-color": ACTION_COLORS.replace,
-      "border-width": 1.5,
-      "background-color": "#78350f",
-      "background-opacity": 0.35,
-      color: "#fde68a",
+    {
+      selector: ".replace",
+      style: {
+        "border-color": ACTION_COLORS.replace,
+        "border-width": 1.5,
+        "background-color": isLight ? "#fffbeb" : "#78350f",
+        "background-opacity": isLight ? 0.95 : 0.35,
+        color: isLight ? "#92400e" : "#fde68a",
+      },
     },
-  },
-  {
-    selector: ".no-op",
-    style: {
-      "border-color": "#334155",
-      "border-width": 1,
-      "background-color": "#151924",
-      "background-opacity": 0.6,
-      color: "#94a3b8",
+    {
+      selector: ".no-op",
+      style: {
+        "border-color": isLight ? "#cbd5e1" : "#334155",
+        "border-width": 1,
+        "background-color": isLight ? "#f8fafc" : "#151924",
+        "background-opacity": isLight ? 0.95 : 0.6,
+        color: isLight ? "#475569" : "#94a3b8",
+      },
     },
-  },
-  {
-    selector: ".variable",
-    style: {
-      "border-color": ACTION_COLORS.variable,
-      "border-width": 1.5,
-      "border-style": "dashed",
-      "background-color": "#1e1b4b",
-      "background-opacity": 0.5,
-      color: "#c7d2fe",
+    {
+      selector: ".variable",
+      style: {
+        "border-color": ACTION_COLORS.variable,
+        "border-width": 1.5,
+        "border-style": "dashed",
+        "background-color": isLight ? "#eff6ff" : "#1e1b4b",
+        "background-opacity": isLight ? 0.95 : 0.5,
+        color: isLight ? "#1e40af" : "#c7d2fe",
+      },
     },
-  },
-  {
-    selector: ".output",
-    style: {
-      "border-color": ACTION_COLORS.output,
-      "border-width": 1.5,
-      "border-style": "double",
-      "background-color": "#4a044e",
-      "background-opacity": 0.5,
-      color: "#f5d0fe",
+    {
+      selector: ".output",
+      style: {
+        "border-color": ACTION_COLORS.output,
+        "border-width": 1.5,
+        "border-style": "double",
+        "background-color": isLight ? "#fdf4ff" : "#4a044e",
+        "background-opacity": isLight ? 0.95 : 0.5,
+        color: isLight ? "#86198f" : "#f5d0fe",
+      },
     },
-  },
-  // Bridged edges synthesized during intermediate node contraction
-  {
-    selector: ".collapsed-edge, edge.collapsed-edge",
-    style: {
-      "line-style": "dashed",
-      "line-dash-pattern": [6, 4],
-      width: 1.75,
-      "line-color": "#60a5fa",
-      "target-arrow-color": "#60a5fa",
-      opacity: 0.9,
+    // Bridged edges synthesized during intermediate node contraction
+    {
+      selector: ".collapsed-edge, edge.collapsed-edge",
+      style: {
+        "line-style": "dashed",
+        "line-dash-pattern": [6, 4],
+        width: 1.75,
+        "line-color": isLight ? "#2563eb" : "#60a5fa",
+        "target-arrow-color": isLight ? "#2563eb" : "#60a5fa",
+        opacity: 0.9,
+      },
     },
-  },
-  {
-    selector: ".dimmed",
-    style: {
-      opacity: 0.15,
+    {
+      selector: ".dimmed",
+      style: {
+        opacity: isLight ? 0.2 : 0.15,
+      },
     },
-  },
-  {
-    selector: ".highlighted",
-    style: {
-      "border-width": 2.5,
-      "border-color": "#38bdf8",
-      "background-color": "#0f2338",
-      "background-opacity": 0.9,
-      color: "#ffffff",
-      opacity: 1,
-      "z-index": 999,
+    {
+      selector: ".highlighted",
+      style: {
+        "border-width": 2.5,
+        "border-color": isLight ? "#0284c7" : "#38bdf8",
+        "background-color": isLight ? "#e0f2fe" : "#0f2338",
+        "background-opacity": 1,
+        color: isLight ? "#0369a1" : "#ffffff",
+        opacity: 1,
+        "z-index": 999,
+      },
     },
-  },
-  {
-    selector: "edge.highlighted-edge",
-    style: {
-      width: 2.5,
-      "line-color": "#38bdf8",
-      "target-arrow-color": "#38bdf8",
-      opacity: 1,
-      "z-index": 998,
+    {
+      selector: "edge.highlighted-edge",
+      style: {
+        width: 2.5,
+        "line-color": isLight ? "#0284c7" : "#38bdf8",
+        "target-arrow-color": isLight ? "#0284c7" : "#38bdf8",
+        opacity: 1,
+        "z-index": 998,
+      },
     },
-  },
-];
+  ];
+}
+
+export const CYTOSCAPE_STYLES = getCytoscapeStyles("dark");

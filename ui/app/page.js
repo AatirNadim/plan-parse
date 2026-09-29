@@ -7,11 +7,14 @@ import WorkbenchSidebar from "../components/WorkbenchSidebar";
 import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
 import KeyboardShortcutsModal from "../components/KeyboardShortcutsModal";
-import { CYTOSCAPE_STYLES } from "../lib/cytoscape-styles";
+import { getCytoscapeStyles } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
+import { useTheme } from "../lib/use-theme";
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
+
   const [graphData, setGraphData] = useState(null);
   const [cliLoaded, setCliLoaded] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -134,6 +137,13 @@ export default function Home() {
     cyRef.current.userZoomingEnabled(!isLocked);
   }, [isLocked]);
 
+  // Dynamic Cytoscape style update on theme change
+  useEffect(() => {
+    if (cyRef.current && !cyRef.current.destroyed()) {
+      cyRef.current.style(getCytoscapeStyles(theme));
+    }
+  }, [theme]);
+
   // Handle resizing of Cytoscape viewport when sidebars toggle
   useEffect(() => {
     if (!cyRef.current) return;
@@ -191,13 +201,14 @@ export default function Home() {
     try {
       const cleanName = (planName || "terraform-plan").replace(/\.[^/.]+$/, "");
       const exportName = isCollapsed ? `${cleanName}-collapsed` : cleanName;
-      await exportGraphAsPng(cyRef.current, exportName);
+      const bg = theme === "light" ? "#f8fafc" : "#090a0f";
+      await exportGraphAsPng(cyRef.current, exportName, { theme, bg });
     } catch (err) {
       console.error("Failed to export graph PNG:", err);
     } finally {
       setIsExporting(null);
     }
-  }, [planName, isExporting, isCollapsed]);
+  }, [planName, isExporting, isCollapsed, theme]);
 
   const handleExportSvg = useCallback(async () => {
     if (!cyRef.current || isExporting) return;
@@ -205,13 +216,14 @@ export default function Home() {
     try {
       const cleanName = (planName || "terraform-plan").replace(/\.[^/.]+$/, "");
       const exportName = isCollapsed ? `${cleanName}-collapsed` : cleanName;
-      await exportGraphAsSvg(cyRef.current, exportName);
+      const bg = theme === "light" ? "#f8fafc" : "#090a0f";
+      await exportGraphAsSvg(cyRef.current, exportName, { theme, bg });
     } catch (err) {
       console.error("Failed to export graph SVG:", err);
     } finally {
       setIsExporting(null);
     }
-  }, [planName, isExporting, isCollapsed]);
+  }, [planName, isExporting, isCollapsed, theme]);
 
   // Clear selected node if it was hidden in current collapsed view
   useEffect(() => {
@@ -325,8 +337,6 @@ export default function Home() {
       }
 
       // Single-character shortcuts: MUST ensure no modifier keys (Cmd/Ctrl/Alt) are pressed.
-      // This guarantees native OS shortcuts like Cmd+C / Ctrl+C (clipboard copy),
-      // Cmd+F (find in page), Cmd+0 (reset browser zoom), etc. are NEVER intercepted.
       const isPlainKey = !e.metaKey && !e.ctrlKey && !e.altKey;
       if (!isPlainKey) {
         return;
@@ -338,6 +348,9 @@ export default function Home() {
       } else if (e.key === "]") {
         e.preventDefault();
         setIsInspectorOpen((prev) => !prev);
+      } else if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        toggleTheme();
       } else if (e.key === "c" || e.key === "C") {
         if (graphData && graphData.nodes && graphData.nodes.length > 0) {
           e.preventDefault();
@@ -370,6 +383,7 @@ export default function Home() {
     handleZoomIn,
     handleZoomOut,
     handleResetZoom,
+    toggleTheme,
   ]);
 
   // Render Cytoscape graph when activeGraphData changes
@@ -417,7 +431,7 @@ export default function Home() {
         wheelSensitivity: 0.2,
         minZoom: 0.05,
         maxZoom: 3.5,
-        style: CYTOSCAPE_STYLES,
+        style: getCytoscapeStyles(theme),
       });
 
       // Real-time Zoom tracking
@@ -543,7 +557,7 @@ export default function Home() {
         cyRef.current = null;
       }
     };
-  }, [activeGraphData, cyReady, selectAndFocusNode]);
+  }, [activeGraphData, cyReady, selectAndFocusNode, theme]);
 
   const handlePlanParsed = useCallback((newGraph, fileName) => {
     setGraphData(newGraph);
@@ -577,7 +591,7 @@ export default function Home() {
     : originalEdgeCount;
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-workbench-bg text-slate-200 overflow-hidden font-sans select-none">
+    <div className="w-screen h-screen flex flex-col bg-workbench-bg text-slate-800 dark:text-slate-200 overflow-hidden font-sans select-none transition-colors duration-150">
       {/* Grounded Top Application Header */}
       <AppHeader
         cliLoaded={cliLoaded}
@@ -599,6 +613,8 @@ export default function Home() {
         isCollapsed={isCollapsed}
         onToggleCollapse={handleToggleCollapse}
         collapsedCount={collapsedCount}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main Workbench Middle Area */}
@@ -626,7 +642,7 @@ export default function Home() {
           {!hasGraph && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none">
               <div className="w-full max-w-md bg-workbench-panel border border-workbench-border rounded p-6 shadow-2xl pointer-events-auto space-y-4 font-mono">
-                <div className="flex items-center gap-2 text-xs text-slate-400 border-b border-workbench-border pb-3">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 border-b border-workbench-border pb-3">
                   <img
                     src="/icon.svg"
                     alt="Plan Parse"
@@ -634,23 +650,23 @@ export default function Home() {
                     width={20}
                     height={20}
                   />
-                  <span className="font-semibold text-slate-200">Terraform Plan Workbench</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">Terraform Plan Workbench</span>
                 </div>
 
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   No execution plan loaded in active session. Ingest a Terraform plan JSON to compute and render the dependency DAG.
                 </p>
 
-                <div className="p-3 bg-workbench-header border border-workbench-border rounded text-[11px] text-slate-300 space-y-1">
-                  <div className="text-slate-500 font-semibold text-[10px] uppercase">Export Command:</div>
-                  <div className="text-sky-400 select-all font-mono">
+                <div className="p-3 bg-workbench-header border border-workbench-border rounded text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
+                  <div className="text-slate-500 dark:text-slate-500 font-semibold text-[10px] uppercase">Export Command:</div>
+                  <div className="text-sky-600 dark:text-sky-400 select-all font-mono">
                     terraform show -json tfplan &gt; plan.json
                   </div>
                 </div>
 
                 <button
                   onClick={handleOpenUpload}
-                  className="w-full py-2 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white text-xs font-mono font-semibold transition"
+                  className="w-full py-2 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white text-xs font-mono font-semibold transition cursor-pointer"
                 >
                   Load Plan JSON File
                 </button>
@@ -693,6 +709,8 @@ export default function Home() {
         isCollapsed={isCollapsed}
         onToggleCollapse={handleToggleCollapse}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Dedicated Keyboard Shortcuts Cheat Sheet Modal */}

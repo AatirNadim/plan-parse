@@ -5,7 +5,7 @@ import { SHORTCUT_SECTIONS } from "../lib/shortcuts-data";
 
 /**
  * KeyboardShortcutsModal: Dedicated cheat sheet modal displaying all navigation and canvas shortcuts.
- * Follows Linear Dark Precision Workbench design system.
+ * Supports both Precision Dark and Slate Light themes.
  */
 function KeyboardShortcutsModal({ isOpen, onClose }) {
   // Listen for Escape or ? to close while modal is open
@@ -28,7 +28,7 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-100"
+      className="fixed inset-0 z-50 bg-black/60 dark:bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-100"
       onClick={onClose}
     >
       <div
@@ -38,24 +38,24 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-workbench-border bg-workbench-header">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-workbench-subpanel border border-workbench-border flex items-center justify-center text-slate-300 shrink-0">
-              <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded bg-workbench-subpanel border border-workbench-border flex items-center justify-center text-slate-700 dark:text-slate-300 shrink-0">
+              <svg className="w-4 h-4 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="1.8" />
                 <path strokeLinecap="round" strokeWidth="1.8" d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 13h.01M17 13h.01M10 14h4" />
               </svg>
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-slate-100 font-sans tracking-tight">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 font-sans tracking-tight">
                 Keyboard Shortcuts
               </h2>
-              <p className="text-[11px] text-slate-400 font-mono">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                 Workbench navigation and canvas control
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-2 py-1 rounded bg-workbench-subpanel hover:bg-workbench-hover text-slate-400 hover:text-slate-200 border border-workbench-border transition text-xs font-mono cursor-pointer"
+            className="flex items-center gap-1.5 px-2 py-1 rounded bg-workbench-subpanel hover:bg-workbench-hover text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-workbench-border transition text-xs font-mono cursor-pointer"
             title="Close dialog (Escape)"
           >
             <span className="text-[10px]">Esc</span>
@@ -71,13 +71,13 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
             <div key={section.title} className="space-y-2">
               <div className="flex items-center justify-between pb-1 border-b border-workbench-border/80">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-400" />
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     {section.title}
                   </span>
                 </div>
                 {section.subtitle && (
-                  <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider">
+                  <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     {section.subtitle}
                   </span>
                 )}
@@ -90,11 +90,11 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
                     className="flex items-center justify-between gap-2 py-1 px-1 rounded hover:bg-workbench-subpanel/50 transition-colors"
                   >
                     <div className="min-w-0 pr-1">
-                      <div className="text-xs text-slate-300 font-sans leading-snug">
+                      <div className="text-xs text-slate-700 dark:text-slate-300 font-sans leading-snug">
                         {item.label}
                       </div>
                       {item.detail && (
-                        <div className="text-[10px] text-slate-500 font-mono">
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                           {item.detail}
                         </div>
                       )}
@@ -102,13 +102,13 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
                     <div className="flex items-center gap-1 shrink-0">
                       {item.keys.map((k, kIdx) =>
                         k.divider ? (
-                          <span key={kIdx} className="text-[10px] text-slate-500 font-mono px-0.5">
+                          <span key={kIdx} className="text-[10px] text-slate-400 dark:text-slate-500 font-mono px-0.5">
                             {k.divider}
                           </span>
                         ) : (
                           <kbd
                             key={kIdx}
-                            className="px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-200 bg-workbench-subpanel border border-workbench-border rounded shadow-xs"
+                            className="px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-800 dark:text-slate-200 bg-workbench-subpanel border border-workbench-border rounded shadow-xs"
                           >
                             {k.key}
                           </kbd>
@@ -123,12 +123,12 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-2.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500">
+        <div className="px-5 py-2.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
             <span className="truncate">Shortcuts are active when focus is outside text inputs.</span>
           </div>
-          <span className="text-[10px] text-slate-500 shrink-0 hidden sm:inline">
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 hidden sm:inline">
             Press ? or Esc to close
           </span>
         </div>

@@ -269,20 +269,20 @@ function WorkbenchSidebar({
       <div className="flex border-b border-workbench-border bg-workbench-header p-1 gap-1 shrink-0">
         <button
           onClick={() => onTabChange && onTabChange("resources")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono font-medium transition ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono font-medium transition cursor-pointer ${
             activeTab === "resources"
-              ? "bg-workbench-subpanel text-white border border-workbench-border"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
           Resources {totalCount > 0 ? `(${totalCount})` : ""}
         </button>
         <button
           onClick={() => onTabChange && onTabChange("source")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono font-medium transition ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono font-medium transition cursor-pointer ${
             activeTab === "source"
-              ? "bg-workbench-subpanel text-white border border-workbench-border"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
           Plan Source
@@ -299,8 +299,8 @@ function WorkbenchSidebar({
               {totalCount > 0 && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400 font-medium">Plan Changes</span>
-                    <span className="text-slate-300">{totalCount} Changes</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Plan Changes</span>
+                    <span className="text-slate-700 dark:text-slate-300">{totalCount} Changes</span>
                   </div>
 
                   {/* Progress Bar */}
@@ -325,10 +325,10 @@ function WorkbenchSidebar({
                   <div className="flex flex-wrap gap-1 pt-0.5">
                     <button
                       onClick={() => setActionFilter("all")}
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition ${
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition cursor-pointer ${
                         actionFilter === "all"
-                          ? "bg-workbench-hover text-white border border-workbench-border font-bold"
-                          : "text-slate-400 hover:text-slate-200"
+                          ? "bg-workbench-hover text-slate-900 dark:text-white border border-workbench-border font-bold"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                       }`}
                     >
                       All ({totalCount})
@@ -342,10 +342,10 @@ function WorkbenchSidebar({
                         <button
                           key={key}
                           onClick={() => setActionFilter(isActive ? "all" : key)}
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1 ${
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1 cursor-pointer ${
                             isActive
-                              ? "bg-workbench-hover text-white border border-workbench-border font-bold"
-                              : "text-slate-400 hover:text-slate-200"
+                              ? "bg-workbench-hover text-slate-900 dark:text-white border border-workbench-border font-bold"
+                              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                           }`}
                         >
                           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />
@@ -362,17 +362,17 @@ function WorkbenchSidebar({
               {totalEntities > 0 && (
                 <div className={`${totalCount > 0 ? "pt-2 border-t border-workbench-border/60" : ""} space-y-1.5`}>
                   <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-slate-400 font-medium">Graph Entities</span>
-                    <span className="text-slate-400">{totalEntities} Entities</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Graph Entities</span>
+                    <span className="text-slate-500 dark:text-slate-400">{totalEntities} Entities</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {variableCount > 0 && (
                       <button
                         onClick={() => setActionFilter(actionFilter === "variable" ? "all" : "variable")}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 ${
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 cursor-pointer ${
                           actionFilter === "variable"
-                            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 font-bold"
-                            : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40"
+                            ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/50 font-bold"
+                            : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40"
                         }`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
@@ -382,10 +382,10 @@ function WorkbenchSidebar({
                     {outputCount > 0 && (
                       <button
                         onClick={() => setActionFilter(actionFilter === "output" ? "all" : "output")}
-                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 ${
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition flex items-center gap-1.5 cursor-pointer ${
                           actionFilter === "output"
-                            ? "bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/50 font-bold"
-                            : "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 hover:border-fuchsia-500/40"
+                            ? "bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-500/50 font-bold"
+                            : "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-500/20 hover:border-fuchsia-500/40"
                         }`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500" />
@@ -406,19 +406,19 @@ function WorkbenchSidebar({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter explorer..."
-                className="w-full pl-6 pr-2 py-1 text-xs bg-workbench-subpanel border border-workbench-border rounded text-slate-200 placeholder-slate-500 font-mono focus:outline-none focus:border-slate-500"
+                className="w-full pl-6 pr-2 py-1 text-xs bg-workbench-subpanel border border-workbench-border rounded text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 font-mono focus:outline-none focus:border-slate-400 dark:focus:border-slate-500"
               />
-              <svg className="w-3 h-3 text-slate-500 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <button
               onClick={() => setGroupByModule(!groupByModule)}
               title={groupByModule ? "Switch to flat list" : "Group by module"}
-              className={`p-1 rounded border text-[10px] font-mono transition ${
+              className={`p-1 rounded border text-[10px] font-mono transition cursor-pointer ${
                 groupByModule
-                  ? "bg-workbench-subpanel text-slate-300 border-workbench-border"
-                  : "text-slate-500 border-transparent hover:text-slate-300"
+                  ? "bg-workbench-subpanel text-slate-700 dark:text-slate-300 border-workbench-border"
+                  : "text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300"
               }`}
             >
               MOD
@@ -428,14 +428,14 @@ function WorkbenchSidebar({
           {/* Hierarchical Resource Tree */}
           <div className="flex-1 overflow-y-auto p-1.5 space-y-2.5 custom-scrollbar">
             {filteredResources.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-500 font-mono">
+              <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
                 {totalCount === 0 && totalEntities === 0 ? "No plan loaded" : "No matching resources"}
               </div>
             ) : (
               Object.entries(groupedResources).map(([groupName, items]) => (
                 <div key={groupName} className="space-y-0.5">
                   {groupByModule && (
-                    <div className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                    <div className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
                       <span className="truncate">{groupName}</span>
                       <span>{items.length}</span>
                     </div>
@@ -455,8 +455,8 @@ function WorkbenchSidebar({
                         onClick={() => onNavigateToNode && onNavigateToNode(data.id)}
                         className={`px-2 py-1 rounded transition-colors cursor-pointer border flex items-center justify-between gap-2 ${
                           isSelected
-                            ? "bg-workbench-hover border-sky-500/50 text-white"
-                            : "bg-workbench-panel border-transparent hover:bg-workbench-subpanel text-slate-300"
+                            ? "bg-workbench-hover border-sky-500/50 text-slate-900 dark:text-white"
+                            : "bg-workbench-panel border-transparent hover:bg-workbench-subpanel text-slate-700 dark:text-slate-300"
                         }`}
                       >
                         <div className="truncate flex-1 min-w-0">
@@ -464,7 +464,7 @@ function WorkbenchSidebar({
                             {data.label || data.id}
                           </div>
                           {(data.resourceType || isEntity) && (
-                            <div className="text-[10px] font-mono text-slate-500 truncate">
+                            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
                               {data.resourceType || (isEntity ? cfg.label : "")}
                             </div>
                           )}
@@ -502,23 +502,23 @@ function WorkbenchSidebar({
               height={60}
             />
             <div className="min-w-0">
-              <div className="text-sm font-mono font-bold text-slate-100 tracking-wide leading-tight mb-1">
+              <div className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100 tracking-wide leading-tight mb-1">
                 Plan Ingestion
               </div>
-              <div className="text-xs font-mono text-slate-400 leading-snug truncate">
-                Terraform/OpenTofu<br/> DAG Engine
+              <div className="text-xs font-mono text-slate-500 dark:text-slate-400 leading-snug truncate">
+                Terraform &amp; OpenTofu DAG Engine
               </div>
             </div>
           </div>
 
           {disabled && (
-            <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono">
+            <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-mono">
               CLI Session active. Plan is loaded directly from server CLI flags.
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-mono text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
               {totalCount > 0 ? "Replace Plan File" : "Upload Plan File"}
             </label>
             <div
@@ -536,10 +536,10 @@ function WorkbenchSidebar({
                 disabled
                   ? "border-workbench-border bg-workbench-subpanel opacity-50 cursor-not-allowed"
                   : isDragging
-                  ? "border-sky-500 bg-sky-950/20"
+                  ? "border-sky-500 bg-sky-50 dark:bg-sky-950/20"
                   : selectedFile
                   ? "border-emerald-500/40 bg-workbench-subpanel"
-                  : "border-workbench-border bg-workbench-subpanel hover:border-slate-500"
+                  : "border-workbench-border bg-workbench-subpanel hover:border-slate-400 dark:hover:border-slate-500"
               }`}
             >
               <input
@@ -552,7 +552,7 @@ function WorkbenchSidebar({
               />
               <div className="flex flex-col items-center gap-1.5">
                 <svg
-                  className="w-6 h-6 text-slate-400 group-hover:text-slate-200 transition-colors"
+                  className="w-6 h-6 text-slate-400 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -564,10 +564,10 @@ function WorkbenchSidebar({
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
-                <div className="text-xs font-mono text-slate-200">
+                <div className="text-xs font-mono text-slate-700 dark:text-slate-200">
                   {selectedFile ? selectedFile.name : "Drop plan.json here or click to browse"}
                 </div>
-                <div className="text-[10px] font-mono text-slate-500">
+                <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
                   {selectedFile ? formatBytes(selectedFile.size) : "JSON output of 'terraform show -json'"}
                 </div>
               </div>
@@ -578,20 +578,20 @@ function WorkbenchSidebar({
           {validationState && (
             <div className={`p-2.5 rounded border text-xs font-mono ${
               validationState.valid
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                : "bg-rose-500/10 border-rose-500/30 text-rose-300"
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
             }`}>
               {validationState.valid ? (
                 <div>
                   <div className="font-semibold">✓ Valid Plan JSON</div>
-                  <div className="text-[11px] text-slate-400 mt-1">
+                  <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
                     TF: {validationState.meta.tfVersion} • {validationState.meta.resourceCount} changes detected
                   </div>
                 </div>
               ) : (
                 <div>
                   <div className="font-semibold">✗ Invalid Plan</div>
-                  <div className="text-[11px] text-rose-400 mt-1">{validationState.error}</div>
+                  <div className="text-[11px] text-rose-600 dark:text-rose-400 mt-1">{validationState.error}</div>
                 </div>
               )}
             </div>
@@ -599,7 +599,7 @@ function WorkbenchSidebar({
 
           {/* Server Error */}
           {apiError && (
-            <div className="p-2.5 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono">
+            <div className="p-2.5 rounded bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-mono">
               {apiError}
             </div>
           )}
@@ -609,16 +609,16 @@ function WorkbenchSidebar({
             <button
               onClick={handleSubmit}
               disabled={loading || disabled}
-              className="w-full py-1.5 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 disabled:opacity-50 text-white text-xs font-mono font-semibold transition"
+              className="w-full py-1.5 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 disabled:opacity-50 text-white text-xs font-mono font-semibold transition cursor-pointer"
             >
               {loading ? "Parsing on Go server..." : "Parse & Update Canvas"}
             </button>
           )}
 
           {/* CLI Export Guidance */}
-          <div className="p-2.5 rounded border border-workbench-border bg-workbench-header space-y-1.5 text-[11px] font-mono text-slate-400">
-            <div className="text-slate-300 font-semibold">Generate JSON Plan:</div>
-            <pre className="p-1.5 bg-workbench-subpanel rounded text-slate-300 overflow-x-auto select-all">
+          <div className="p-2.5 rounded border border-workbench-border bg-workbench-header space-y-1.5 text-[11px] font-mono text-slate-600 dark:text-slate-400">
+            <div className="text-slate-800 dark:text-slate-300 font-semibold">Generate JSON Plan:</div>
+            <pre className="p-1.5 bg-workbench-subpanel rounded text-slate-800 dark:text-slate-300 overflow-x-auto select-all">
               terraform plan -out=tfplan{"\n"}terraform show -json tfplan &gt; plan.json
             </pre>
           </div>

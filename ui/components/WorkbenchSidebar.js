@@ -492,6 +492,25 @@ function WorkbenchSidebar({
       {/* Tab Content: Plan Source Upload */}
       {activeTab === "source" && (
         <div className="flex-1 overflow-y-auto p-3.5 space-y-4 custom-scrollbar">
+          {/* Brand Ingestion Header */}
+          <div className="flex items-center gap-3.5 p-3.5 rounded-lg bg-workbench-subpanel border border-workbench-border shadow-sm">
+            <img
+              src="/icon.svg"
+              alt="Plan Parse Icon"
+              className="w-14 h-14 rounded-lg shrink-0 shadow-md select-none"
+              width={60}
+              height={60}
+            />
+            <div className="min-w-0">
+              <div className="text-sm font-mono font-bold text-slate-100 tracking-wide leading-tight mb-1">
+                Plan Ingestion
+              </div>
+              <div className="text-xs font-mono text-slate-400 leading-snug truncate">
+                Terraform/OpenTofu<br/> DAG Engine
+              </div>
+            </div>
+          </div>
+
           {disabled && (
             <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono">
               CLI Session active. Plan is loaded directly from server CLI flags.
@@ -513,7 +532,7 @@ function WorkbenchSidebar({
                 }
               }}
               onClick={() => !disabled && !loading && fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded p-4 text-center cursor-pointer transition ${
+              className={`group border-2 border-dashed rounded p-4 text-center cursor-pointer transition ${
                 disabled
                   ? "border-workbench-border bg-workbench-subpanel opacity-50 cursor-not-allowed"
                   : isDragging
@@ -532,8 +551,18 @@ function WorkbenchSidebar({
                 className="hidden"
               />
               <div className="flex flex-col items-center gap-1.5">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <svg
+                  className="w-6 h-6 text-slate-400 group-hover:text-slate-200 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
                 </svg>
                 <div className="text-xs font-mono text-slate-200">
                   {selectedFile ? selectedFile.name : "Drop plan.json here or click to browse"}

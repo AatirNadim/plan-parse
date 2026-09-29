@@ -29,64 +29,56 @@
   <rect x="132" y="390" width="26" height="10" rx="5" fill="#334155" opacity="0.5"/>
 
   <!-- Right: Perfect Semicircular Half-Tube Track (The Parsed DAG) -->
-  <!-- Track Outer Casing: Center (296, 224), Radius 76, Stroke Width 46 (Workbench Subpanel) -->
+  <!-- Track Outer Border Outline (Crisp Geometry) -->
   <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
-        stroke="#151924" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Track Border Outline -->
+        stroke="#3B4861" stroke-width="50" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Track Outer Casing (Workbench Subpanel Slate) -->
   <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
-        stroke="#232936" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-  <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
-        stroke="#151924" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+        stroke="#1F2638" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Abrupt Color Transitions on Conduit Core (No Gradients) -->
+  <!-- Abrupt Color Transitions on Conduit Core (No Gradients, High-Visibility Vivid Tones) -->
   <!-- 1. BLUE Segment: From Gutter entry (216, 148) around upper curve to cut point (361.8, 186.0) -->
   <path d="M 216 148 H 296 A 76 76 0 0 1 361.8 186.0" 
-        stroke="#0284C7" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        stroke="#38BDF8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- 2. GREEN Segment: Abrupt transition at (361.8, 186.0), wrapping apex to (361.8, 262.0) -->
   <path d="M 361.8 186.0 A 76 76 0 0 1 361.8 262.0" 
-        stroke="#10B981" stroke-width="8" stroke-linecap="butt"/>
+        stroke="#34D399" stroke-width="12" stroke-linecap="butt"/>
 
   <!-- 3. YELLOW Segment: Abrupt transition at (361.8, 262.0), lower curve to gutter return (216, 300) -->
   <path d="M 361.8 262.0 A 76 76 0 0 1 296 300 H 216" 
-        stroke="#F59E0B" stroke-width="8" stroke-linecap="butt" stroke-linejoin="round"/>
-
-  <!-- Precision Cut Accent Lines (Clean architectural joints) -->
-  <!-- Blue -> Green Cut Marker at 30° above horizontal -->
-  <!-- <line x1="358" y1="183.8" x2="365.6" y2="188.2" stroke="#090A0F" stroke-width="2"/> -->
-  <!-- Green -> Yellow Cut Marker at 30° below horizontal -->
-  <!-- <line x1="358" y1="264.2" x2="365.6" y2="259.8" stroke="#090A0F" stroke-width="2"/> -->
+        stroke="#FBBF24" stroke-width="12" stroke-linecap="butt" stroke-linejoin="round"/>
 
   <!-- Internal DAG Dependency Chord (Cross-edge connecting Root to Exit) -->
-  <path d="M 252 148 L 336 270" stroke="#717D96" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.6"/>
+  <path d="M 252 148 L 336 270" stroke="#94A3B8" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.8"/>
 
   <!-- DAG Action Nodes on the Half-Tube (Crisp Flat Badges - No Fuzzy Glow Slop) -->
 
   <!-- Node 1: UPDATE Node (Upper Blue Arm at x=252, y=148) -->
   <g transform="translate(252, 148)">
-    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#0284C7" stroke-width="3"/>
-    <circle cx="0" cy="0" r="13" fill="#0284C7" fill-opacity="0.15"/>
+    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#38BDF8" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" fill="#38BDF8" fill-opacity="0.25"/>
     <!-- Update Symbol (~) -->
     <path d="M-6 0C-4 -3 -2 -3 0 0C2 3 4 3 6 0" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 
   <!-- Node 2: CREATE Node (Apex Green Crest of Half-Tube Arc at x=372, y=224) -->
   <g transform="translate(372, 224)">
-    <circle cx="0" cy="0" r="22" fill="#0C0E14" stroke="#10B981" stroke-width="3.5"/>
-    <circle cx="0" cy="0" r="15" fill="#10B981" fill-opacity="0.2"/>
+    <circle cx="0" cy="0" r="22" fill="#0C0E14" stroke="#34D399" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="15" fill="#34D399" fill-opacity="0.25"/>
     <!-- Create Symbol (+) -->
     <path d="M-7 0H7M0 -7V7" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
   </g>
 
   <!-- Node 3: REPLACE Node (Lower Yellow Return Arm at x=268, y=300) -->
   <g transform="translate(268, 300)">
-    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#F59E0B" stroke-width="3"/>
-    <circle cx="0" cy="0" r="13" fill="#F59E0B" fill-opacity="0.15"/>
+    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#FBBF24" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" fill="#FBBF24" fill-opacity="0.25"/>
     <!-- Replace Symbol (±) -->
     <path d="M-5 -2H5M0 -7V3M-5 6H5" stroke="#FBBF24" stroke-width="2.2" stroke-linecap="round"/>
   </g>
 
   <!-- Return Flow Indicator into Gutter -->
-  <path d="M 228 294 L 218 300 L 228 306" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 228 294 L 218 300 L 228 306" stroke="#FBBF24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 

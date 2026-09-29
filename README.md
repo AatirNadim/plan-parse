@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.svg" alt="plan-parse — Interactive Terraform Plan DAG Visualizer" width="100%" />
+</p>
+
 # Plan-Parse: Interactive Terraform Plan DAG Visualizer
 
 `plan-parse` is a high-performance developer tool and web application designed to parse, analyze, and visually interact with Terraform execution plans. It transforms complex JSON plan exports into intuitive, hierarchical Cytoscape Directed Acyclic Graphs (DAGs), enabling platform engineers, SREs, and developers to audit planned infrastructure modifications, inspect resource blast radius, and trace cross-module dependency lineages before applying changes.

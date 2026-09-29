@@ -1,14 +1,14 @@
 import "./globals.css";
+import { siteMetadata } from "../lib/site-metadata";
 
-export const metadata = {
-  title: "Plan Parse - Terraform DAG Visualizer",
-  description: "Interactive Terraform Plan DAG Visualizer and Workbench",
-};
+export const metadata = siteMetadata;
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

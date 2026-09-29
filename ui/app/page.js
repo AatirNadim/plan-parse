@@ -627,7 +627,13 @@ export default function Home() {
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none">
               <div className="w-full max-w-md bg-workbench-panel border border-workbench-border rounded p-6 shadow-2xl pointer-events-auto space-y-4 font-mono">
                 <div className="flex items-center gap-2 text-xs text-slate-400 border-b border-workbench-border pb-3">
-                  <span className="w-2 h-2 rounded-full bg-slate-600" />
+                  <img
+                    src="/icon.svg"
+                    alt="Plan Parse"
+                    className="w-5 h-5 rounded shrink-0 select-none"
+                    width={20}
+                    height={20}
+                  />
                   <span className="font-semibold text-slate-200">Terraform Plan Workbench</span>
                 </div>
 

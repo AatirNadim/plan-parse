@@ -43,6 +43,9 @@ describe("Keyboard Shortcuts Registry Tests", () => {
     assert.ok(allKeys.includes("c"), "Must include c for collapse toggle");
     assert.ok(allKeys.includes("⌘K"), "Must include ⌘K for command palette");
     assert.ok(allKeys.includes("Ctrl+K"), "Must include Ctrl+K for command palette");
+    assert.ok(allKeys.includes("D"), "Must include D for diff modal");
+    assert.ok(allKeys.includes("d"), "Must include d for diff modal");
+    assert.ok(allKeys.includes("Space"), "Must include Space for diff modal");
   });
 
   test("Dialogs & General section includes ? and Escape", () => {

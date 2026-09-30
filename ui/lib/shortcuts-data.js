@@ -48,7 +48,12 @@ export const SHORTCUT_SECTIONS = [
       {
         label: "View Resource IaC Diff Modal",
         detail: "when resource selected",
-        keys: [{ key: "D" }, { divider: "/" }, { key: "d" }, { divider: "or" }, { key: "Space" }],
+        keys: [{ key: "D" }, { divider: "/" }, { key: "d" }],
+      },
+      {
+        label: "Toggle Quick-Look Popover",
+        detail: "when resource selected",
+        keys: [{ key: "Space" }],
       },
     ],
   },

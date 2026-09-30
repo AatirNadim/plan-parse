@@ -22,12 +22,18 @@ flowchart TD
         end
 
         Footer["StatusBar (Bottom Bar: Metrics, Zoom HUD, Lock, Legend)"]
+        Popover["NodePopover (Tier 1 On-Canvas Popover Card)"]
+        DiffModal["NodeDiffModal (Tier 2 Centered Deep Diff Modal)"]
         Palette["CommandPalette (Global Modal: ⌘K Quick Jump)"]
 
         Header --> MiddleArea
         MiddleArea --> Footer
         LeftSidebar -.-> CenterCanvas
         CenterCanvas -.-> RightInspector
+        CenterCanvas -.->|tap node| Popover
+        Popover -.->|Full Diff button or D| DiffModal
+        RightInspector -.->|Full Diff button| DiffModal
+        Palette -.->|View IaC Diff action| DiffModal
     end
 ```
 
@@ -53,6 +59,15 @@ The persistent top navigation bar of the workbench. It anchors application brand
   | `onOpenUpload` | `function` | Switches sidebar to the "source" ingestion tab. |
   | `onFit` | `function` | Re-centers and fits graph to canvas padding (`f`). |
   | `onResetZoom` | `function` | Resets canvas zoom to 100% (`0`). |
+  | `onOpenShortcuts` | `function` | Triggers keyboard shortcuts cheat sheet modal (`?`). |
+  | `onExportPng` | `function` | Exports the current graph canvas as a PNG image. |
+  | `onExportSvg` | `function` | Exports the current graph canvas as an SVG vector image. |
+  | `isExporting` | `string \| null` | Tracks active export format (`"png"` or `"svg"`). |
+  | `isCollapsed` | `boolean` | Flag indicating whether non-mutating intermediate nodes are collapsed. |
+  | `onToggleCollapse` | `function` | Toggles intermediate node collapse (`C`). |
+  | `collapsedCount` | `number` | Count of hidden intermediate nodes. |
+  | `theme` | `string` | Active theme (`"dark"` or `"light"`). |
+  | `onToggleTheme` | `function` | Toggles workbench theme (`T`). |
 
 - **UI Elements**:
   - **Context & Badges**: Displays `PLAN-PARSE` logo, `CLI Mode` amber badge (when pre-loaded), or plan filename.
@@ -137,10 +152,12 @@ The docked right slide-over inspector panel. Provides deep architectural insight
   | `node` | `NodeData` | Selected node object containing ID, label, action, changeDetails, incomers, outgoers. |
   | `onClose` | `function` | Closes the inspector (`Escape` or close button). |
   | `onNavigateToNode` | `function` | Callback to jump camera focus to an upstream or downstream dependency node. |
+  | `onOpenFullDiff` | `function` | Callback to open the Tier 2 `NodeDiffModal` (`D` shortcut or button click). |
 
-- **Subsystem Tabs**:
+- **Subsystem Tabs & Diff Actions**:
   1. **Attribute Diff Tab (`"diff"`)**:
      - Compares `before` and `after` resource configurations from Terraform's `changeDetails`.
+     - Header "Full Diff [D]" button to promote the view directly into the Tier 2 deep modal.
      - Displays line-by-line colored diff rows:
        - `+ ADDED` (Emerald, green background)
        - `- REMOVED` (Rose, red background)
@@ -167,6 +184,10 @@ The grounded engineering status strip docked at the bottom of the viewport.
   | `onZoomOut` | `function` | Zoom out callback (-25%). |
   | `isLocked` | `boolean` | Flag indicating whether viewport panning and zooming are locked. |
   | `onToggleLock` | `function` | Callback to toggle canvas navigation lock. |
+  | `isCollapsed` | `boolean` | Flag indicating whether non-mutating intermediate nodes are collapsed. |
+  | `collapsedCount` | `number` | Total number of collapsed non-mutating nodes. |
+  | `bridgedCount` | `number` | Count of synthesized transitive dependency edges. |
+  | `onOpenShortcuts` | `function` | Triggers keyboard shortcuts cheat sheet modal (`?`). |
 
 - **Sections**:
   - **Left HUD**: Active graph metrics (`N nodes • N edges`), inline zoom percentage HUD (`100%`), inline `-`/`+` step zoom buttons, and `LOCKED`/`UNLOCKED` navigation toggle.
@@ -183,10 +204,18 @@ A global modal dialog triggered by `Cmd+K` / `Ctrl+K` for rapid keyboard-driven 
   | `isOpen` | `boolean` | Modal visibility state. |
   | `onClose` | `function` | Callback to dismiss the palette (`Escape` or backdrop click). |
   | `nodes` | `Array<Node>` | Complete array of graph nodes to search. |
+  | `selectedNode` | `NodeData` | Currently selected node for contextual actions. |
   | `onSelectNode` | `function` | Callback invoked when an item is selected `(nodeId)`. |
+  | `onOpenDiffModal` | `function` | Callback to trigger Tier 2 `NodeDiffModal` for the selected node. |
+  | `onToggleCollapse` | `function` | Callback to toggle collapsed/mutating graph view (`C`). |
+  | `isCollapsed` | `boolean` | Flag indicating whether non-mutating intermediate nodes are collapsed. |
+  | `onToggleTheme` | `function` | Callback to toggle light/dark theme (`T`). |
+  | `theme` | `string` | Current theme (`"dark"` or `"light"`). |
+  | `onOpenShortcuts` | `function` | Callback to open the keyboard shortcuts modal (`?`). |
 
 - **Features**:
   - **Keyboard Navigation**: Fully operable via `ArrowUp`, `ArrowDown`, `Enter` (select), and `Escape` (dismiss).
+  - **Contextual Action Execution**: When a mutating node is selected, renders a dynamic `View IaC Diff: <selectedNode>` action (`D` shortcut), plus global commands for theme toggle (`T`), graph collapse (`C`), and shortcut help (`?`).
   - **Real-Time Fuzzy Matching**: Evaluates user queries against resource IDs, labels, resource types, action changes, and module names using `useDeferredValue`.
   - **Item Visualization**: Each result displays the resource action pill, resource label, module breadcrumb, and resource type badge.
   - **Auto-Scroll**: Keeps the active highlighted keyboard selection centered within view.
@@ -196,14 +225,86 @@ flowchart TD
     Hotkey["User presses Cmd+K / Ctrl+K"] --> Open["CommandPalette Opens (Input Focused)"]
     Open --> Type["User Types Search Query"]
     Type --> Deferred["useDeferredValue(query)"]
-    Deferred --> Filter["Filter nodes (ID, label, type, module, action)"]
-    Filter --> Display["Display Top 12 Results"]
+    Deferred --> Filter["Filter actions & nodes (ID, label, type, module, action)"]
+    Filter --> Display["Display Top Matches"]
     Display --> Nav{"Keyboard Input"}
     Nav -->|ArrowUp / ArrowDown| Move["Cycle selectedIndex & Scroll into View"]
-    Nav -->|Enter| Select["onSelectNode(nodeId)"]
+    Nav -->|Enter (Action)| Exec["Execute Action (e.g. Open Diff Modal, Toggle Theme)"]
+    Nav -->|Enter (Node)| Select["onSelectNode(nodeId) -> Animate Camera"]
     Nav -->|Escape| Close["onClose()"]
-    Select --> Animate["Cytoscape animates camera & highlights node"]
-    Select --> Close
+```
+
+---
+
+### 6. `NodePopover.js`
+Tier 1 on-canvas quick-look popover card. Positioned dynamically adjacent to the selected or hovered node on the Cytoscape canvas with viewport clamping.
+
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `node` | `NodeData` | Selected node object containing label, module, change type, and `changeDetails`. |
+  | `position` | `{ x: number, y: number }` | Rendered canvas coordinates `node.renderedPosition()` for absolute placement. |
+  | `onOpenModal` | `function` | Promotes view to Tier 2 `NodeDiffModal` (`Space` or `D`). |
+  | `onClose` | `function` | Dismisses popover (`Escape` or canvas background click). |
+  | `canvasWidth` | `number` | Active viewport width for boundary clamping (default: `1000`). |
+  | `canvasHeight` | `number` | Active viewport height for boundary clamping (default: `700`). |
+
+- **Key Mechanics**:
+  - **Boundary Clamping**: Automatically detects canvas edges (`margin = 16`, `popoverWidth = 320`, `popoverHeight = 280`) and flips placement horizontally or vertically so the card is never clipped outside the visible viewport.
+  - **Delta Counters**: Color-coded badges summarizing change metrics: `+N added` (emerald), `~N modified` (sky), `-N removed` (rose).
+  - **Forces Replacement Alert**: Displays high-visibility amber warning when modifications trigger resource re-creation.
+  - **Top Attribute Changes Preview**: Renders the top 3 modified properties with change symbols (`+`, `~`, `-`) and compact before/after summaries.
+  - **Quick Dismissal**: Auto-dismisses on canvas `pan`, `zoom`, or background tap to preserve fluid graph navigation.
+
+---
+
+### 7. `NodeDiffModal.js`
+Tier 2 deep IaC diff inspection modal. A centered, high-density dialog for inspecting complete Terraform Infrastructure-as-Code diffs.
+
+- **Props**:
+  | Prop | Type | Description |
+  | :--- | :--- | :--- |
+  | `isOpen` | `boolean` | Modal visibility state. |
+  | `node` | `NodeData` | Complete node object with `changeDetails` and metadata. |
+  | `onClose` | `function` | Dismisses modal (`Escape`, close button, or backdrop click). |
+
+- **Subsystems & Viewing Modes**:
+  1. **Header Breadcrumbs & Utilities**:
+     - Hierarchical breadcrumbs (`Module > Resource Type > Resource Name`).
+     - Source code file location (`node.file:node.line`).
+     - Affirmative "Copy Address" and "Copy Diff" buttons with 1.6s visual feedback.
+  2. **View Mode Switcher**:
+     - **Unified HCL Diff**: Formatted Terraform CLI / HCL representation with sticky line gutters (`lineNum`, `symbol`) and syntax coloring for additions (`+`), removals (`-`), modifications (`~`), comments, and replacement badges.
+     - **Side-by-Side (Split) HCL**: Dual-column state comparison (Left: Current State / Before / Deletions; Right: Planned State / After / Additions).
+     - **Attributes JSON Matrix**: Filterable tabular matrix with search query input, "Changed Only" toggle, before/after values, and `(forces replacement)` flags.
+  3. **Keyboard Controls**:
+     - `Tab`: Cycles through view modes (Unified $\rightarrow$ Split $\rightarrow$ Matrix).
+     - `Escape`: Closes the modal.
+     - Input field guard: Prevents single-key canvas shortcuts (`Space`, `D`) from firing while typing inside attribute filter inputs.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Cy as Cytoscape Canvas (#cy)
+    participant Popover as NodePopover.js (Tier 1)
+    participant Modal as NodeDiffModal.js (Tier 2)
+    participant Insp as NodeInspector.js
+
+    alt Progressive Exploration (Tier 1 -> Tier 2)
+        User->>Cy: Single Tap Mutating Node
+        Cy-->>Popover: Compute renderedPosition() & mount
+        Popover-->>User: Display Quick-Look card (delta badges, top changes)
+        User->>Popover: Click "Full Diff" or press D
+        Popover->>Modal: onOpenModal() -> Open Tier 2 Modal
+        Modal-->>User: Render Unified HCL, Split Diff, or JSON Matrix
+    else Fast Jump (Double Click)
+        User->>Cy: Double-Click Node
+        Cy->>Modal: Open Tier 2 Modal directly
+    else Via Inspector
+        User->>Insp: Click "Full Diff [D]" in header or diff tab
+        Insp->>Modal: Open Tier 2 Modal
+    end
 ```
 
 ---

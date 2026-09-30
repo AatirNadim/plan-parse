@@ -25,6 +25,8 @@ flowchart TD
             Inspector["NodeInspector (Docked Right)<br/>Tabs: Attribute Diff | Lineage | JSON"]
         end
 
+        Popover["NodePopover (Tier 1 On-Canvas Popover)<br/>Delta Badges • Top Changes • Space/D Cues"]
+        DiffModal["NodeDiffModal (Tier 2 Deep IaC Diff Modal)<br/>Unified HCL • Split HCL • JSON Matrix"]
         Status["StatusBar (Persistent Bottom Bar)<br/>Node/Edge HUD • Zoom Controls • Lock • Action Legend"]
         Palette["CommandPalette (Global Modal)<br/>⌘K Quick Jump • Keyboard First"]
 
@@ -32,7 +34,11 @@ flowchart TD
         WorkbenchBody --> Status
         Sidebar -.-> Canvas
         Canvas -.-> Inspector
+        Canvas -.->|single tap| Popover
+        Popover -.->|Full Diff button or D| DiffModal
+        Inspector -.->|Full Diff button| DiffModal
         Palette -.-> Canvas
+        Palette -.->|View IaC Diff| DiffModal
     end
 ```
 
@@ -84,7 +90,24 @@ Persistent 28px bottom status bar providing:
 ### 6. Quick Navigation Command Palette (`components/CommandPalette.js`)
 Keyboard-first search modal opened via `Cmd+K` / `Ctrl+K`:
 - Real-time search across resource IDs, labels, resource types, modules, and action types.
+- Contextual action execution: instant jump to resources, toggle collapsed/mutating graph view (`C`), toggle light/dark theme (`T`), and view full IaC diff (`D`).
 - Full keyboard navigation (`ArrowUp`, `ArrowDown`, `Enter` to select and animate camera, `Escape` to close).
+
+### 7. 2-Tier Progressive IaC Diff System (`components/NodePopover.js` & `components/NodeDiffModal.js`)
+Progressive disclosure architecture for auditing Terraform infrastructure mutations without loss of spatial context:
+- **Tier 1: On-Canvas Quick-Look Popover (`NodePopover.js`)**:
+  - Boundary-aware floating card positioned adjacent to the selected node on canvas (`renderedPosition()`), clamping to canvas boundaries (`margin = 16`, `popoverWidth = 320`, `popoverHeight = 280`).
+  - Displays resource address, module origin, action badge (`+ CREATE`, `~ UPDATE`, `- DELETE`, `± REPLACE`), delta summary badges (`+N added`, `~N modified`, `-N removed`), top 3 changed attributes preview, and replacement alerts.
+  - Interactive "Full Diff" CTA with keyboard triggers (`Space` or `D`).
+  - Auto-dismisses on canvas pan/zoom, background click, or `Escape`.
+- **Tier 2: Deep IaC Diff Modal (`NodeDiffModal.js`)**:
+  - High-density centered modal dialog with breadcrumb navigation (`Module > Type > Resource Name`), file origin (`file.tf:line`), and affirmative "Copy Address" and "Copy Diff" utilities.
+  - **Unified HCL Diff**: Formatted Terraform CLI / HCL output with sticky line gutters (`lineNum`, `symbol`) and syntax highlighting for added (`+`), removed (`-`), and modified (`~`) attribute blocks.
+  - **Side-by-Side (Split) HCL**: Dual-column comparison (Left: Current State / Before / Deletions; Right: Planned State / After / Additions).
+  - **Attributes JSON Matrix**: Structured table with real-time text query filter, "Changed Only" toggle, before/after values, and `(forces replacement)` flags.
+  - Full keyboard accessibility: `Tab` cycles view modes, `Escape` closes, and key shortcuts are disabled while typing in input boxes.
+- **HCL Diff Engine (`lib/hcl-diff.js`)**:
+  - Pure utility functions: `computeAttributeDiff()`, `generateHclDiff()`, `getDiffSummary()`, and `formatHclValue()`, backed by unit tests (`lib/hcl-diff.test.js`).
 
 ---
 
@@ -95,11 +118,17 @@ Keyboard-first search modal opened via `Cmd+K` / `Ctrl+K`:
 | `[` | Toggle docked left sidebar | Global |
 | `]` | Toggle docked right inspector | Global (when node is selected) |
 | `Cmd+K` / `Ctrl+K` | Open / dismiss Command Palette modal | Global |
+| `d` / `D` | Open Tier 2 IaC Diff Modal | Global (when node is selected) |
+| `Space` | Toggle Tier 1 On-Canvas Popover card | Canvas (when node is selected) |
+| `Tab` | Cycle view modes (Unified $\rightarrow$ Split $\rightarrow$ Matrix) | Inside IaC Diff Modal |
+| `c` / `C` | Toggle intermediate node collapse (Mutations Only) | Global |
+| `t` / `T` | Toggle light / dark workbench theme | Global |
+| `?` / `Shift + /` | Open keyboard shortcuts cheat sheet | Global |
 | `f` / `F` | Fit all graph nodes within canvas padding | Global |
 | `+` / `=` | Smooth zoom in (factor 1.3) | Global |
 | `-` | Smooth zoom out (factor 0.75) | Global |
 | `0` | Reset camera zoom to 100% (1:1) | Global |
-| `Escape` | Dismiss modal, clear selection, or reset canvas dimming | Global |
+| `Escape` | Dismiss modal/popover, clear selection, or reset canvas dimming | Global |
 
 ---
 
@@ -108,8 +137,8 @@ Keyboard-first search modal opened via `Cmd+K` / `Ctrl+K`:
 | File / Folder | Type | Description |
 | :--- | :--- | :--- |
 | [`app/`](./app/README.md) | Next.js App Router | Root layout (`layout.js`), global styles (`globals.css`), and the workbench canvas coordinator (`page.js`). |
-| [`components/`](./components/README.md) | React Components | Workbench panels: `AppHeader`, `WorkbenchSidebar`, `NodeInspector`, `StatusBar`, and `CommandPalette`. |
-| `lib/` | Utility Modules | Action color palettes (`action-theme.js`) and Cytoscape stylesheet rules (`cytoscape-styles.js`). |
+| [`components/`](./components/README.md) | React Components | Workbench panels: `AppHeader`, `WorkbenchSidebar`, `NodeInspector`, `StatusBar`, `CommandPalette`, `NodePopover`, and `NodeDiffModal`. |
+| `lib/` | Utility Modules | Action colors (`action-theme.js`), Cytoscape styles (`cytoscape-styles.js`), graph collapse (`graph-collapse.js`), and HCL diff engine (`hcl-diff.js`). |
 | [`public/`](./public/README.md) | Static Assets | Standalone bundled Cytoscape.js and Klay layout library (`cytoscape-bundle.js`). |
 | `tailwind.config.js` | Config | Tailwind theme extensions declaring DM Sans, DM Mono, and the `workbench-*` color palette. |
 | `next.config.js` | Config | Configures Next.js static export settings (`output: 'export'`, `distDir: 'out'`). |

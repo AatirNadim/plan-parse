@@ -186,8 +186,7 @@ function NodePopover({
       <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-workbench-border/60 pt-2 mt-2">
         <div className="flex items-center gap-1">
           <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">Space</kbd>
-          <span className="text-slate-400 dark:text-slate-500">or</span>
-          <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">D</kbd>
+          <span className="text-slate-400 dark:text-slate-500">toggle</span>
         </div>
 
         <button

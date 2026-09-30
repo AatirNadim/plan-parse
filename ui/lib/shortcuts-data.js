@@ -51,6 +51,10 @@ export const SHORTCUT_SECTIONS = [
     title: "Dialogs & General",
     items: [
       {
+        label: "Toggle Light / Dark Theme",
+        keys: [{ key: "T" }, { divider: "/" }, { key: "t" }],
+      },
+      {
         label: "Toggle Shortcuts Cheat Sheet",
         keys: [{ key: "?" }, { divider: "or" }, { key: "Shift + /" }],
       },

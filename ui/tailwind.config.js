@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,15 +15,15 @@ module.exports = {
       },
       colors: {
         workbench: {
-          bg: "#090a0f",
-          header: "#0c0e14",
-          panel: "#0f121a",
-          subpanel: "#151924",
-          card: "#181d2a",
-          border: "#232936",
-          hover: "#1c2230",
-          active: "#252d3d",
-          muted: "#717d96",
+          bg: "rgb(var(--workbench-bg) / <alpha-value>)",
+          header: "rgb(var(--workbench-header) / <alpha-value>)",
+          panel: "rgb(var(--workbench-panel) / <alpha-value>)",
+          subpanel: "rgb(var(--workbench-subpanel) / <alpha-value>)",
+          card: "rgb(var(--workbench-card) / <alpha-value>)",
+          border: "rgb(var(--workbench-border) / <alpha-value>)",
+          hover: "rgb(var(--workbench-hover) / <alpha-value>)",
+          active: "rgb(var(--workbench-active) / <alpha-value>)",
+          muted: "rgb(var(--workbench-muted) / <alpha-value>)",
         },
         action: {
           create: "#10b981",

@@ -129,7 +129,8 @@ export async function exportGraphAsPng(cy, planName = "terraform-plan", options 
     const targetScale = options.targetScale || 2.5;
     const maxCanvasDim = options.maxCanvasDim || 8192;
     const scale = calculateAdaptiveScale(cy, targetScale, maxCanvasDim);
-    const bg = options.bg || "#090a0f";
+    const defaultBg = options.theme === "light" ? "#f8fafc" : "#090a0f";
+    const bg = options.bg || defaultBg;
 
     const dataUri = cy.png({
       output: "base64uri",
@@ -191,7 +192,8 @@ export async function exportGraphAsSvg(cy, planName = "terraform-plan", options 
       }
     }
 
-    const bg = options.bg || "#090a0f";
+    const defaultBg = options.theme === "light" ? "#f8fafc" : "#090a0f";
+    const bg = options.bg || defaultBg;
     let svgContent = cy.svg({
       full: true,
       bg: bg,

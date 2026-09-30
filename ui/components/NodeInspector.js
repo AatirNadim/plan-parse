@@ -71,16 +71,16 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
               {cfg.symbol} {badgeLabel}
             </span>
             {node.module && (
-              <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]">
+              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]">
                 {node.module}
               </span>
             )}
           </div>
-          <h2 className="text-xs font-mono font-semibold text-white break-all leading-snug select-text">
+          <h2 className="text-xs font-mono font-semibold text-slate-900 dark:text-white break-all leading-snug select-text">
             {node.label || node.id}
           </h2>
           {(node.resourceType || isEntity) && (
-            <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">
+            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 truncate">
               {node.resourceType || cfg.label}
             </div>
           )}
@@ -88,7 +88,7 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
 
         <button
           onClick={onClose}
-          className="p-1 rounded text-slate-400 hover:text-white hover:bg-workbench-subpanel transition shrink-0"
+          className="p-1 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-workbench-subpanel transition shrink-0 cursor-pointer"
           title="Close inspector (Esc)"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,30 +101,30 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
       <div className="flex border-b border-workbench-border bg-workbench-subpanel/50 p-1 gap-1 shrink-0">
         <button
           onClick={() => setActiveTab("diff")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
             activeTab === "diff"
-              ? "bg-workbench-subpanel text-white border border-workbench-border font-medium"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
           Attribute Diff
         </button>
         <button
           onClick={() => setActiveTab("lineage")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
             activeTab === "lineage"
-              ? "bg-workbench-subpanel text-white border border-workbench-border font-medium"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
           Lineage
         </button>
         <button
           onClick={() => setActiveTab("json")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
             activeTab === "json"
-              ? "bg-workbench-subpanel text-white border border-workbench-border font-medium"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
           }`}
         >
           Raw JSON
@@ -138,7 +138,7 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
           <div className="space-y-3">
             {diffEntries && diffEntries.length > 0 ? (
               <div className="space-y-2">
-                <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Resource Attribute Changes
                 </div>
                 <div className="divide-y divide-workbench-border border border-workbench-border rounded bg-workbench-header overflow-hidden font-mono text-[11px]">
@@ -147,12 +147,12 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                       key={item.key}
                       className={`p-2 ${
                         item.isAdded
-                          ? "bg-emerald-950/20 text-emerald-300"
+                          ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
                           : item.isRemoved
-                          ? "bg-rose-950/20 text-rose-300"
+                          ? "bg-rose-500/10 text-rose-800 dark:text-rose-300"
                           : item.isModified
-                          ? "bg-amber-950/15 text-slate-200"
-                          : "text-slate-400"
+                          ? "bg-amber-500/10 text-slate-900 dark:text-slate-200"
+                          : "text-slate-500 dark:text-slate-400"
                       }`}
                     >
                       <div className="flex items-center justify-between font-semibold mb-1">
@@ -162,11 +162,11 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                         </span>
                       </div>
                       {item.isModified && item.before !== undefined && (
-                        <div className="text-rose-400/80 line-through truncate text-[10px]">
+                        <div className="text-rose-600/80 dark:text-rose-400/80 line-through truncate text-[10px]">
                           - {JSON.stringify(item.before)}
                         </div>
                       )}
-                      <div className="truncate text-[10px] text-slate-300">
+                      <div className="truncate text-[10px] text-slate-700 dark:text-slate-300">
                         {item.after !== undefined ? `+ ${JSON.stringify(item.after)}` : "(removed)"}
                       </div>
                     </div>
@@ -174,7 +174,7 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                 </div>
               </div>
             ) : (
-              <div className="p-4 text-center text-slate-500 font-mono text-xs">
+              <div className="p-4 text-center text-slate-400 dark:text-slate-500 font-mono text-xs">
                 No granular attribute change diff available for this resource.
               </div>
             )}
@@ -186,9 +186,9 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
           <div className="space-y-4">
             {/* Depends On */}
             <div>
-              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                 <span>Depends On ({node.outgoers ? node.outgoers.length : 0})</span>
-                <span className="text-slate-600">Upstream</span>
+                <span className="text-slate-400 dark:text-slate-600">Upstream</span>
               </div>
               {node.outgoers && node.outgoers.length > 0 ? (
                 <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
@@ -196,16 +196,16 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                     <button
                       key={id}
                       onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-300 hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition"
+                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
                       title={id}
                     >
                       <span className="truncate">→ {id}</span>
-                      <span className="text-[10px] text-slate-500 shrink-0 ml-1">focus</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <div className="p-2 text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
+                <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
                   No upstream dependencies
                 </div>
               )}
@@ -213,9 +213,9 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
 
             {/* Referenced By (Blast Radius) */}
             <div>
-              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                 <span>Referenced By ({node.incomers ? node.incomers.length : 0})</span>
-                <span className="text-slate-600">Blast Radius</span>
+                <span className="text-slate-400 dark:text-slate-600">Blast Radius</span>
               </div>
               {node.incomers && node.incomers.length > 0 ? (
                 <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
@@ -223,16 +223,16 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
                     <button
                       key={id}
                       onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-300 hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition"
+                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
                       title={id}
                     >
                       <span className="truncate">← {id}</span>
-                      <span className="text-[10px] text-slate-500 shrink-0 ml-1">focus</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <div className="p-2 text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
+                <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
                   No downstream dependents (leaf node)
                 </div>
               )}
@@ -244,17 +244,17 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
         {activeTab === "json" && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Raw JSON Definition
               </span>
               <button
                 onClick={handleCopyId}
-                className="px-2 py-0.5 rounded text-[10px] font-mono bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border text-slate-300 transition"
+                className="px-2 py-0.5 rounded text-[10px] font-mono bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
               >
                 {copied ? "Copied!" : "Copy Address"}
               </button>
             </div>
-            <pre className="p-2.5 rounded bg-workbench-header border border-workbench-border text-slate-300 font-mono text-[10px] overflow-x-auto max-h-80 custom-scrollbar select-text leading-relaxed">
+            <pre className="p-2.5 rounded bg-workbench-header border border-workbench-border text-slate-800 dark:text-slate-300 font-mono text-[10px] overflow-x-auto max-h-80 custom-scrollbar select-text leading-relaxed">
               {JSON.stringify(node, null, 2)}
             </pre>
           </div>

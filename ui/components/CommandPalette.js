@@ -7,7 +7,17 @@ import { ACTION_CONFIG } from "../lib/action-theme";
  * CommandPalette: Global ⌘K quick switcher & node navigation.
  * High-performance, keyboard-first, zero layout interference.
  */
-function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed = false, onToggleCollapse, onOpenShortcuts }) {
+function CommandPalette({
+  isOpen,
+  onClose,
+  nodes = [],
+  onSelectNode,
+  isCollapsed = false,
+  onToggleCollapse,
+  onOpenShortcuts,
+  theme = "dark",
+  onToggleTheme,
+}) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -40,6 +50,19 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
         run: onToggleCollapse,
       });
     }
+    if (onToggleTheme) {
+      list.push({
+        id: "action-toggle-theme",
+        isAction: true,
+        label: theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode",
+        description:
+          theme === "light"
+            ? "Switch workbench to precision technical dark theme"
+            : "Switch workbench to precision slate light theme",
+        shortcut: "T",
+        run: onToggleTheme,
+      });
+    }
     if (onOpenShortcuts) {
       list.push({
         id: "action-shortcuts",
@@ -51,7 +74,7 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
       });
     }
     return list;
-  }, [isCollapsed, onToggleCollapse, onOpenShortcuts]);
+  }, [isCollapsed, onToggleCollapse, onToggleTheme, theme, onOpenShortcuts]);
 
   const filteredActions = useMemo(() => {
     if (!actions || actions.length === 0) return [];
@@ -70,7 +93,10 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
         "collapse".includes(q) ||
         "expand".includes(q) ||
         "mutation".includes(q) ||
-        "toggle".includes(q)
+        "toggle".includes(q) ||
+        "theme".includes(q) ||
+        "dark".includes(q) ||
+        "light".includes(q)
     );
   }, [actions, deferredQuery]);
 
@@ -151,7 +177,7 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
       >
         {/* Search Input Bar */}
         <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-workbench-border bg-workbench-header">
-          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -163,10 +189,10 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Jump to resource, module, or type..."
-            className="flex-1 bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none font-mono"
+            placeholder="Jump to resource, module, command, or theme..."
+            className="flex-1 bg-transparent text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none font-mono"
           />
-          <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-workbench-subpanel border border-workbench-border rounded">
+          <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-workbench-subpanel border border-workbench-border rounded">
             ESC
           </kbd>
         </div>
@@ -174,7 +200,7 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
         {/* Results List */}
         <div ref={listRef} className="max-h-80 overflow-y-auto p-1 space-y-0.5 custom-scrollbar">
           {allFilteredItems.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-500 font-mono">
+            <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
               No matching resources or commands found for "{query}"
             </div>
           ) : (
@@ -190,33 +216,33 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
                       onClose();
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}
-                    className={`w-full flex items-center justify-between gap-3 px-2.5 py-2 text-left rounded transition-colors ${
+                    className={`w-full flex items-center justify-between gap-3 px-2.5 py-2 text-left rounded transition-colors cursor-pointer ${
                       isSelected
-                        ? "bg-workbench-hover text-white"
-                        : "text-slate-300 hover:bg-workbench-subpanel"
+                        ? "bg-workbench-hover text-slate-900 dark:text-white"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-workbench-subpanel"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30">
                         ⚡ Action
                       </span>
                       <div className="truncate flex-1 min-w-0">
-                        <div className="text-xs font-mono text-slate-100 font-medium truncate">
+                        <div className="text-xs font-mono text-slate-900 dark:text-slate-100 font-medium truncate">
                           {item.label}
                         </div>
-                        <div className="text-[10px] font-mono text-slate-400 truncate">
+                        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
                           {item.description}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {item.shortcut && (
-                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-workbench-panel border border-workbench-border rounded">
+                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-workbench-panel border border-workbench-border rounded">
                           {item.shortcut}
                         </kbd>
                       )}
                       {isSelected && (
-                        <span className="text-[10px] font-mono text-slate-400">
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                           Execute ↵
                         </span>
                       )}
@@ -237,10 +263,10 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full flex items-center justify-between gap-3 px-2.5 py-1.5 text-left rounded transition-colors ${
+                  className={`w-full flex items-center justify-between gap-3 px-2.5 py-1.5 text-left rounded transition-colors cursor-pointer ${
                     isSelected
-                      ? "bg-workbench-hover text-white"
-                      : "text-slate-300 hover:bg-workbench-subpanel"
+                      ? "bg-workbench-hover text-slate-900 dark:text-white"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-workbench-subpanel"
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate flex-1 min-w-0">
@@ -255,11 +281,11 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
                       {cfg.symbol} {change}
                     </span>
                     <div className="truncate flex-1 min-w-0">
-                      <div className="text-xs font-mono text-slate-200 truncate">
+                      <div className="text-xs font-mono text-slate-800 dark:text-slate-200 truncate">
                         {data.label || data.id}
                       </div>
                       {data.resourceType && (
-                        <div className="text-[10px] font-mono text-slate-500 truncate">
+                        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
                           {data.resourceType}
                           {data.module ? ` • ${data.module}` : ""}
                         </div>
@@ -267,7 +293,7 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
                     </div>
                   </div>
                   {isSelected && (
-                    <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
                       Jump ↵
                     </span>
                   )}
@@ -278,11 +304,11 @@ function CommandPalette({ isOpen, onClose, nodes = [], onSelectNode, isCollapsed
         </div>
 
         {/* Palette Footer */}
-        <div className="px-3.5 py-1.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500">
+        <div className="px-3.5 py-1.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-3">
-            <span><kbd className="text-slate-400">↑↓</kbd> navigate</span>
-            <span><kbd className="text-slate-400">↵</kbd> select</span>
-            <span><kbd className="text-slate-400">esc</kbd> close</span>
+            <span><kbd className="text-slate-600 dark:text-slate-400">↑↓</kbd> navigate</span>
+            <span><kbd className="text-slate-600 dark:text-slate-400">↵</kbd> select</span>
+            <span><kbd className="text-slate-600 dark:text-slate-400">esc</kbd> close</span>
           </div>
           <span>{allFilteredItems.length} results</span>
         </div>

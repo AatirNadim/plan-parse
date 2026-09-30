@@ -10,7 +10,7 @@ import { ACTION_CONFIG } from "../lib/action-theme";
  * 2. Dependency & Blast Radius Lineage
  * 3. Raw HCL/JSON representation
  */
-function NodeInspector({ node, onClose, onNavigateToNode }) {
+function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
   const [activeTab, setActiveTab] = useState("diff");
   const [copied, setCopied] = useState(false);
 
@@ -86,15 +86,30 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
           )}
         </div>
 
-        <button
-          onClick={onClose}
-          className="p-1 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-workbench-subpanel transition shrink-0 cursor-pointer"
-          title="Close inspector (Esc)"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {onOpenFullDiff && (
+            <button
+              onClick={() => onOpenFullDiff(node)}
+              className="flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              title="Open full diff modal (D)"
+            >
+              <svg className="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              <span>Full Diff</span>
+              <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-500">D</kbd>
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="p-1 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-workbench-subpanel transition shrink-0 cursor-pointer"
+            title="Close inspector (Esc)"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -138,8 +153,20 @@ function NodeInspector({ node, onClose, onNavigateToNode }) {
           <div className="space-y-3">
             {diffEntries && diffEntries.length > 0 ? (
               <div className="space-y-2">
-                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Resource Attribute Changes
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Resource Attribute Changes
+                  </span>
+                  {onOpenFullDiff && (
+                    <button
+                      onClick={() => onOpenFullDiff(node)}
+                      className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-sky-600 dark:text-sky-400 transition cursor-pointer flex items-center gap-1"
+                      title="Open full diff modal (D)"
+                    >
+                      <span>Full Diff</span>
+                      <kbd className="text-[9px] px-1 bg-workbench-panel rounded border border-workbench-border">D</kbd>
+                    </button>
+                  )}
                 </div>
                 <div className="divide-y divide-workbench-border border border-workbench-border rounded bg-workbench-header overflow-hidden font-mono text-[11px]">
                   {diffEntries.map((item) => (

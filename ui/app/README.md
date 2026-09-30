@@ -55,6 +55,10 @@ flowchart TD
 - `sidebarTab` (`useState`, `"resources"` | `"source"`): Controls active sidebar tab.
 - `isInspectorOpen` (`useState`, default `true`): Controls docked right inspector panel visibility.
 - `selectedNode` (`useState`): Stores the currently inspected node enriched with upstream (`incomers`) and downstream (`outgoers`) dependency IDs.
+- `popoverNode` / `popoverPos` (`useState`): Coordinates the Tier 1 on-canvas floating card adjacent to the selected node via `node.renderedPosition()`.
+- `diffModalNode` (`useState`): Controls display of the Tier 2 deep IaC diff modal (`NodeDiffModal`).
+- `isCollapsed` (`useState`, default `false`): Toggles intermediate non-mutating node collapse with transitive dependency bridging.
+- `theme` (`useTheme`): Controls active theme (`"dark"` or `"light"`), dynamically updating Cytoscape stylesheets and CSS variables.
 - `zoomLevel` (`useState`, default `1`): Tracks the live Cytoscape camera zoom ratio.
 - `isLocked` (`useState`, default `false`): Toggles Cytoscape navigation pan/zoom lock.
 - `cyReady` (`useState`): Tracks synchronous script tag availability of `window.cytoscape`.
@@ -92,22 +96,29 @@ const layout = cy.layout({
 layout.run();
 ```
 
-#### D. Node Selection, Blast Radius Highlighting & Camera Animation
-- **Single-Tap Selection**: Tapping a node extracts connected dependencies (`incomers` and `outgoers`), applies `.dimmed` (low opacity) to unrelated elements, adds `.highlighted` and `.highlighted-edge` (`#38bdf8` glowing border) to the selected node and its direct dependencies, and smoothly centers the camera via `cy.animate({ center: { eles: node }, zoom: Math.max(cy.zoom(), 1.25), duration: 400 })`.
-- **Double-Tap Quick Centering**: Double-tapping centers camera focus on the target node and zooms in (`Math.max(cy.zoom(), 1.3)`).
-- **Escape Key Handling**: Clears `selectedNode`, dismisses active panels/palettes, and removes all `.dimmed` and `.highlighted` classes across elements.
+#### D. Node Selection, 2-Tier Progressive Diff & Interaction Flow
+- **Single-Tap Selection**: Tapping a node extracts connected dependencies (`incomers` and `outgoers`), applies `.dimmed` (low opacity) to unrelated elements, adds `.highlighted` and `.highlighted-edge` (`#38bdf8` border) to the selected node and its direct dependencies, centers the camera smoothly, and positions the Tier 1 **`NodePopover`** at `node.renderedPosition()`.
+- **Double-Tap Direct Modal Jump**: Double-tapping any node opens the Tier 2 **`NodeDiffModal`** directly for deep attribute and HCL inspection.
+- **Canvas Navigation Auto-Dismiss**: When the user pans, zooms, or clicks canvas background, `popoverNode` automatically unmounts to preserve an uncluttered viewport.
+- **Escape Key Handling**: Clears `popoverNode`, closes `diffModalNode` if open, deselects `selectedNode`, and resets `.dimmed` and `.highlighted` classes across all elements.
 
 #### E. Global Keyboard Shortcuts
-| Key Combo | Action | Handler |
-| :--- | :--- | :--- |
-| `[` | Toggle docked left sidebar | `setIsSidebarOpen(prev => !prev)` |
-| `]` | Toggle docked right inspector | `setIsInspectorOpen(prev => !prev)` |
-| `Cmd+K` / `Ctrl+K` | Open / toggle Command Palette | `setIsCommandPaletteOpen(prev => !prev)` |
-| `f` / `F` | Fit canvas elements to viewport | `handleFit()` (`cy.animate({ fit: ... })`) |
-| `+` / `=` | Smooth zoom in by factor 1.3 | `handleZoomIn()` |
-| `-` | Smooth zoom out by factor 0.75 | `handleZoomOut()` |
-| `0` | Reset zoom to 100% (1:1) | `handleResetZoom()` |
-| `Escape` | Close palette or deselect active node | Resets selection and clears canvas dimming |
+| Key Combo | Action | Handler | Context / Scope |
+| :--- | :--- | :--- | :--- |
+| `[` | Toggle docked left sidebar | `setIsSidebarOpen(prev => !prev)` | Global |
+| `]` | Toggle docked right inspector | `setIsInspectorOpen(prev => !prev)` | Global (when node is selected) |
+| `Cmd+K` / `Ctrl+K` | Open / toggle Command Palette | `setIsCommandPaletteOpen(prev => !prev)` | Global |
+| `d` / `D` | Open Tier 2 IaC Diff Modal | `setDiffModalNode(selectedNode)` | Global (when node is selected) |
+| `Space` | Toggle Tier 1 On-Canvas Popover card | `setPopoverState(prev => ...)` | Canvas (when node is selected) |
+| `Tab` | Cycle diff view modes (Unified/Split/Matrix) | Handled inside `NodeDiffModal` | Inside Diff Modal |
+| `c` / `C` | Toggle intermediate node collapse | `handleToggleCollapse()` | Global |
+| `t` / `T` | Toggle light / dark workbench theme | `toggleTheme()` | Global |
+| `?` / `Shift + /` | Open keyboard shortcuts cheat sheet | `setIsShortcutsOpen(prev => !prev)` | Global |
+| `f` / `F` | Fit canvas elements to viewport | `handleFit()` (`cy.animate({ fit: ... })`) | Global |
+| `+` / `=` | Smooth zoom in by factor 1.3 | `handleZoomIn()` | Global |
+| `-` | Smooth zoom out by factor 0.75 | `handleZoomOut()` | Global |
+| `0` | Reset zoom to 100% (1:1) | `handleResetZoom()` | Global |
+| `Escape` | Dismiss modal/popover, deselect node, reset dimming | Resets popover, modal, and selection | Global |
 
 #### F. Tab-Level State Isolation
 All parsed DAG information lives strictly within React's client state in the browser tab. Because no session state is maintained on the Go server, users can open multiple tabs in their browser to visualize different plans or compare environments concurrently without collisions.
@@ -119,7 +130,7 @@ All parsed DAG information lives strictly within React's client state in the bro
 
 ---
 
-## Node Selection & Highlighting Flow
+## Node Selection & 2-Tier Diff Highlighting Flow
 
 ```mermaid
 sequenceDiagram
@@ -127,16 +138,26 @@ sequenceDiagram
     actor User
     participant Page as app/page.js
     participant Cy as Cytoscape Canvas (#cy)
+    participant Popover as NodePopover (Tier 1)
+    participant Modal as NodeDiffModal (Tier 2)
     participant Insp as NodeInspector
 
-    User->>Cy: Tap Node ("module.compute.aws_instance.worker[0]")
+    User->>Cy: Tap Mutating Node ("module.compute.aws_instance.worker[0]")
     Cy->>Page: cy.on('tap', 'node')
     Page->>Cy: Apply .dimmed to unrelated elements
     Page->>Cy: Apply .highlighted to node, ancestors & descendants
     Page->>Cy: Apply .highlighted-edge to incident edges
     Page->>Cy: cy.animate({ center: node, zoom: 1.25 })
+    Page->>Popover: Mount Popover at node.renderedPosition()
     Page->>Insp: setSelectedNode(enrichedNodeData)
-    Insp-->>User: Slide over attribute diff & lineage buttons
+    Popover-->>User: Floating quick-look card (deltas, top changes, Space/D cue)
+    
+    alt Expand to Full Diff
+        User->>Popover: Press D or click "Full Diff"
+        Popover->>Page: onOpenModal(node)
+        Page->>Modal: setDiffModalNode(node)
+        Modal-->>User: Open Tier 2 Modal (Unified HCL / Split / Matrix)
+    end
 ```
 
 ---

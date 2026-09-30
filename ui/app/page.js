@@ -7,6 +7,8 @@ import WorkbenchSidebar from "../components/WorkbenchSidebar";
 import NodeInspector from "../components/NodeInspector";
 import CommandPalette from "../components/CommandPalette";
 import KeyboardShortcutsModal from "../components/KeyboardShortcutsModal";
+import NodePopover from "../components/NodePopover";
+import NodeDiffModal from "../components/NodeDiffModal";
 import { getCytoscapeStyles } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
@@ -30,6 +32,8 @@ export default function Home() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [diffModalNode, setDiffModalNode] = useState(null);
+  const [popoverState, setPopoverState] = useState(null); // { node, position: { x, y } }
 
   // Compute collapsed graph representation with transitive edge bridging
   const collapsedGraph = useMemo(() => {
@@ -251,6 +255,7 @@ export default function Home() {
       outgoers,
     });
     setIsInspectorOpen(true);
+    setPopoverState(null);
 
     // Highlight connections
     cy.elements().removeClass("dimmed highlighted highlighted-edge");
@@ -307,6 +312,14 @@ export default function Home() {
       }
 
       if (e.key === "Escape") {
+        if (diffModalNode) {
+          setDiffModalNode(null);
+          return;
+        }
+        if (popoverState) {
+          setPopoverState(null);
+          return;
+        }
         if (isShortcutsOpen) {
           setIsShortcutsOpen(false);
           return;
@@ -317,6 +330,7 @@ export default function Home() {
         }
         if (selectedNode) {
           setSelectedNode(null);
+          setPopoverState(null);
           if (cyRef.current) {
             cyRef.current.elements().removeClass("dimmed highlighted highlighted-edge");
           }
@@ -332,13 +346,33 @@ export default function Home() {
       }
 
       // If a modal or palette is open, do not handle canvas/workbench single-character shortcuts
-      if (isShortcutsOpen || isCommandPaletteOpen) {
+      if (isShortcutsOpen || isCommandPaletteOpen || diffModalNode) {
         return;
       }
 
       // Single-character shortcuts: MUST ensure no modifier keys (Cmd/Ctrl/Alt) are pressed.
       const isPlainKey = !e.metaKey && !e.ctrlKey && !e.altKey;
       if (!isPlainKey) {
+        return;
+      }
+
+      if ((e.key === "d" || e.key === "D") && selectedNode) {
+        e.preventDefault();
+        setDiffModalNode(selectedNode);
+        setPopoverState(null);
+        return;
+      }
+
+      if (e.key === " " && selectedNode) {
+        e.preventDefault();
+        setPopoverState((curr) => {
+          if (curr) return null;
+          if (!cyRef.current) return null;
+          const cyNode = cyRef.current.$id(selectedNode.id);
+          if (!cyNode || cyNode.length === 0) return null;
+          const pos = cyNode.renderedPosition();
+          return { node: selectedNode, position: { x: pos.x, y: pos.y } };
+        });
         return;
       }
 
@@ -376,6 +410,8 @@ export default function Home() {
   }, [
     isShortcutsOpen,
     isCommandPaletteOpen,
+    diffModalNode,
+    popoverState,
     selectedNode,
     graphData,
     handleToggleCollapse,
@@ -448,12 +484,20 @@ export default function Home() {
         const incomers = node.incomers("node").map((n) => n.data().id);
         const outgoers = node.outgoers("node").map((n) => n.data().id);
 
-        setSelectedNode({
+        const nodeObj = {
           ...data,
           incomers,
           outgoers,
-        });
+        };
+
+        setSelectedNode(nodeObj);
         setIsInspectorOpen(true);
+
+        const pos = node.renderedPosition();
+        setPopoverState({
+          node: nodeObj,
+          position: { x: pos.x, y: pos.y },
+        });
 
         // Highlight paths
         cy.elements().removeClass("dimmed highlighted highlighted-edge");
@@ -467,20 +511,27 @@ export default function Home() {
         node.outgoers().removeClass("dimmed").addClass("highlighted");
       });
 
-      // Double-click to center and zoom in
+      // Double-click to open full diff modal
       cy.on("dbltap", "node", (evt) => {
         const node = evt.target;
-        cy.animate({
-          center: { eles: node },
-          zoom: Math.max(cy.zoom(), 1.3),
-          duration: 350,
-        });
+        const data = node.data();
+        const incomers = node.incomers("node").map((n) => n.data().id);
+        const outgoers = node.outgoers("node").map((n) => n.data().id);
+        const nodeObj = { ...data, incomers, outgoers };
+        setDiffModalNode(nodeObj);
+        setPopoverState(null);
+      });
+
+      // Dismiss popover on pan or zoom
+      cy.on("pan zoom", () => {
+        setPopoverState(null);
       });
 
       // Tap canvas background to deselect
       cy.on("tap", (evt) => {
         if (evt.target === cy) {
           setSelectedNode(null);
+          setPopoverState(null);
           cy.elements().removeClass("dimmed highlighted highlighted-edge");
         }
       });
@@ -564,6 +615,8 @@ export default function Home() {
     setCliLoaded(false);
     setDisabled(false);
     setSelectedNode(null);
+    setDiffModalNode(null);
+    setPopoverState(null);
     setIsCollapsed(false);
     if (fileName) {
       setPlanName(fileName);
@@ -638,6 +691,21 @@ export default function Home() {
         <main className="flex-1 relative h-full overflow-hidden canvas-bg">
           <div id="cy" ref={cyContainerRef} className="w-full h-full" />
 
+          {/* Tier 1 Floating On-Canvas Popover */}
+          {popoverState && (
+            <NodePopover
+              node={popoverState.node}
+              position={popoverState.position}
+              onOpenModal={() => {
+                setDiffModalNode(popoverState.node);
+                setPopoverState(null);
+              }}
+              onClose={() => setPopoverState(null)}
+              canvasWidth={cyContainerRef.current?.clientWidth || 1000}
+              canvasHeight={cyContainerRef.current?.clientHeight || 700}
+            />
+          )}
+
           {/* Empty Workbench State (Professional CLI drop target, zero AI clichés) */}
           {!hasGraph && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none">
@@ -679,8 +747,15 @@ export default function Home() {
         {selectedNode && isInspectorOpen && (
           <NodeInspector
             node={selectedNode}
-            onClose={() => setSelectedNode(null)}
+            onClose={() => {
+              setSelectedNode(null);
+              setPopoverState(null);
+            }}
             onNavigateToNode={handleNavigateToNode}
+            onOpenFullDiff={(n) => {
+              setDiffModalNode(n || selectedNode);
+              setPopoverState(null);
+            }}
           />
         )}
       </div>
@@ -705,6 +780,11 @@ export default function Home() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         nodes={graphData?.nodes || []}
+        selectedNode={selectedNode}
+        onOpenDiffModal={(n) => {
+          setDiffModalNode(n || selectedNode);
+          setPopoverState(null);
+        }}
         onSelectNode={handleNavigateToNode}
         isCollapsed={isCollapsed}
         onToggleCollapse={handleToggleCollapse}
@@ -717,6 +797,13 @@ export default function Home() {
       <KeyboardShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Tier 2 Deep IaC Diff Modal */}
+      <NodeDiffModal
+        isOpen={Boolean(diffModalNode)}
+        node={diffModalNode}
+        onClose={() => setDiffModalNode(null)}
       />
     </div>
   );

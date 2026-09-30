@@ -11,6 +11,8 @@ function CommandPalette({
   isOpen,
   onClose,
   nodes = [],
+  selectedNode = null,
+  onOpenDiffModal,
   onSelectNode,
   isCollapsed = false,
   onToggleCollapse,
@@ -36,6 +38,16 @@ function CommandPalette({
   // Action items
   const actions = useMemo(() => {
     const list = [];
+    if (selectedNode && onOpenDiffModal) {
+      list.push({
+        id: "action-open-diff",
+        isAction: true,
+        label: `View IaC Diff: ${selectedNode.label || selectedNode.id}`,
+        description: "Open unified and side-by-side Terraform HCL diff modal",
+        shortcut: "D",
+        run: () => onOpenDiffModal(selectedNode),
+      });
+    }
     if (onToggleCollapse) {
       list.push({
         id: "action-toggle-collapse",

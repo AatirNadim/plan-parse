@@ -45,6 +45,16 @@ export const SHORTCUT_SECTIONS = [
         label: "Command Palette / Quick Search",
         keys: [{ key: "⌘K" }, { divider: "/" }, { key: "Ctrl+K" }],
       },
+      {
+        label: "View Resource IaC Diff Modal",
+        detail: "when resource selected",
+        keys: [{ key: "D" }, { divider: "/" }, { key: "d" }],
+      },
+      {
+        label: "Toggle Quick-Look Popover",
+        detail: "when resource selected",
+        keys: [{ key: "Space" }],
+      },
     ],
   },
   {

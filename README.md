@@ -45,6 +45,7 @@ flowchart TD
         K --> O["NodeInspector (Attribute Diffs & Lineage)"]
         K --> P["StatusBar (Node/Edge HUD, Zoom & Legend)"]
         K --> Q["CommandPalette (Global ⌘K Quick Switcher)"]
+        K --> R["2-Tier IaC Diff (NodePopover & NodeDiffModal)"]
     end
 
     I <-->|Stateless JSON Payloads| K
@@ -175,6 +176,13 @@ The user interface delivers a docked engineering workbench styled with DM Sans, 
   - *Raw JSON Tab*: Syntax-highlighted raw resource definition with address copying.
 - **StatusBar**: Grounded bottom status strip showing live node and edge counts, zoom percentage HUD, viewport lock toggle, and integrated color-coded action legend.
 - **CommandPalette**: Fast keyboard-first search modal triggered by `Cmd+K` / `Ctrl+K`.
+- **2-Tier Progressive IaC Diff System**:
+  - *Tier 1: On-Canvas Popover (`NodePopover`)*: Boundary-clamped quick-look card positioned adjacent to the selected node on the Cytoscape canvas. Displays resource action badges (`+ CREATE`, `~ UPDATE`, `- DELETE`, `± REPLACE`), module path, delta counters (`+N added`, `~N modified`, `-N removed`), `(forces replacement)` warnings, top 3 changed attributes preview, and shortcut triggers.
+  - *Tier 2: Deep IaC Diff Modal (`NodeDiffModal`)*: High-density centered inspection dialog featuring:
+    - **Unified HCL Diff**: CLI-style Terraform HCL output with sticky line gutters (`lineNum`, `symbol`) and syntax coloring for added, removed, and modified blocks.
+    - **Side-by-Side (Split) HCL**: Dual-column state comparison between Current State (`before`) and Planned State (`after`).
+    - **Attributes JSON Matrix**: Filterable tabular matrix with search query input, "Changed Only" toggle, before/after values, and replacement flags.
+    - **Action Controls**: One-click "Copy Address" and "Copy Diff" utilities with affirmative visual feedback.
 
 ### Keyboard Shortcuts
 
@@ -183,11 +191,17 @@ The user interface delivers a docked engineering workbench styled with DM Sans, 
 | `[` | Toggle docked left sidebar | Global |
 | `]` | Toggle docked right inspector | Global (when node is selected) |
 | `Cmd+K` / `Ctrl+K` | Open / toggle Command Palette | Global |
+| `d` / `D` | Open Tier 2 IaC Diff Modal | Global (when node is selected) |
+| `Space` | Toggle Tier 1 On-Canvas Popover card | Canvas (when node is selected) |
+| `Tab` | Cycle view modes (Unified $\rightarrow$ Split $\rightarrow$ Matrix) | Inside IaC Diff Modal |
+| `c` / `C` | Toggle intermediate node collapse (Mutations Only) | Global |
+| `t` / `T` | Toggle light / dark workbench theme | Global |
+| `?` / `Shift + /` | Open keyboard shortcuts cheat sheet | Global |
 | `f` / `F` | Fit all nodes to canvas viewport | Global |
 | `+` / `=` | Smooth zoom in (factor 1.3) | Global |
 | `-` | Smooth zoom out (factor 0.75) | Global |
 | `0` | Reset zoom level to 100% (1:1) | Global |
-| `Escape` | Dismiss modal, deselect node, or clear canvas dimming | Global |
+| `Escape` | Dismiss modal/popover, deselect node, or clear canvas dimming | Global |
 
 ---
 

@@ -126,7 +126,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
 
             <div className="min-w-0">
               {/* Breadcrumbs: Module > Type > Name */}
-              <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 dark:text-slate-400 truncate">
+              <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
                 <span className="text-purple-600 dark:text-purple-400 font-medium truncate max-w-[140px]">{moduleBreadcrumb}</span>
                 <span>/</span>
                 <span className="text-slate-600 dark:text-slate-300 truncate max-w-[160px]">{typeBreadcrumb}</span>
@@ -135,8 +135,8 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               </div>
 
               {/* Full Address & File info */}
-              <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 mt-0.5 truncate">
-                <span className="select-text truncate text-slate-500 dark:text-slate-400">{address}</span>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                <span className="select-text truncate text-slate-600 dark:text-slate-400">{address}</span>
                 {fileLocation && (
                   <>
                     <span>•</span>
@@ -161,7 +161,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border rounded transition cursor-pointer"
               title="Copy formatted HCL to clipboard"
             >
-              <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <span>{copiedHcl ? "Copied Diff!" : "Copy Diff"}</span>
@@ -225,7 +225,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                 placeholder="Filter attributes..."
                 className="w-40 sm:w-48 px-2 py-1 pl-6 bg-workbench-panel border border-workbench-border rounded text-xs font-mono text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
               />
-              <svg className="w-3 h-3 text-slate-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -251,7 +251,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               <div className="divide-y divide-workbench-border/40 min-w-full w-max">
                 {hclDiff.lines.map((line, idx) => {
                   let rowBg = "text-slate-600 dark:text-slate-400 hover:bg-workbench-subpanel/30";
-                  let symbolColor = "text-slate-400";
+                  let symbolColor = "text-slate-400 dark:text-slate-500";
                   let badge = null;
 
                   if (line.type === "add") {
@@ -267,8 +267,8 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                     rowBg = "font-bold text-slate-900 dark:text-white bg-workbench-subpanel/40";
                     symbolColor = "text-sky-500 font-bold";
                   } else if (line.type === "comment") {
-                    rowBg = "text-slate-400 dark:text-slate-500 italic bg-workbench-subpanel/20";
-                    symbolColor = "text-slate-400";
+                    rowBg = "text-slate-500 dark:text-slate-400 italic bg-workbench-subpanel/20";
+                    symbolColor = "text-slate-400 dark:text-slate-500";
                   }
 
                   if (line.forcesReplacement) {
@@ -306,7 +306,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-[12px] h-full">
               {/* Left Pane: Current State (Before) */}
               <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col">
-                <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
+                <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px] font-semibold">
                   <span>Current State (Before)</span>
                   <span className="text-rose-500 font-bold">- DELETIONS</span>
                 </div>
@@ -318,7 +318,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                         className={`p-2 rounded border border-workbench-border/60 ${
                           attr.isRemoved || attr.isModified
                             ? "bg-rose-500/10 text-rose-800 dark:text-rose-300 border-rose-500/30"
-                            : "bg-workbench-panel text-slate-500"
+                            : "bg-workbench-panel text-slate-600 dark:text-slate-400"
                         }`}
                       >
                         <div className="font-semibold mb-0.5">{attr.key}</div>
@@ -332,14 +332,14 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                       </div>
                     ))
                   ) : (
-                    <div className="p-6 text-center text-slate-400">No matching attributes</div>
+                    <div className="p-6 text-center text-slate-500 dark:text-slate-400">No matching attributes</div>
                   )}
                 </div>
               </div>
 
               {/* Right Pane: Planned State (After) */}
               <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col">
-                <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-500 uppercase tracking-wider text-[10px] font-semibold">
+                <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px] font-semibold">
                   <span>Planned State (After)</span>
                   <span className="text-emerald-500 font-bold">+ ADDITIONS</span>
                 </div>
@@ -351,7 +351,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                         className={`p-2 rounded border border-workbench-border/60 ${
                           attr.isAdded || attr.isModified
                             ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30"
-                            : "bg-workbench-panel text-slate-500"
+                            : "bg-workbench-panel text-slate-600 dark:text-slate-400"
                         }`}
                       >
                         <div className="font-semibold mb-0.5 flex items-center justify-between">
@@ -374,7 +374,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                       </div>
                     ))
                   ) : (
-                    <div className="p-6 text-center text-slate-400">No matching attributes</div>
+                    <div className="p-6 text-center text-slate-500 dark:text-slate-400">No matching attributes</div>
                   )}
                 </div>
               </div>
@@ -385,7 +385,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
           {viewMode === "matrix" && (
             <div className="border border-workbench-border rounded-lg overflow-hidden">
               <table className="w-full text-left font-mono text-[11px] divide-y divide-workbench-border">
-                <thead className="bg-workbench-header text-slate-500 uppercase tracking-wider text-[10px]">
+                <thead className="bg-workbench-header text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px]">
                   <tr>
                     <th className="p-2.5">Attribute</th>
                     <th className="p-2.5">Change Type</th>
@@ -397,7 +397,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                   {filteredAttributes.length > 0 ? (
                     filteredAttributes.map((attr) => {
                       let typeLabel = "UNCHANGED";
-                      let typeBadge = "text-slate-500 bg-slate-500/10 border-slate-500/20";
+                      let typeBadge = "text-slate-600 dark:text-slate-400 bg-slate-500/10 border-slate-500/20";
 
                       if (attr.isAdded) {
                         typeLabel = "+ ADDED";
@@ -446,7 +446,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={4} className="p-6 text-center text-slate-400 font-mono">
+                      <td colSpan={4} className="p-6 text-center text-slate-500 dark:text-slate-400 font-mono">
                         No attribute changes match the current filter.
                       </td>
                     </tr>
@@ -484,9 +484,9 @@ function NodeDiffModal({ isOpen, node, onClose }) {
           </div>
 
           <div className="text-slate-400 dark:text-slate-500 text-[10px] flex items-center gap-2">
-            <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border">Tab</kbd> switch view</span>
+            <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-slate-600 dark:text-slate-300">Tab</kbd> switch view</span>
             <span>•</span>
-            <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border">Esc</kbd> close</span>
+            <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-slate-600 dark:text-slate-300">Esc</kbd> close</span>
           </div>
         </div>
       </div>

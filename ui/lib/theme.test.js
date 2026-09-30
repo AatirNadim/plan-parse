@@ -210,4 +210,34 @@ describe("Theme System & Light/Dark Mode Specification", () => {
       );
     });
   });
+
+  describe("NodePopover & NodeDiffModal Theme Conformance", () => {
+    test("NodePopover.js utilizes semantic workbench tokens and dark contrast pairs", () => {
+      const popoverPath = path.join(uiRoot, "components", "NodePopover.js");
+      const popoverContent = fs.readFileSync(popoverPath, "utf-8");
+
+      assert.ok(popoverContent.includes("bg-workbench-panel"), "NodePopover must use bg-workbench-panel");
+      assert.ok(popoverContent.includes("border-workbench-border"), "NodePopover must use border-workbench-border");
+      assert.ok(popoverContent.includes("bg-workbench-subpanel"), "NodePopover must use bg-workbench-subpanel");
+      assert.ok(popoverContent.includes("dark:text-slate-100"), "NodePopover must have dark mode header text");
+      assert.ok(popoverContent.includes("dark:text-slate-400"), "NodePopover must have dark mode secondary text");
+      assert.ok(popoverContent.includes("custom-scrollbar"), "NodePopover must use theme-aware custom-scrollbar");
+    });
+
+    test("NodeDiffModal.js utilizes semantic workbench tokens and dark contrast pairs", () => {
+      const modalPath = path.join(uiRoot, "components", "NodeDiffModal.js");
+      const modalContent = fs.readFileSync(modalPath, "utf-8");
+
+      assert.ok(modalContent.includes("bg-workbench-panel"), "NodeDiffModal must use bg-workbench-panel");
+      assert.ok(modalContent.includes("bg-workbench-header"), "NodeDiffModal must use bg-workbench-header");
+      assert.ok(modalContent.includes("bg-workbench-subpanel"), "NodeDiffModal must use bg-workbench-subpanel");
+      assert.ok(modalContent.includes("border-workbench-border"), "NodeDiffModal must use border-workbench-border");
+      assert.ok(modalContent.includes("dark:bg-black/75"), "NodeDiffModal backdrop must be dark-theme aware");
+      assert.ok(modalContent.includes("dark:text-emerald-300"), "NodeDiffModal additions must be dark-theme aware");
+      assert.ok(modalContent.includes("dark:text-rose-300"), "NodeDiffModal deletions must be dark-theme aware");
+      assert.ok(modalContent.includes("dark:text-amber-300"), "NodeDiffModal modifications must be dark-theme aware");
+      assert.ok(modalContent.includes("custom-scrollbar"), "NodeDiffModal must use theme-aware custom-scrollbar");
+    });
+  });
 });
+

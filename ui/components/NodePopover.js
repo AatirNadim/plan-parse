@@ -88,7 +88,7 @@ function NodePopover({
             {address}
           </h3>
           {(node.resourceType || isEntity) && (
-            <div className="text-[10px] font-mono text-slate-400 truncate mt-0.5">
+            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">
               {node.resourceType || cfg.label}
             </div>
           )}
@@ -124,7 +124,7 @@ function NodePopover({
             </span>
           )}
           {!hasChanges && (
-            <span className="text-slate-400 text-[10px] font-mono">
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] font-mono">
               No attribute modifications
             </span>
           )}
@@ -174,7 +174,7 @@ function NodePopover({
               </div>
             ))}
             {summary.extraChangesCount > 0 && (
-              <div className="text-[9px] font-mono text-slate-400 text-center py-0.5">
+              <div className="text-[9px] font-mono text-slate-500 dark:text-slate-400 text-center py-0.5">
                 +{summary.extraChangesCount} more attribute changes...
               </div>
             )}
@@ -183,10 +183,10 @@ function NodePopover({
       )}
 
       {/* Footer shortcut hint & CTA */}
-      <div className="font-mono text-[10px] text-slate-500 flex items-center justify-between border-t border-workbench-border/60 pt-2 mt-2">
+      <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-workbench-border/60 pt-2 mt-2">
         <div className="flex items-center gap-1">
           <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">Space</kbd>
-          <span className="text-slate-400">or</span>
+          <span className="text-slate-400 dark:text-slate-500">or</span>
           <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">D</kbd>
         </div>
 

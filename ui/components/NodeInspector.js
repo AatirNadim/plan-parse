@@ -1,18 +1,28 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
+import TargetCommandCard from "./TargetCommandCard";
+import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
 
 /**
  * NodeInspector: Docked right-hand inspector panel.
  * Provides deep architectural insight into selected resources:
  * 1. Visual Attribute Diff
- * 2. Dependency & Blast Radius Lineage
- * 3. Raw HCL/JSON representation
+ * 2. Targeted Apply Command Generator (Target CLI)
+ * 3. Dependency & Blast Radius Lineage
+ * 4. Raw HCL/JSON representation
  */
-function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
+function NodeInspector({
+  node,
+  graphData,
+  onClose,
+  onNavigateToNode,
+  onOpenFullDiff,
+}) {
   const [activeTab, setActiveTab] = useState("diff");
   const [copied, setCopied] = useState(false);
+  const [targetCopied, setTargetCopied] = useState(false);
 
   if (!node) return null;
 
@@ -21,6 +31,10 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
   const cfg = ACTION_CONFIG[badgeKey] || ACTION_CONFIG["no-op"];
   const badgeLabel = isEntity ? cfg.label : (node.change || "no-op");
 
+  const targetAddress = useMemo(() => {
+    return getNodeTargetAddress(node);
+  }, [node]);
+
   const handleCopyId = () => {
     if (node.id && typeof navigator !== "undefined") {
       navigator.clipboard.writeText(node.id);
@@ -28,6 +42,16 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
       setTimeout(() => setCopied(false), 1500);
     }
   };
+
+  const handleQuickCopyTarget = useCallback(async () => {
+    if (!targetAddress) return;
+    const cmd = `terraform apply -target="${targetAddress}"`;
+    const ok = await copyToClipboard(cmd);
+    if (ok) {
+      setTargetCopied(true);
+      setTimeout(() => setTargetCopied(false), 1800);
+    }
+  }, [targetAddress]);
 
   // Compute attribute diff entries
   const diffEntries = useMemo(() => {
@@ -87,6 +111,34 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          {targetAddress && (
+            <button
+              onClick={handleQuickCopyTarget}
+              className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-mono border transition cursor-pointer ${
+                targetCopied
+                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-semibold"
+                  : "bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+              }`}
+              title={`Quick copy: terraform apply -target="${targetAddress}"`}
+            >
+              {targetCopied ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>-target</span>
+                </>
+              )}
+            </button>
+          )}
+
           {onOpenFullDiff && (
             <button
               onClick={() => onOpenFullDiff(node)}
@@ -100,6 +152,7 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
               <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-500">D</kbd>
             </button>
           )}
+
           <button
             onClick={onClose}
             className="p-1 rounded text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-workbench-subpanel transition shrink-0 cursor-pointer"
@@ -113,10 +166,10 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-workbench-border bg-workbench-subpanel/50 p-1 gap-1 shrink-0">
+      <div className="flex border-b border-workbench-border bg-workbench-subpanel/50 p-1 gap-1 shrink-0 overflow-x-auto custom-scrollbar">
         <button
           onClick={() => setActiveTab("diff")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer whitespace-nowrap ${
             activeTab === "diff"
               ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
@@ -125,8 +178,18 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
           Attribute Diff
         </button>
         <button
+          onClick={() => setActiveTab("target")}
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer whitespace-nowrap flex items-center justify-center gap-1 ${
+            activeTab === "target"
+              ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+          }`}
+        >
+          <span>Target CLI</span>
+        </button>
+        <button
           onClick={() => setActiveTab("lineage")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer whitespace-nowrap ${
             activeTab === "lineage"
               ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
@@ -136,7 +199,7 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
         </button>
         <button
           onClick={() => setActiveTab("json")}
-          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer ${
+          className={`flex-1 py-1 px-2 rounded text-xs font-mono transition cursor-pointer whitespace-nowrap ${
             activeTab === "json"
               ? "bg-workbench-subpanel text-slate-900 dark:text-white border border-workbench-border font-medium"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
@@ -208,7 +271,18 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
           </div>
         )}
 
-        {/* Tab 2: Lineage (Dependencies & Blast Radius) */}
+        {/* Tab 2: Targeted Command Generator (Target CLI) */}
+        {activeTab === "target" && (
+          <div className="space-y-3">
+            <TargetCommandCard
+              node={node}
+              graphData={graphData}
+              onNavigateToNode={onNavigateToNode}
+            />
+          </div>
+        )}
+
+        {/* Tab 3: Lineage (Dependencies & Blast Radius) */}
         {activeTab === "lineage" && (
           <div className="space-y-4">
             {/* Depends On */}
@@ -218,18 +292,32 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
                 <span className="text-slate-400 dark:text-slate-600">Upstream</span>
               </div>
               {node.outgoers && node.outgoers.length > 0 ? (
-                <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                  {node.outgoers.map((id) => (
+                <div className="space-y-2">
+                  <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                    {node.outgoers.map((id) => (
+                      <button
+                        key={id}
+                        onClick={() => onNavigateToNode && onNavigateToNode(id)}
+                        className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
+                        title={id}
+                      >
+                        <span className="truncate">→ {id}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {targetAddress && (
                     <button
-                      key={id}
-                      onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
-                      title={id}
+                      onClick={() => setActiveTab("target")}
+                      className="w-full p-2 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-sky-600 dark:text-sky-400 font-sans text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
-                      <span className="truncate">→ {id}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>Generate Target Command with Prerequisite Dependencies</span>
                     </button>
-                  ))}
+                  )}
                 </div>
               ) : (
                 <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
@@ -267,7 +355,7 @@ function NodeInspector({ node, onClose, onNavigateToNode, onOpenFullDiff }) {
           </div>
         )}
 
-        {/* Tab 3: Raw JSON */}
+        {/* Tab 4: Raw JSON */}
         {activeTab === "json" && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">

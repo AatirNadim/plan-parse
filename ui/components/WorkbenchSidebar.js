@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from "react";
 import { ACTION_CONFIG, METRIC_KEYS, ACTION_KEYS, ENTITY_KEYS } from "../lib/action-theme";
+import { copyToClipboard } from "../lib/target-command";
 
 function formatBytes(bytes, decimals = 1) {
   if (!bytes || bytes === 0) return "0 Bytes";
@@ -39,6 +40,16 @@ function WorkbenchSidebar({
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [actionFilter, setActionFilter] = useState("all");
   const [groupByModule, setGroupByModule] = useState(true);
+  const [copiedModule, setCopiedModule] = useState(null);
+
+  const handleCopyModuleTarget = useCallback(async (moduleName) => {
+    const cmd = `terraform apply -target="${moduleName}"`;
+    const ok = await copyToClipboard(cmd);
+    if (ok) {
+      setCopiedModule(moduleName);
+      setTimeout(() => setCopiedModule(null), 1800);
+    }
+  }, []);
 
   const fileInputRef = useRef(null);
 
@@ -435,9 +446,36 @@ function WorkbenchSidebar({
               Object.entries(groupedResources).map(([groupName, items]) => (
                 <div key={groupName} className="space-y-0.5">
                   {groupByModule && (
-                    <div className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-                      <span className="truncate">{groupName}</span>
-                      <span>{items.length}</span>
+                    <div
+                      onClick={() => groupName.startsWith("module.") && onNavigateToNode && onNavigateToNode(groupName)}
+                      className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between group/mod hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer rounded hover:bg-workbench-subpanel/50 transition"
+                      title={groupName.startsWith("module.") ? `Focus ${groupName} on canvas` : groupName}
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        {groupName.startsWith("module.") && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                        )}
+                        <span className="truncate">{groupName}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {groupName.startsWith("module.") && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopyModuleTarget(groupName);
+                            }}
+                            className={`px-1.5 py-[1px] rounded border text-[9px] font-mono transition cursor-pointer ${
+                              copiedModule === groupName
+                                ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold"
+                                : "border-workbench-border bg-workbench-header hover:bg-workbench-subpanel text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 opacity-70 group-hover/mod:opacity-100"
+                            }`}
+                            title={`Copy terraform apply -target="${groupName}"`}
+                          >
+                            {copiedModule === groupName ? "Copied!" : "-target"}
+                          </button>
+                        )}
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{items.length}</span>
+                      </div>
                     </div>
                   )}
                   {items.map((n) => {

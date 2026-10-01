@@ -747,6 +747,7 @@ export default function Home() {
         {selectedNode && isInspectorOpen && (
           <NodeInspector
             node={selectedNode}
+            graphData={graphData}
             onClose={() => {
               setSelectedNode(null);
               setPopoverState(null);
@@ -781,6 +782,7 @@ export default function Home() {
         onClose={() => setIsCommandPaletteOpen(false)}
         nodes={graphData?.nodes || []}
         selectedNode={selectedNode}
+        graphData={graphData}
         onOpenDiffModal={(n) => {
           setDiffModalNode(n || selectedNode);
           setPopoverState(null);

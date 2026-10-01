@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 import { getDiffSummary } from "../lib/hcl-diff";
+import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
 
 /**
  * NodePopover: Tier 1 Quick-Look Floating Canvas Popover.
  * Positioned adjacent to the selected/hovered Cytoscape node with viewport clamping.
- * Shows resource change summary, top attribute deltas, and keyboard shortcut to the full diff modal.
+ * Shows resource change summary, top attribute deltas, 1-click targeted apply command,
+ * and keyboard shortcut to the full diff modal.
  */
 function NodePopover({
   node,
@@ -17,10 +19,27 @@ function NodePopover({
   canvasWidth = 1000,
   canvasHeight = 700,
 }) {
+  const [targetCopied, setTargetCopied] = useState(false);
+
   const summary = useMemo(() => {
     if (!node) return null;
     return getDiffSummary(node);
   }, [node]);
+
+  const targetAddress = useMemo(() => {
+    return getNodeTargetAddress(node);
+  }, [node]);
+
+  const handleCopyTarget = useCallback(async (e) => {
+    e.stopPropagation();
+    if (!targetAddress) return;
+    const cmd = `terraform apply -target="${targetAddress}"`;
+    const ok = await copyToClipboard(cmd);
+    if (ok) {
+      setTargetCopied(true);
+      setTimeout(() => setTargetCopied(false), 1800);
+    }
+  }, [targetAddress]);
 
   if (!node || !position) return null;
 
@@ -106,7 +125,7 @@ function NodePopover({
       </div>
 
       {/* Delta Metrics & Replacement Alert */}
-      <div className="py-2 space-y-1.5">
+      <div className="py-2 space-y-1.5 font-sans">
         <div className="flex items-center gap-1.5 text-[10px] font-mono">
           {summary?.addedCount > 0 && (
             <span className="px-1.5 py-[1px] rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
@@ -182,20 +201,50 @@ function NodePopover({
         </div>
       )}
 
-      {/* Footer shortcut hint & CTA */}
-      <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-workbench-border/60 pt-2 mt-2">
-        <div className="flex items-center gap-1">
+      {/* Footer shortcut hint & CTAs */}
+      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-workbench-border/60 pt-2.5 mt-2">
+        <div className="flex items-center gap-1 font-mono text-[10px]">
           <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">Space</kbd>
           <span className="text-slate-400 dark:text-slate-500">toggle</span>
         </div>
 
-        <button
-          onClick={onOpenModal}
-          className="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-mono text-[11px] font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-        >
-          <span>Full Diff</span>
-          <kbd className="px-1 text-[9px] bg-sky-700 rounded border border-sky-500/40">D</kbd>
-        </button>
+        <div className="flex items-center gap-1.5">
+          {targetAddress && (
+            <button
+              onClick={handleCopyTarget}
+              className={`px-2 py-1 rounded border font-mono text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer ${
+                targetCopied
+                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                  : "bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border text-slate-700 dark:text-slate-200"
+              }`}
+              title={`Copy: terraform apply -target="${targetAddress}"`}
+            >
+              {targetCopied ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>-target</span>
+                </>
+              )}
+            </button>
+          )}
+
+          <button
+            onClick={onOpenModal}
+            className="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-mono text-[11px] font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <span>Full Diff</span>
+            <kbd className="px-1 text-[9px] bg-sky-700 rounded border border-sky-500/40">D</kbd>
+          </button>
+        </div>
       </div>
     </div>
   );

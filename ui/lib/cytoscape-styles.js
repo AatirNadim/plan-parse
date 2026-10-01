@@ -212,6 +212,88 @@ export function getCytoscapeStyles(theme = "dark") {
         "z-index": 998,
       },
     },
+    // Transitive Multi-Hop Blast Radius Precision Archetype Styles
+    {
+      selector: ".blast-root",
+      style: {
+        "border-width": 3,
+        "border-color": isLight ? "#0284c7" : "#38bdf8",
+        "background-color": isLight ? "#e0f2fe" : "#0c2438",
+        "background-opacity": 1,
+        color: isLight ? "#0369a1" : "#38bdf8",
+        "font-weight": "600",
+        opacity: 1,
+        "z-index": 1000,
+      },
+    },
+    {
+      selector: ".blast-direct",
+      style: {
+        "border-width": 2,
+        "border-color": isLight ? "#0284c7" : "#38bdf8",
+        "background-color": isLight ? "#f0f9ff" : "#0e2238",
+        "background-opacity": 0.95,
+        opacity: 1,
+        "z-index": 999,
+      },
+    },
+    {
+      selector: ".blast-transitive",
+      style: {
+        "border-width": 1.5,
+        "border-style": "dashed",
+        "border-color": isLight ? "#38bdf8" : "#0284c7",
+        "background-color": isLight ? "#f8fafc" : "#111827",
+        "background-opacity": 0.9,
+        opacity: 0.95,
+        "z-index": 998,
+      },
+    },
+    {
+      selector: ".blast-mutating",
+      style: {
+        "border-width": 2.5,
+        "border-color": isLight ? "#e11d48" : "#fb7185",
+        "background-color": isLight ? "#fff1f2" : "#2a0d17",
+        "background-opacity": 0.95,
+        color: isLight ? "#be123c" : "#fda4af",
+        "font-weight": "600",
+        opacity: 1,
+        "z-index": 1001,
+      },
+    },
+    {
+      selector: "edge.blast-edge-direct",
+      style: {
+        width: 2.5,
+        "line-color": isLight ? "#0284c7" : "#38bdf8",
+        "target-arrow-color": isLight ? "#0284c7" : "#38bdf8",
+        opacity: 1,
+        "z-index": 997,
+      },
+    },
+    {
+      selector: "edge.blast-edge-transitive",
+      style: {
+        width: 1.75,
+        "line-style": "dashed",
+        "line-dash-pattern": [5, 3],
+        "line-color": isLight ? "#38bdf8" : "#0284c7",
+        "target-arrow-color": isLight ? "#38bdf8" : "#0284c7",
+        opacity: 0.85,
+        "z-index": 996,
+      },
+    },
+    {
+      selector: "edge.blast-edge-mutating",
+      style: {
+        width: 2.5,
+        "line-color": isLight ? "#e11d48" : "#fb7185",
+        "target-arrow-color": isLight ? "#e11d48" : "#fb7185",
+        opacity: 1,
+        "z-index": 998,
+      },
+    },
   ];
 }
 

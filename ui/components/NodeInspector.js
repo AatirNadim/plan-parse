@@ -4,13 +4,14 @@ import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 import TargetCommandCard from "./TargetCommandCard";
 import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
+import { computeBlastRadius, computeUpstreamLineage } from "../lib/blast-radius";
 
 /**
  * NodeInspector: Docked right-hand inspector panel.
  * Provides deep architectural insight into selected resources:
  * 1. Visual Attribute Diff
  * 2. Targeted Apply Command Generator (Target CLI)
- * 3. Dependency & Blast Radius Lineage
+ * 3. Dependency & Transitive Blast Radius Lineage
  * 4. Raw HCL/JSON representation
  */
 function NodeInspector({
@@ -19,10 +20,13 @@ function NodeInspector({
   onClose,
   onNavigateToNode,
   onOpenFullDiff,
+  isBlastIsolated = false,
+  onToggleBlastIsolation,
 }) {
   const [activeTab, setActiveTab] = useState("diff");
   const [copied, setCopied] = useState(false);
   const [targetCopied, setTargetCopied] = useState(false);
+  const [mutatingOnlyBlast, setMutatingOnlyBlast] = useState(false);
 
   if (!node) return null;
 
@@ -77,6 +81,17 @@ function NodeInspector({
       };
     });
   }, [node.changeDetails]);
+
+  // Compute transitive blast radius and upstream lineage
+  const blastRadius = useMemo(() => {
+    if (!node || !node.id || !graphData) return null;
+    return computeBlastRadius(node.id, graphData);
+  }, [node, graphData]);
+
+  const upstreamLineage = useMemo(() => {
+    if (!node || !node.id || !graphData) return null;
+    return computeUpstreamLineage(node.id, graphData);
+  }, [node, graphData]);
 
   return (
     <aside className="w-96 h-full border-l border-workbench-border bg-workbench-panel flex flex-col shrink-0 select-none z-10">
@@ -285,24 +300,240 @@ function NodeInspector({
         {/* Tab 3: Lineage (Dependencies & Blast Radius) */}
         {activeTab === "lineage" && (
           <div className="space-y-4">
-            {/* Depends On */}
-            <div>
-              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                <span>Depends On ({node.outgoers ? node.outgoers.length : 0})</span>
-                <span className="text-slate-400 dark:text-slate-600">Upstream</span>
+            {/* Blast Radius Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>Downstream Blast Radius</span>
+                </span>
+                {blastRadius && (
+                  <span className="text-[10px] font-mono font-medium text-slate-400">
+                    Max Depth: {blastRadius.maxDepth} {blastRadius.maxDepth === 1 ? "hop" : "hops"}
+                  </span>
+                )}
               </div>
-              {node.outgoers && node.outgoers.length > 0 ? (
-                <div className="space-y-2">
-                  <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                    {node.outgoers.map((id) => (
+
+              {blastRadius && blastRadius.stats.totalCount > 0 ? (
+                <div className="space-y-2.5">
+                  {/* Summary Metric Strip */}
+                  <div className="grid grid-cols-3 gap-1.5 p-2 rounded bg-workbench-header border border-workbench-border text-center font-mono">
+                    <div className="p-1 rounded bg-workbench-subpanel/50 border border-workbench-border/50">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Direct</div>
+                      <div className="text-xs font-bold text-sky-600 dark:text-sky-400">
+                        {blastRadius.stats.directCount}
+                      </div>
+                    </div>
+                    <div className="p-1 rounded bg-workbench-subpanel/50 border border-workbench-border/50">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Transitive</div>
+                      <div className="text-xs font-bold text-purple-600 dark:text-purple-400">
+                        {blastRadius.stats.transitiveCount}
+                      </div>
+                    </div>
+                    <div className="p-1 rounded bg-workbench-subpanel/50 border border-workbench-border/50">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase">Mutating</div>
+                      <div className={`text-xs font-bold ${
+                        blastRadius.stats.mutatingCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-500"
+                      }`}>
+                        {blastRadius.stats.mutatingCount}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions & Filters */}
+                  <div className="flex flex-col gap-2">
+                    {onToggleBlastIsolation && (
                       <button
-                        key={id}
-                        onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                        className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
-                        title={id}
+                        onClick={onToggleBlastIsolation}
+                        className={`w-full py-1.5 px-2.5 rounded text-xs font-mono border flex items-center justify-center gap-2 transition cursor-pointer ${
+                          isBlastIsolated
+                            ? "bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/40 font-semibold shadow-sm"
+                            : "bg-workbench-subpanel hover:bg-workbench-hover border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                        }`}
+                        title="Toggle Subgraph Isolation on Canvas (B)"
                       >
-                        <span className="truncate">→ {id}</span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
+                        <span className={`w-2 h-2 rounded-full ${isBlastIsolated ? "bg-sky-500 animate-pulse" : "bg-slate-400"}`} />
+                        <span>{isBlastIsolated ? "Exit Subgraph Isolation" : "Isolate Blast Radius Subgraph"}</span>
+                        <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-500">B</kbd>
+                      </button>
+                    )}
+
+                    {blastRadius.stats.mutatingCount > 0 && (
+                      <label className="flex items-center gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400 cursor-pointer select-none px-1">
+                        <input
+                          type="checkbox"
+                          checked={mutatingOnlyBlast}
+                          onChange={(e) => setMutatingOnlyBlast(e.target.checked)}
+                          className="rounded border-workbench-border text-sky-500 focus:ring-0 focus:ring-offset-0 bg-workbench-subpanel"
+                        />
+                        <span>Only show mutating casualties ({blastRadius.stats.mutatingCount} of {blastRadius.stats.totalCount})</span>
+                      </label>
+                    )}
+                  </div>
+
+                  {/* Tiered Casualty List */}
+                  <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar pr-0.5">
+                    {/* Tier 1: Direct Dependents */}
+                    {blastRadius.byDepth[1] && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                          <span>Tier 1 • Direct Dependents (1 hop)</span>
+                          <span className="font-semibold">{blastRadius.byDepth[1].length}</span>
+                        </div>
+                        <div className="space-y-1">
+                          {blastRadius.byDepth[1]
+                            .filter((item) => !mutatingOnlyBlast || item.isMutating)
+                            .map((item) => {
+                              const actionKey = item.change ? item.change.toLowerCase() : "no-op";
+                              const actCfg = ACTION_CONFIG[actionKey] || ACTION_CONFIG["no-op"];
+                              return (
+                                <button
+                                  key={item.id}
+                                  onClick={() => onNavigateToNode && onNavigateToNode(item.id)}
+                                  className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] flex items-center justify-between gap-1.5 transition cursor-pointer group"
+                                  title={`Focus ${item.id}`}
+                                >
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <span
+                                      className="px-1 py-0.2 text-[9px] font-bold rounded uppercase shrink-0"
+                                      style={{
+                                        backgroundColor: `${actCfg.color}15`,
+                                        color: actCfg.color,
+                                        border: `1px solid ${actCfg.color}35`,
+                                      }}
+                                    >
+                                      {actCfg.symbol}
+                                    </span>
+                                    <span className="truncate">{item.label || item.id}</span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                    focus →
+                                  </span>
+                                </button>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tier 2: Secondary Dependents */}
+                    {blastRadius.byDepth[2] && (
+                      <div className="space-y-1 pt-1">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                          <span>Tier 2 • Secondary Dependents (2 hops)</span>
+                          <span className="font-semibold">{blastRadius.byDepth[2].length}</span>
+                        </div>
+                        <div className="space-y-1">
+                          {blastRadius.byDepth[2]
+                            .filter((item) => !mutatingOnlyBlast || item.isMutating)
+                            .map((item) => {
+                              const actionKey = item.change ? item.change.toLowerCase() : "no-op";
+                              const actCfg = ACTION_CONFIG[actionKey] || ACTION_CONFIG["no-op"];
+                              return (
+                                <button
+                                  key={item.id}
+                                  onClick={() => onNavigateToNode && onNavigateToNode(item.id)}
+                                  className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] flex items-center justify-between gap-1.5 transition cursor-pointer group"
+                                  title={`Focus ${item.id}`}
+                                >
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <span
+                                      className="px-1 py-0.2 text-[9px] font-bold rounded uppercase shrink-0"
+                                      style={{
+                                        backgroundColor: `${actCfg.color}15`,
+                                        color: actCfg.color,
+                                        border: `1px solid ${actCfg.color}35`,
+                                      }}
+                                    >
+                                      {actCfg.symbol}
+                                    </span>
+                                    <span className="truncate">{item.label || item.id}</span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                    focus →
+                                  </span>
+                                </button>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tier 3+: Deep Cascades */}
+                    {Object.keys(blastRadius.byDepth)
+                      .filter((d) => Number(d) >= 3)
+                      .map((d) => (
+                        <div key={d} className="space-y-1 pt-1">
+                          <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">
+                            <span>Tier {d} • Deep Cascades ({d} hops)</span>
+                            <span className="font-semibold">{blastRadius.byDepth[d].length}</span>
+                          </div>
+                          <div className="space-y-1">
+                            {blastRadius.byDepth[d]
+                              .filter((item) => !mutatingOnlyBlast || item.isMutating)
+                              .map((item) => {
+                                const actionKey = item.change ? item.change.toLowerCase() : "no-op";
+                                const actCfg = ACTION_CONFIG[actionKey] || ACTION_CONFIG["no-op"];
+                                return (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => onNavigateToNode && onNavigateToNode(item.id)}
+                                    className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] flex items-center justify-between gap-1.5 transition cursor-pointer group"
+                                    title={`Focus ${item.id}`}
+                                  >
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                      <span
+                                        className="px-1 py-0.2 text-[9px] font-bold rounded uppercase shrink-0"
+                                        style={{
+                                          backgroundColor: `${actCfg.color}15`,
+                                          color: actCfg.color,
+                                          border: `1px solid ${actCfg.color}35`,
+                                        }}
+                                      >
+                                        {actCfg.symbol}
+                                      </span>
+                                      <span className="truncate">{item.label || item.id}</span>
+                                    </div>
+                                    <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                      focus →
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-2.5 text-slate-500 dark:text-slate-500 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
+                  No downstream dependents (leaf resource with zero blast radius).
+                </div>
+              )}
+            </div>
+
+            {/* Upstream Prerequisites Section */}
+            <div className="pt-3 border-t border-workbench-border/70 space-y-2">
+              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Depends On ({upstreamLineage ? upstreamLineage.stats.totalCount : (node.outgoers ? node.outgoers.length : 0)})</span>
+                <span className="text-slate-400 dark:text-slate-600">Upstream Prerequisites</span>
+              </div>
+              {upstreamLineage && upstreamLineage.stats.totalCount > 0 ? (
+                <div className="space-y-2">
+                  <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                    {upstreamLineage.all.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => onNavigateToNode && onNavigateToNode(item.id)}
+                        className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
+                        title={item.id}
+                      >
+                        <span className="truncate">→ {item.label || item.id}</span>
+                        <span className="text-[9px] text-slate-400 px-1 py-0.5 rounded bg-workbench-panel border border-workbench-border/60 shrink-0 ml-1">
+                          hop {item.lineageDepth}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -321,34 +552,7 @@ function NodeInspector({
                 </div>
               ) : (
                 <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
-                  No upstream dependencies
-                </div>
-              )}
-            </div>
-
-            {/* Referenced By (Blast Radius) */}
-            <div>
-              <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                <span>Referenced By ({node.incomers ? node.incomers.length : 0})</span>
-                <span className="text-slate-400 dark:text-slate-600">Blast Radius</span>
-              </div>
-              {node.incomers && node.incomers.length > 0 ? (
-                <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                  {node.incomers.map((id) => (
-                    <button
-                      key={id}
-                      onClick={() => onNavigateToNode && onNavigateToNode(id)}
-                      className="w-full text-left p-1.5 rounded bg-workbench-header hover:bg-workbench-subpanel border border-workbench-border text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-mono text-[11px] truncate flex items-center justify-between transition cursor-pointer"
-                      title={id}
-                    >
-                      <span className="truncate">← {id}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 ml-1">focus</span>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
-                  No downstream dependents (leaf node)
+                  No upstream dependencies (root resource)
                 </div>
               )}
             </div>

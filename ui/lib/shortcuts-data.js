@@ -55,6 +55,11 @@ export const SHORTCUT_SECTIONS = [
         detail: "when resource selected",
         keys: [{ key: "Space" }],
       },
+      {
+        label: "Toggle Blast Radius Subgraph Isolation",
+        detail: "when resource selected",
+        keys: [{ key: "B" }, { divider: "/" }, { key: "b" }],
+      },
     ],
   },
   {

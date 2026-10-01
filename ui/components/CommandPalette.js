@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
+import {
+  getNodeTargetAddress,
+  getUpstreamDependencies,
+  generateTargetCommand,
+  copyToClipboard,
+} from "../lib/target-command";
 
 /**
  * CommandPalette: Global ⌘K quick switcher & node navigation.
@@ -12,6 +18,7 @@ function CommandPalette({
   onClose,
   nodes = [],
   selectedNode = null,
+  graphData = null,
   onOpenDiffModal,
   onSelectNode,
   isCollapsed = false,
@@ -48,6 +55,42 @@ function CommandPalette({
         run: () => onOpenDiffModal(selectedNode),
       });
     }
+
+    if (selectedNode) {
+      const targetAddr = getNodeTargetAddress(selectedNode);
+      if (targetAddr) {
+        list.push({
+          id: "action-copy-target",
+          isAction: true,
+          label: `Copy Target Apply: ${selectedNode.label || selectedNode.id}`,
+          description: `Generate and copy 'terraform apply -target="${targetAddr}"'`,
+          shortcut: "T",
+          run: async () => {
+            const cmd = `terraform apply -target="${targetAddr}"`;
+            await copyToClipboard(cmd);
+          },
+        });
+
+        const upstream = graphData ? getUpstreamDependencies(selectedNode.id || targetAddr, graphData) : [];
+        if (upstream.length > 0) {
+          list.push({
+            id: "action-copy-target-upstream",
+            isAction: true,
+            label: `Copy Target Apply (+${upstream.length} Upstream Prerequisites): ${selectedNode.label || selectedNode.id}`,
+            description: "Generate targeted apply command including topological prerequisite chain",
+            run: async () => {
+              const cmd = generateTargetCommand(targetAddr, {
+                command: "apply",
+                includeUpstream: true,
+                upstreamAddresses: upstream.map((u) => u.id),
+              });
+              await copyToClipboard(cmd);
+            },
+          });
+        }
+      }
+    }
+
     if (onToggleCollapse) {
       list.push({
         id: "action-toggle-collapse",
@@ -71,7 +114,7 @@ function CommandPalette({
           theme === "light"
             ? "Switch workbench to precision technical dark theme"
             : "Switch workbench to precision slate light theme",
-        shortcut: "T",
+        shortcut: "Shift+T",
         run: onToggleTheme,
       });
     }
@@ -86,7 +129,7 @@ function CommandPalette({
       });
     }
     return list;
-  }, [isCollapsed, onToggleCollapse, onToggleTheme, theme, onOpenShortcuts]);
+  }, [selectedNode, graphData, onOpenDiffModal, isCollapsed, onToggleCollapse, onToggleTheme, theme, onOpenShortcuts]);
 
   const filteredActions = useMemo(() => {
     if (!actions || actions.length === 0) return [];
@@ -97,6 +140,9 @@ function CommandPalette({
         a.label.toLowerCase().includes(q) ||
         a.description.toLowerCase().includes(q) ||
         (a.shortcut && a.shortcut.toLowerCase().includes(q)) ||
+        "target".includes(q) ||
+        "apply".includes(q) ||
+        "upstream".includes(q) ||
         "shortcuts".includes(q) ||
         "cheat".includes(q) ||
         "sheet".includes(q) ||
@@ -182,9 +228,9 @@ function CommandPalette({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-xs select-none">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-xs select-none font-sans">
       <div
-        className="w-full max-w-xl bg-workbench-panel border border-workbench-border rounded shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-xl bg-workbench-panel border border-workbench-border rounded-lg shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
@@ -201,7 +247,7 @@ function CommandPalette({
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Jump to resource, module, command, or theme..."
+            placeholder="Jump to resource, module, command (target, apply, diff)..."
             className="flex-1 bg-transparent text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none font-mono"
           />
           <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-workbench-subpanel border border-workbench-border rounded">
@@ -210,7 +256,7 @@ function CommandPalette({
         </div>
 
         {/* Results List */}
-        <div ref={listRef} className="max-h-80 overflow-y-auto p-1 space-y-0.5 custom-scrollbar">
+        <div ref={listRef} className="max-h-80 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
           {allFilteredItems.length === 0 ? (
             <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
               No matching resources or commands found for "{query}"
@@ -221,108 +267,98 @@ function CommandPalette({
 
               if (item.isAction) {
                 return (
-                  <button
-                    key={item.id || idx}
+                  <div
+                    key={item.id}
                     onClick={() => {
                       item.run();
                       onClose();
                     }}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    className={`w-full flex items-center justify-between gap-3 px-2.5 py-2 text-left rounded transition-colors cursor-pointer ${
+                    className={`p-2 rounded cursor-pointer transition flex items-center justify-between gap-3 ${
                       isSelected
-                        ? "bg-workbench-hover text-slate-900 dark:text-white"
-                        : "text-slate-700 dark:text-slate-300 hover:bg-workbench-subpanel"
+                        ? "bg-workbench-subpanel border border-workbench-border shadow-xs text-slate-900 dark:text-white"
+                        : "hover:bg-workbench-hover text-slate-700 dark:text-slate-300"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 truncate flex-1 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30">
-                        ⚡ Action
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="p-1 rounded bg-sky-500/10 text-sky-500 dark:text-sky-400 shrink-0">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                       </span>
-                      <div className="truncate flex-1 min-w-0">
-                        <div className="text-xs font-mono text-slate-900 dark:text-slate-100 font-medium truncate">
-                          {item.label}
-                        </div>
-                        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium font-sans truncate">{item.label}</div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate font-sans">
                           {item.description}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {item.shortcut && (
-                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-workbench-panel border border-workbench-border rounded">
-                          {item.shortcut}
-                        </kbd>
-                      )}
-                      {isSelected && (
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-                          Execute ↵
-                        </span>
-                      )}
-                    </div>
-                  </button>
+                    {item.shortcut && (
+                      <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400 shrink-0">
+                        {item.shortcut}
+                      </kbd>
+                    )}
+                  </div>
                 );
               }
 
-              const data = item.data || {};
-              const change = (data.change || "no-op").toLowerCase();
-              const cfg = ACTION_CONFIG[change] || ACTION_CONFIG["no-op"];
+              // Resource item
+              const data = item.data || item;
+              const isEntity = data.type === "variable" || data.type === "output";
+              const badgeKey = isEntity ? data.type : (data.change ? data.change.toLowerCase() : "no-op");
+              const cfg = ACTION_CONFIG[badgeKey] || ACTION_CONFIG["no-op"];
 
               return (
-                <button
-                  key={data.id || idx}
+                <div
+                  key={data.id}
                   onClick={() => {
                     onSelectNode(data.id);
                     onClose();
                   }}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full flex items-center justify-between gap-3 px-2.5 py-1.5 text-left rounded transition-colors cursor-pointer ${
+                  className={`p-2 rounded cursor-pointer transition flex items-center justify-between gap-3 ${
                     isSelected
-                      ? "bg-workbench-hover text-slate-900 dark:text-white"
-                      : "text-slate-700 dark:text-slate-300 hover:bg-workbench-subpanel"
+                      ? "bg-workbench-subpanel border border-workbench-border shadow-xs text-slate-900 dark:text-white"
+                      : "hover:bg-workbench-hover text-slate-700 dark:text-slate-300"
                   }`}
                 >
-                  <div className="flex items-center gap-2 truncate flex-1 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded shrink-0 uppercase"
+                      className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded uppercase tracking-wider shrink-0"
                       style={{
                         backgroundColor: `${cfg.color}15`,
                         color: cfg.color,
                         border: `1px solid ${cfg.color}30`,
                       }}
                     >
-                      {cfg.symbol} {change}
+                      {cfg.symbol} {data.change || data.type || "no-op"}
                     </span>
-                    <div className="truncate flex-1 min-w-0">
-                      <div className="text-xs font-mono text-slate-800 dark:text-slate-200 truncate">
+                    <div className="min-w-0">
+                      <div className="text-xs font-mono font-medium truncate text-slate-900 dark:text-white">
                         {data.label || data.id}
                       </div>
-                      {data.resourceType && (
-                        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
-                          {data.resourceType}
-                          {data.module ? ` • ${data.module}` : ""}
-                        </div>
-                      )}
+                      <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                        {data.id}
+                      </div>
                     </div>
                   </div>
-                  {isSelected && (
-                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
-                      Jump ↵
+                  {data.module && (
+                    <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1 py-0.5 rounded truncate max-w-[120px] shrink-0">
+                      {data.module}
                     </span>
                   )}
-                </button>
+                </div>
               );
             })
           )}
         </div>
 
-        {/* Palette Footer */}
-        <div className="px-3.5 py-1.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+        {/* Footer Shortcut Info */}
+        <div className="p-2 px-3 border-t border-workbench-border bg-workbench-header/50 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-mono">
           <div className="flex items-center gap-3">
-            <span><kbd className="text-slate-600 dark:text-slate-400">↑↓</kbd> navigate</span>
-            <span><kbd className="text-slate-600 dark:text-slate-400">↵</kbd> select</span>
-            <span><kbd className="text-slate-600 dark:text-slate-400">esc</kbd> close</span>
+            <span>↑↓ Navigate</span>
+            <span>↵ Select</span>
+            <span>ESC Close</span>
           </div>
-          <span>{allFilteredItems.length} results</span>
+          <span className="text-[9px] uppercase tracking-wider text-slate-400">plan-parse quick command</span>
         </div>
       </div>
     </div>

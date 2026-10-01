@@ -120,3 +120,10 @@ Encountered an issue or have a feature suggestion?
 
 Contributions and feedback are always welcome!
 
+---
+
+## License
+
+Distributed under the [MIT License](https://github.com/AatirNadim/plan-parse/blob/main/LICENSE).
+
+

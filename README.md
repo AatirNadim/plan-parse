@@ -362,3 +362,10 @@ flowchart TD
     classDef current fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
     classDef node fill:#1e293b,stroke:#475569,stroke-width:1px,color:#f8fafc;
 ```
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+

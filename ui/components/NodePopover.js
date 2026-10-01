@@ -4,6 +4,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 import { getDiffSummary } from "../lib/hcl-diff";
 import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
+import { computeBlastRadius } from "../lib/blast-radius";
 
 /**
  * NodePopover: Tier 1 Quick-Look Floating Canvas Popover.
@@ -13,9 +14,12 @@ import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
  */
 function NodePopover({
   node,
+  graphData,
   position,
   onOpenModal,
   onClose,
+  isBlastIsolated = false,
+  onToggleBlastIsolation,
   canvasWidth = 1000,
   canvasHeight = 700,
 }) {
@@ -29,6 +33,11 @@ function NodePopover({
   const targetAddress = useMemo(() => {
     return getNodeTargetAddress(node);
   }, [node]);
+
+  const blastRadius = useMemo(() => {
+    if (!node || !node.id || !graphData) return null;
+    return computeBlastRadius(node.id, graphData);
+  }, [node, graphData]);
 
   const handleCopyTarget = useCallback(async (e) => {
     e.stopPropagation();
@@ -158,6 +167,40 @@ function NodePopover({
           </div>
         )}
       </div>
+
+      {/* Transitive Blast Radius Footprint */}
+      {blastRadius && blastRadius.stats.totalCount > 0 && (
+        <div className="mb-2 p-1.5 px-2 rounded bg-workbench-header/80 border border-workbench-border flex items-center justify-between text-[10px] font-mono gap-1">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="text-amber-500 font-bold shrink-0">⚡ Blast:</span>
+            <span className="text-slate-800 dark:text-slate-200 font-medium truncate">
+              {blastRadius.stats.directCount} direct • {blastRadius.stats.transitiveCount} transitive
+            </span>
+            {blastRadius.stats.mutatingCount > 0 && (
+              <span className="text-rose-600 dark:text-rose-400 font-semibold shrink-0">
+                ({blastRadius.stats.mutatingCount} mutating)
+              </span>
+            )}
+          </div>
+          {onToggleBlastIsolation && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleBlastIsolation();
+              }}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold border transition cursor-pointer flex items-center gap-1 shrink-0 ${
+                isBlastIsolated
+                  ? "bg-sky-500/20 text-sky-600 dark:text-sky-300 border-sky-500/40"
+                  : "bg-workbench-subpanel hover:bg-workbench-hover text-slate-700 dark:text-slate-300 border-workbench-border"
+              }`}
+              title="Toggle Blast Radius Subgraph Isolation (B)"
+            >
+              <span>{isBlastIsolated ? "Exit" : "Isolate"}</span>
+              <kbd className="text-[8px] px-0.5 bg-workbench-panel rounded border border-workbench-border/60">B</kbd>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Changed Attributes Preview */}
       {hasChanges && summary?.topChanges?.length > 0 && (

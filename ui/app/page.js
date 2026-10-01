@@ -13,6 +13,7 @@ import { getCytoscapeStyles } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
 import { useTheme } from "../lib/use-theme";
+import { computeBlastRadius, extractBlastSubgraph } from "../lib/blast-radius";
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
@@ -35,20 +36,47 @@ export default function Home() {
   const [diffModalNode, setDiffModalNode] = useState(null);
   const [popoverState, setPopoverState] = useState(null); // { node, position: { x, y } }
 
+  // Blast Radius Isolation state
+  const [isBlastIsolated, setIsBlastIsolated] = useState(false);
+  const [blastIsolatedNodeId, setBlastIsolatedNodeId] = useState(null);
+  const [blastDepthFilter, setBlastDepthFilter] = useState("all"); // 'all' | 1 | 2
+  const [blastMutatingOnly, setBlastMutatingOnly] = useState(false);
+
   // Compute collapsed graph representation with transitive edge bridging
   const collapsedGraph = useMemo(() => {
     if (!graphData) return null;
     return collapseGraph(graphData);
   }, [graphData]);
 
-  // Compute active elements to feed Cytoscape canvas
+  // Compute active elements to feed Cytoscape canvas (with optional collapse or blast isolation)
   const activeGraphData = useMemo(() => {
     if (!graphData) return null;
-    if (isCollapsed && collapsedGraph) {
-      return collapsedGraph;
+    const base = isCollapsed && collapsedGraph ? collapsedGraph : graphData;
+    if (isBlastIsolated && blastIsolatedNodeId) {
+      const blast = computeBlastRadius(blastIsolatedNodeId, base, {
+        maxDepth: blastDepthFilter === "all" ? Infinity : Number(blastDepthFilter),
+        mutatingOnly: blastMutatingOnly,
+      });
+      return extractBlastSubgraph(base, blast, { includeContainers: true });
     }
-    return graphData;
-  }, [graphData, isCollapsed, collapsedGraph]);
+    return base;
+  }, [graphData, isCollapsed, collapsedGraph, isBlastIsolated, blastIsolatedNodeId, blastDepthFilter, blastMutatingOnly]);
+
+  // Current blast radius analysis of the selected node
+  const currentBlastRadius = useMemo(() => {
+    if (!selectedNode || !selectedNode.id || !activeGraphData) return null;
+    return computeBlastRadius(selectedNode.id, activeGraphData);
+  }, [selectedNode, activeGraphData]);
+
+  const handleToggleBlastIsolation = useCallback(() => {
+    if (isBlastIsolated) {
+      setIsBlastIsolated(false);
+      setBlastIsolatedNodeId(null);
+    } else if (selectedNode?.id) {
+      setBlastIsolatedNodeId(selectedNode.id);
+      setIsBlastIsolated(true);
+    }
+  }, [isBlastIsolated, selectedNode]);
 
   const handleToggleCollapse = useCallback(() => {
     setIsCollapsed((prev) => !prev);
@@ -239,6 +267,60 @@ export default function Home() {
     }
   }, [activeGraphData, selectedNode]);
 
+  // Precision highlighting helper that illuminates transitive downstream blast radius and upstream lineage
+  const applyBlastHighlight = useCallback((cy, node, targetGraphData) => {
+    if (!cy || cy.destroyed() || !node || node.length === 0) return;
+    const targetNodeId = node.data().id;
+    const blast = computeBlastRadius(targetNodeId, targetGraphData || { nodes: [], edges: [] });
+
+    cy.elements().removeClass(
+      "dimmed highlighted highlighted-edge blast-root blast-direct blast-transitive blast-mutating blast-edge-direct blast-edge-transitive blast-edge-mutating"
+    );
+    cy.elements().addClass("dimmed");
+
+    node.removeClass("dimmed").addClass("blast-root highlighted");
+    node.ancestors().removeClass("dimmed");
+    node.descendants().removeClass("dimmed");
+
+    // Un-dim immediate outgoers (upstream prerequisites)
+    node.outgoers().removeClass("dimmed").addClass("highlighted");
+    node.outgoers("edge").removeClass("dimmed").addClass("highlighted-edge");
+
+    if (blast && blast.all.length > 0) {
+      for (const item of blast.all) {
+        const itemNode = cy.$id(item.id);
+        if (itemNode && itemNode.length > 0) {
+          itemNode.removeClass("dimmed");
+          itemNode.ancestors().removeClass("dimmed");
+          if (item.isMutating) {
+            itemNode.addClass("blast-mutating");
+          } else if (item.blastDepth === 1) {
+            itemNode.addClass("blast-direct");
+          } else {
+            itemNode.addClass("blast-transitive");
+          }
+        }
+      }
+
+      for (const edgeId of blast.edgeIds) {
+        const edge = cy.$id(edgeId);
+        if (edge && edge.length > 0) {
+          const edgeData = edge.data();
+          const isMut = blast.mutatingNodes.some((m) => m.id === edgeData.source);
+          edge.removeClass("dimmed");
+          if (isMut) {
+            edge.addClass("blast-edge-mutating");
+          } else {
+            edge.addClass("blast-edge-direct");
+          }
+        }
+      }
+    } else {
+      node.connectedEdges().removeClass("dimmed").addClass("highlighted-edge");
+      node.incomers().removeClass("dimmed").addClass("highlighted");
+    }
+  }, []);
+
   // Helper to focus, highlight, and smoothly zoom to a node in Cytoscape
   const selectAndFocusNode = useCallback((cy, targetNodeId) => {
     if (!cy || cy.destroyed() || !targetNodeId) return;
@@ -257,16 +339,7 @@ export default function Home() {
     setIsInspectorOpen(true);
     setPopoverState(null);
 
-    // Highlight connections
-    cy.elements().removeClass("dimmed highlighted highlighted-edge");
-    cy.elements().addClass("dimmed");
-
-    node.removeClass("dimmed").addClass("highlighted");
-    node.ancestors().removeClass("dimmed");
-    node.descendants().removeClass("dimmed");
-    node.connectedEdges().removeClass("dimmed").addClass("highlighted-edge");
-    node.incomers().removeClass("dimmed").addClass("highlighted");
-    node.outgoers().removeClass("dimmed").addClass("highlighted");
+    applyBlastHighlight(cy, node, activeGraphData);
 
     // Smoothly animate camera to center & zoom onto the node
     cy.animate({
@@ -274,7 +347,7 @@ export default function Home() {
       zoom: Math.max(cy.zoom(), 1.25),
       duration: 400,
     });
-  }, []);
+  }, [activeGraphData, applyBlastHighlight]);
 
   // Navigate to and select a specific node
   const handleNavigateToNode = useCallback((nodeId) => {
@@ -328,11 +401,16 @@ export default function Home() {
           setIsCommandPaletteOpen(false);
           return;
         }
+        if (isBlastIsolated) {
+          setIsBlastIsolated(false);
+          setBlastIsolatedNodeId(null);
+          return;
+        }
         if (selectedNode) {
           setSelectedNode(null);
           setPopoverState(null);
           if (cyRef.current) {
-            cyRef.current.elements().removeClass("dimmed highlighted highlighted-edge");
+            cyRef.current.elements().removeClass("dimmed highlighted highlighted-edge blast-root blast-direct blast-transitive blast-mutating blast-edge-direct blast-edge-transitive blast-edge-mutating");
           }
           return;
         }
@@ -353,6 +431,12 @@ export default function Home() {
       // Single-character shortcuts: MUST ensure no modifier keys (Cmd/Ctrl/Alt) are pressed.
       const isPlainKey = !e.metaKey && !e.ctrlKey && !e.altKey;
       if (!isPlainKey) {
+        return;
+      }
+
+      if ((e.key === "b" || e.key === "B") && selectedNode) {
+        e.preventDefault();
+        handleToggleBlastIsolation();
         return;
       }
 
@@ -414,6 +498,8 @@ export default function Home() {
     popoverState,
     selectedNode,
     graphData,
+    isBlastIsolated,
+    handleToggleBlastIsolation,
     handleToggleCollapse,
     handleFit,
     handleZoomIn,
@@ -499,16 +585,8 @@ export default function Home() {
           position: { x: pos.x, y: pos.y },
         });
 
-        // Highlight paths
-        cy.elements().removeClass("dimmed highlighted highlighted-edge");
-        cy.elements().addClass("dimmed");
-
-        node.removeClass("dimmed").addClass("highlighted");
-        node.ancestors().removeClass("dimmed");
-        node.descendants().removeClass("dimmed");
-        node.connectedEdges().removeClass("dimmed").addClass("highlighted-edge");
-        node.incomers().removeClass("dimmed").addClass("highlighted");
-        node.outgoers().removeClass("dimmed").addClass("highlighted");
+        // Highlight paths using precision multi-hop blast radius
+        applyBlastHighlight(cy, node, activeGraphData);
       });
 
       // Double-click to open full diff modal
@@ -532,7 +610,9 @@ export default function Home() {
         if (evt.target === cy) {
           setSelectedNode(null);
           setPopoverState(null);
-          cy.elements().removeClass("dimmed highlighted highlighted-edge");
+          cy.elements().removeClass(
+            "dimmed highlighted highlighted-edge blast-root blast-direct blast-transitive blast-mutating blast-edge-direct blast-edge-transitive blast-edge-mutating"
+          );
         }
       });
 
@@ -558,6 +638,13 @@ export default function Home() {
                 const targetId = pendingNavigateNodeIdRef.current;
                 pendingNavigateNodeIdRef.current = null;
                 selectAndFocusNode(cy, targetId);
+              } else if (isBlastIsolated && blastIsolatedNodeId) {
+                const isolatedRoot = cy.$id(blastIsolatedNodeId);
+                if (isolatedRoot && isolatedRoot.length > 0) {
+                  applyBlastHighlight(cy, isolatedRoot, activeGraphData);
+                }
+                cy.fit(undefined, 50);
+                setZoomLevel(cy.zoom());
               } else {
                 cy.fit(undefined, 50);
                 setZoomLevel(cy.zoom());
@@ -574,6 +661,13 @@ export default function Home() {
                 const targetId = pendingNavigateNodeIdRef.current;
                 pendingNavigateNodeIdRef.current = null;
                 selectAndFocusNode(cy, targetId);
+              } else if (isBlastIsolated && blastIsolatedNodeId) {
+                const isolatedRoot = cy.$id(blastIsolatedNodeId);
+                if (isolatedRoot && isolatedRoot.length > 0) {
+                  applyBlastHighlight(cy, isolatedRoot, activeGraphData);
+                }
+                cy.fit(undefined, 50);
+                setZoomLevel(cy.zoom());
               } else {
                 cy.fit(undefined, 50);
                 setZoomLevel(cy.zoom());
@@ -691,16 +785,94 @@ export default function Home() {
         <main className="flex-1 relative h-full overflow-hidden canvas-bg">
           <div id="cy" ref={cyContainerRef} className="w-full h-full" />
 
+          {/* Floating Transitive Blast Radius Canvas HUD */}
+          {hasGraph && (currentBlastRadius?.stats?.totalCount > 0 || isBlastIsolated) && (
+            <div className="absolute top-3 left-3 z-20 flex items-center gap-2 p-1.5 px-3 rounded-md border border-workbench-border bg-workbench-panel/95 backdrop-blur-md shadow-lg shadow-black/20 text-xs font-mono select-none pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span className="font-semibold text-slate-800 dark:text-slate-100">
+                  {isBlastIsolated ? "Isolated Subgraph:" : "Blast Radius:"}
+                </span>
+                <span className="text-sky-600 dark:text-sky-400 font-medium">
+                  {currentBlastRadius?.stats?.directCount || 0} direct
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-purple-600 dark:text-purple-400 font-medium">
+                  {currentBlastRadius?.stats?.transitiveCount || 0} transitive
+                </span>
+                {currentBlastRadius?.stats?.mutatingCount > 0 && (
+                  <>
+                    <span className="text-slate-400">•</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-semibold">
+                      {currentBlastRadius.stats.mutatingCount} mutating
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <div className="h-3.5 w-px bg-workbench-border mx-0.5 shrink-0" />
+
+              {/* Isolation Action Button */}
+              <button
+                onClick={handleToggleBlastIsolation}
+                className={`px-2 py-1 rounded text-[11px] font-mono font-semibold border transition cursor-pointer flex items-center gap-1 shrink-0 ${
+                  isBlastIsolated
+                    ? "bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/40"
+                    : "bg-workbench-subpanel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 border-workbench-border"
+                }`}
+                title="Toggle Blast Radius Subgraph Isolation (B)"
+              >
+                <span>{isBlastIsolated ? "Exit Isolation" : "Isolate Subgraph"}</span>
+                <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-500">B</kbd>
+              </button>
+
+              {/* Depth & Mutation Filter Controls when Isolated */}
+              {isBlastIsolated && (
+                <div className="flex items-center gap-1 pl-1.5 border-l border-workbench-border shrink-0">
+                  <span className="text-[10px] text-slate-400 mr-0.5">Depth:</span>
+                  {["all", 1, 2].map((depth) => (
+                    <button
+                      key={depth}
+                      onClick={() => setBlastDepthFilter(depth)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition cursor-pointer ${
+                        blastDepthFilter === depth
+                          ? "bg-sky-600 text-white font-bold"
+                          : "bg-workbench-subpanel text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      {depth === "all" ? "All" : `${depth}h`}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setBlastMutatingOnly((prev) => !prev)}
+                    className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono border transition cursor-pointer ${
+                      blastMutatingOnly
+                        ? "bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/40 font-bold"
+                        : "bg-workbench-subpanel text-slate-600 dark:text-slate-400 border-workbench-border hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                    title="Toggle filtering for mutating casualties only"
+                  >
+                    Mutating Only
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Tier 1 Floating On-Canvas Popover */}
           {popoverState && (
             <NodePopover
               node={popoverState.node}
+              graphData={activeGraphData}
               position={popoverState.position}
               onOpenModal={() => {
                 setDiffModalNode(popoverState.node);
                 setPopoverState(null);
               }}
               onClose={() => setPopoverState(null)}
+              isBlastIsolated={isBlastIsolated}
+              onToggleBlastIsolation={handleToggleBlastIsolation}
               canvasWidth={cyContainerRef.current?.clientWidth || 1000}
               canvasHeight={cyContainerRef.current?.clientHeight || 700}
             />
@@ -757,6 +929,8 @@ export default function Home() {
               setDiffModalNode(n || selectedNode);
               setPopoverState(null);
             }}
+            isBlastIsolated={isBlastIsolated}
+            onToggleBlastIsolation={handleToggleBlastIsolation}
           />
         )}
       </div>
@@ -790,6 +964,8 @@ export default function Home() {
         onSelectNode={handleNavigateToNode}
         isCollapsed={isCollapsed}
         onToggleCollapse={handleToggleCollapse}
+        isBlastIsolated={isBlastIsolated}
+        onToggleBlastIsolation={handleToggleBlastIsolation}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         theme={theme}
         onToggleTheme={toggleTheme}

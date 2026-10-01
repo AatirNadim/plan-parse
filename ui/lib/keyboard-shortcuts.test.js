@@ -46,6 +46,8 @@ describe("Keyboard Shortcuts Registry Tests", () => {
     assert.ok(allKeys.includes("D"), "Must include D for diff modal");
     assert.ok(allKeys.includes("d"), "Must include d for diff modal");
     assert.ok(allKeys.includes("Space"), "Must include Space for diff modal");
+    assert.ok(allKeys.includes("B"), "Must include B for blast radius isolation toggle");
+    assert.ok(allKeys.includes("b"), "Must include b for blast radius isolation toggle");
   });
 
   test("Dialogs & General section includes ? and Escape", () => {

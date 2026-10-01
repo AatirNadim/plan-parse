@@ -23,6 +23,8 @@ function CommandPalette({
   onSelectNode,
   isCollapsed = false,
   onToggleCollapse,
+  isBlastIsolated = false,
+  onToggleBlastIsolation,
   onOpenShortcuts,
   theme = "dark",
   onToggleTheme,
@@ -53,6 +55,21 @@ function CommandPalette({
         description: "Open unified and side-by-side Terraform HCL diff modal",
         shortcut: "D",
         run: () => onOpenDiffModal(selectedNode),
+      });
+    }
+
+    if (selectedNode && onToggleBlastIsolation) {
+      list.push({
+        id: "action-toggle-blast-isolation",
+        isAction: true,
+        label: isBlastIsolated
+          ? "Exit Subgraph Isolation (Show Full Architecture)"
+          : `Isolate Blast Radius Subgraph: ${selectedNode.label || selectedNode.id}`,
+        description: isBlastIsolated
+          ? "Restore full infrastructure DAG on canvas"
+          : "Isolate complete cascading downstream dependency tree and hide unrelated nodes",
+        shortcut: "B",
+        run: () => onToggleBlastIsolation(),
       });
     }
 

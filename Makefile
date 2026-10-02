@@ -1,5 +1,8 @@
 PNPM_VERSION ?= 12.4.2
 PNPM ?= pnpm
+CGO_ENABLED ?= 0
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+LDFLAGS ?= -s -w -X main.version=$(VERSION)
 
 .PHONY: all build build-ui test clean
 
@@ -18,8 +21,8 @@ build-ui:
 	find pkg/server/ui/out -name "*.md" -delete
 
 build: build-ui
-	@echo "Building plan-parse Go binary..."
-	go build -o plan-parse main.go
+	@echo "Building plan-parse Go binary ($(VERSION))..."
+	CGO_ENABLED=$(CGO_ENABLED) go build -ldflags="$(LDFLAGS)" -o plan-parse main.go
 
 test:
 	@echo "Running all tests..."

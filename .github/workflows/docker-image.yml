@@ -8,6 +8,16 @@ on:
         required: false
         type: boolean
         default: false
+      version:
+        description: 'Version string for image build and metadata'
+        required: false
+        type: string
+        default: ''
+      is_latest:
+        description: 'Whether to tag image as latest'
+        required: false
+        type: string
+        default: 'true'
   workflow_dispatch:
     inputs:
       push:
@@ -15,10 +25,19 @@ on:
         required: false
         type: boolean
         default: false
+      version:
+        description: 'Version string for image build and metadata'
+        required: false
+        type: string
+        default: ''
+      is_latest:
+        description: 'Whether to tag image as latest'
+        required: false
+        type: string
+        default: 'true'
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   docker:
@@ -69,10 +88,19 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ steps.image-name.outputs.image }}
+          flavor: |
+            latest=false
           tags: |
-            type=raw,value=latest,enable=${{ inputs.push }}
+            type=raw,value=latest,enable=${{ inputs.push && (inputs.is_latest == 'true' || inputs.is_latest == true) && !contains(inputs.version || github.ref_name, '-') }}
             type=sha,format=long,prefix=,enable=true
             type=sha,format=short,prefix=,enable=true
+            type=semver,pattern={{version}},enable=${{ inputs.version == '' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ inputs.version == '' }}
+            type=semver,pattern={{major}},enable=${{ inputs.version == '' && (inputs.is_latest == 'true' || inputs.is_latest == true) }}
+            type=semver,pattern={{version}},value=${{ inputs.version }},enable=${{ inputs.version != '' }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }},enable=${{ inputs.version != '' }}
+            type=semver,pattern={{major}},value=${{ inputs.version }},enable=${{ inputs.version != '' && (inputs.is_latest == 'true' || inputs.is_latest == true) }}
+            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -82,5 +110,7 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ inputs.version || github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max,ignore-error=true

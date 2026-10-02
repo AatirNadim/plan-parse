@@ -1,0 +1,74 @@
+name: ✨ Feature Request
+description: Propose a new feature, visual workbench improvement, or enhancement for plan-parse.
+title: "[Feature]: "
+labels: ["kind/feature", "status/triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature or improvement for `plan-parse`!
+        Please fill out this form to describe your idea, its motivation, and potential implementation approach.
+
+  - type: checkboxes
+    id: pre-flight-check
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing [open and closed issues](https://github.com/AatirNadim/plan-parse/issues?q=is%3Aissue) and confirmed this feature has not already been suggested.
+          required: true
+        - label: I have confirmed that this proposal aligns with the goals of `plan-parse` as an interactive Terraform plan visualizer and developer workbench.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Target Component / Area
+      description: Which part of plan-parse will this feature impact?
+      options:
+        - "Developer Workbench UI (ui - canvas, inspector, sidebar, palettes)"
+        - "Core Parser & DAG Generator (pkg/core)"
+        - "Terraform CLI Runner (pkg/runner)"
+        - "Embedded Web Server & REST API (pkg/server)"
+        - "CLI Flags & Developer Tooling"
+        - "Docker / Distribution / CI-CD"
+        - "Documentation & Architecture Guides"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem or Limitation
+      description: Is your feature request related to a problem or current limitation? Please describe clearly.
+      placeholder: "I am always frustrated when... / It is currently difficult to understand..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution or UX
+      description: Describe the solution or workflow you would like to see.
+      placeholder: "Add a button/flag/view that allows the user to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: What other designs or workarounds have you tried or considered?
+      placeholder: "I tried using X, but it had limitation Y..."
+
+  - type: textarea
+    id: mockups-or-examples
+    attributes:
+      label: Mockups, CLI Syntax, or Sample Data
+      description: If applicable, add UI mockups, diagrams, or hypothetical CLI command examples.
+
+  - type: checkboxes
+    id: contribution-interest
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be interested in submitting a Pull Request to implement this feature!

@@ -1,0 +1,49 @@
+name: 📖 Documentation Improvement
+description: Suggest additions, corrections, or enhancements to plan-parse documentation.
+title: "[Docs]: "
+labels: ["kind/documentation", "status/triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping keep our documentation clear, accurate, and up-to-date!
+
+  - type: checkboxes
+    id: pre-flight-check
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing [issues and pull requests](https://github.com/AatirNadim/plan-parse/issues?q=is%3Aissue+label%3Akind%2Fdocumentation) to verify this change isn't already reported or in review.
+          required: true
+
+  - type: input
+    id: doc-location
+    attributes:
+      label: Documentation Page or File
+      description: Which file or section needs improvement?
+      placeholder: e.g. README.md, pkg/runner/README.md, or CONTRIBUTING.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Problem or Gap
+      description: What is inaccurate, missing, or confusing?
+      placeholder: Describe what needs to be changed or added...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-fix
+    attributes:
+      label: Suggested Correction or Content
+      description: How should the documentation read instead?
+      placeholder: Suggested replacement text, code block, or explanation...
+
+  - type: checkboxes
+    id: contribution-interest
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to submit a Pull Request with this documentation change!

@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.github/workflows/golangci-lint.yml
+
+  build-test:
+    name: Build & Test
+    needs: [lint]
+    uses: ./.github/workflows/build-test.yml
+
+  release:
+    name: Build & Release Binaries
+    needs: [build-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.resolve-tag.outputs.tag }}
+    steps:
+      - name: Resolve and validate release tag
+        id: resolve-tag
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Release tag '$TAG' is not a valid semver tag (must match pattern ^v[0-9]+\.[0-9]+\.[0-9]+)"
+            exit 1
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: 'ui/pnpm-lock.yaml'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Build UI
+        run: make build-ui
+
+      - name: Cross-compile & Package Binaries
+        env:
+          TAG: ${{ steps.resolve-tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          DIST_DIR="$(pwd)/dist"
+          mkdir -p "$DIST_DIR"
+
+          TARGETS=(
+            "linux/amd64/plan-parse/tar.gz"
+            "linux/arm64/plan-parse/tar.gz"
+            "darwin/amd64/plan-parse/tar.gz"
+            "darwin/arm64/plan-parse/tar.gz"
+            "windows/amd64/plan-parse.exe/zip"
+          )
+
+          for target in "${TARGETS[@]}"; do
+            IFS="/" read -r GOOS GOARCH BIN_NAME FORMAT <<< "$target"
+            echo "==> Building ${BIN_NAME} for ${GOOS}/${GOARCH}..."
+
+            STAGE_DIR="$(pwd)/build_${GOOS}_${GOARCH}"
+            mkdir -p "$STAGE_DIR"
+
+            CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build \
+              -ldflags="-s -w -X main.version=${TAG}" \
+              -o "${STAGE_DIR}/${BIN_NAME}" \
+              main.go
+
+            cp LICENSE README.md "$STAGE_DIR/"
+
+            ARCHIVE_NAME="plan-parse_${TAG}_${GOOS}_${GOARCH}.${FORMAT}"
+            echo "==> Packaging ${ARCHIVE_NAME}..."
+            if [ "$FORMAT" = "tar.gz" ]; then
+              tar -czf "${DIST_DIR}/${ARCHIVE_NAME}" -C "$STAGE_DIR" "${BIN_NAME}" LICENSE README.md
+            elif [ "$FORMAT" = "zip" ]; then
+              (cd "$STAGE_DIR" && zip -9 "${DIST_DIR}/${ARCHIVE_NAME}" "${BIN_NAME}" LICENSE README.md)
+            fi
+
+            rm -rf "$STAGE_DIR"
+          done
+
+          echo "==> Generating checksums.txt..."
+          cd "$DIST_DIR"
+          sha256sum plan-parse_* > checksums.txt
+          cat checksums.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.resolve-tag.outputs.tag }}
+          files: |
+            dist/plan-parse_*
+            dist/checksums.txt
+          generate_release_notes: true
+
+  docker:
+    name: Publish Docker Image
+    needs: [release]
+    uses: ./.github/workflows/docker-image.yml
+    with:
+      push: true
+      version: ${{ needs.release.outputs.tag }}
+    secrets: inherit

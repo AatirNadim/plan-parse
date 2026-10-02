@@ -15,6 +15,8 @@ import (
 	"github.com/AatirNadim/plan-parse/pkg/server"
 )
 
+var version = "dev"
+
 func openBrowser(url string) error {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -30,11 +32,12 @@ func openBrowser(url string) error {
 
 func main() {
 	var (
-		planPath  string
-		dirPath   string
-		port      int
-		addr      string
-		noBrowser bool
+		planPath    string
+		dirPath     string
+		port        int
+		addr        string
+		noBrowser   bool
+		showVersion bool
 	)
 
 	flag.StringVar(&planPath, "plan", "", "Path to Terraform plan JSON file")
@@ -42,7 +45,14 @@ func main() {
 	flag.IntVar(&port, "port", 9000, "Port to listen on")
 	flag.StringVar(&addr, "addr", "127.0.0.1", "Address to bind to")
 	flag.BoolVar(&noBrowser, "no-browser", false, "Do not automatically open browser")
+	flag.BoolVar(&showVersion, "version", false, "Print version information and exit")
+	flag.BoolVar(&showVersion, "v", false, "Print version information and exit (shorthand)")
 	flag.Parse()
+
+	if showVersion {
+		fmt.Printf("plan-parse %s\n", version)
+		return
+	}
 
 	if planPath != "" && dirPath != "" {
 		log.Fatalf("Error: -plan and -dir flags are mutually exclusive. Please provide either a plan file or a directory, not both.")
@@ -118,7 +128,7 @@ func main() {
 		}()
 	}
 
-	log.Printf("Plan-parse starting at %s ...", serverURL)
+	log.Printf("Plan-parse %s starting at %s ...", version, serverURL)
 	if err := srv.Start(); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}

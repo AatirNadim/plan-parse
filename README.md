@@ -62,6 +62,7 @@ The CLI entry point is implemented in `main.go`. When invoked, the binary parses
 - `-port int`: TCP port to bind the HTTP listener (default: `9000`).
 - `-addr string`: Interface address to bind the listener (default: `127.0.0.1`).
 - `-no-browser bool`: Suppresses automatic browser launch when set to `true`.
+- `-v`, `-version`: Print version information and exit.
 
 > [!NOTE]
 > The `-plan` and `-dir` flags are mutually exclusive. Specify either a pre-rendered JSON plan file or a Terraform configuration directory, or omit both to launch in browser-based upload mode.
@@ -221,7 +222,28 @@ The user interface delivers a docked engineering workbench styled with DM Sans, 
 
 ## Build & Usage
 
-### Prerequisites
+### Pre-compiled Releases
+Pre-compiled standalone binaries with embedded UI are published for Linux, macOS, and Windows on [GitHub Releases](https://github.com/AatirNadim/plan-parse/releases).
+
+| Platform | Architecture | Archive |
+| :--- | :--- | :--- |
+| Linux | `amd64` (x86_64) | `plan-parse_<version>_linux_amd64.tar.gz` |
+| Linux | `arm64` (AArch64) | `plan-parse_<version>_linux_arm64.tar.gz` |
+| macOS | `amd64` (Intel) | `plan-parse_<version>_darwin_amd64.tar.gz` |
+| macOS | `arm64` (Apple Silicon) | `plan-parse_<version>_darwin_arm64.tar.gz` |
+| Windows | `amd64` (x86_64) | `plan-parse_<version>_windows_amd64.zip` |
+
+Each release includes SHA-256 checksums in `checksums.txt` for integrity verification:
+```bash
+# Verify downloaded archive integrity
+sha256sum --check checksums.txt --ignore-missing
+```
+
+Download, extract, and execute `plan-parse` directly without requiring Node.js or Go development environments.
+
+### Building from Source
+
+#### Prerequisites
 - Go 1.27+ (matching `go.mod` 1.27.1)
 - Node.js 20+ (Node.js 22 LTS recommended) and pnpm (v12.4+)
 - Terraform CLI (v1.5+) or OpenTofu (v1.6+) in `PATH` (required for `-dir` execution)

@@ -34,7 +34,8 @@ COPY pkg/ ./pkg/
 COPY --from=ui-builder /app/ui/out ./pkg/server/ui/out
 
 # Compile static Go binary
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/plan-parse main.go
+ARG VERSION=dev
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X main.version=${VERSION}" -o /app/plan-parse main.go
 
 # ==============================================================================
 # Stage 3: Minimal Production Runtime

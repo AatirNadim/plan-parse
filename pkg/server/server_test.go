@@ -294,20 +294,46 @@ func TestCORSAndOPTIONS(t *testing.T) {
 	}
 }
 
-func TestStaticSPAFallback(t *testing.T) {
+func TestNotFoundDirectServing(t *testing.T) {
 	srv := server.NewServer("127.0.0.1", 9000, nil)
 
-	// Request non-existent SPA route
+	// 1. Request non-existent route: should directly return 404 with high-craft not-found HTML
 	req := httptest.NewRequest(http.MethodGet, "/dashboard/custom-route", nil)
 	w := httptest.NewRecorder()
 	srv.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Errorf("expected status 200 for SPA fallback, got %d", w.Code)
+	if w.Code != http.StatusNotFound {
+		t.Errorf("expected status 404 for unmapped route, got %d", w.Code)
 	}
 
-	if !bytes.Contains(w.Body.Bytes(), []byte("Plan Parse")) {
-		t.Errorf("expected fallback index.html content, got %s", w.Body.String())
+	if !bytes.Contains(w.Body.Bytes(), []byte("Route Not Found")) {
+		t.Errorf("expected not-found HTML content, got %s", w.Body.String())
+	}
+	if !bytes.Contains(w.Body.Bytes(), []byte("/api/parse")) {
+		t.Errorf("expected server endpoints reference in not-found HTML")
+	}
+
+	// 2. Browser navigating to an unmapped /api/ route with Accept: text/html receives 404 with not-found HTML
+	browserReq := httptest.NewRequest(http.MethodGet, "/api/parse", nil)
+	browserReq.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	browserW := httptest.NewRecorder()
+	srv.ServeHTTP(browserW, browserReq)
+
+	if browserW.Code != http.StatusNotFound {
+		t.Errorf("expected status 404 for browser navigation to /api/parse, got %d", browserW.Code)
+	}
+	if !bytes.Contains(browserW.Body.Bytes(), []byte("Route Not Found")) {
+		t.Errorf("expected not-found HTML for browser navigation to /api/parse")
+	}
+
+	// 3. Non-browser API client requesting unmapped /api/ route receives 404
+	apiReq := httptest.NewRequest(http.MethodGet, "/api/parse", nil)
+	apiReq.Header.Set("Accept", "application/json")
+	apiW := httptest.NewRecorder()
+	srv.ServeHTTP(apiW, apiReq)
+
+	if apiW.Code != http.StatusNotFound {
+		t.Errorf("expected status 404 for non-browser GET /api/parse, got %d", apiW.Code)
 	}
 }
 

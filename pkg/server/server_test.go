@@ -309,6 +309,29 @@ func TestStaticSPAFallback(t *testing.T) {
 	if !bytes.Contains(w.Body.Bytes(), []byte("Plan Parse")) {
 		t.Errorf("expected fallback index.html content, got %s", w.Body.String())
 	}
+
+	// Browser navigating to an unmapped /api/ route with Accept: text/html receives SPA fallback
+	browserReq := httptest.NewRequest(http.MethodGet, "/api/parse", nil)
+	browserReq.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	browserW := httptest.NewRecorder()
+	srv.ServeHTTP(browserW, browserReq)
+
+	if browserW.Code != http.StatusOK {
+		t.Errorf("expected status 200 for browser navigation to /api/parse, got %d", browserW.Code)
+	}
+	if !bytes.Contains(browserW.Body.Bytes(), []byte("Plan Parse")) {
+		t.Errorf("expected index.html for browser navigation to /api/parse")
+	}
+
+	// Non-browser API client requesting unmapped /api/ route receives 404
+	apiReq := httptest.NewRequest(http.MethodGet, "/api/parse", nil)
+	apiReq.Header.Set("Accept", "application/json")
+	apiW := httptest.NewRecorder()
+	srv.ServeHTTP(apiW, apiReq)
+
+	if apiW.Code != http.StatusNotFound {
+		t.Errorf("expected status 404 for non-browser GET /api/parse, got %d", apiW.Code)
+	}
 }
 
 func TestEmbeddedStaticFiles(t *testing.T) {

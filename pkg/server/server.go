@@ -86,8 +86,12 @@ func (s *Server) routes() {
 // handleStatic serves static files from the embedded filesystem with SPA fallback to index.html.
 func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/api/") {
-		http.NotFound(w, r)
-		return
+		// If a browser requests an unmapped API route (e.g. GET /api/parse with Accept: text/html),
+		// fall through to SPA index.html so the UI application renders the not-found guidance page.
+		if r.Method != http.MethodGet || !strings.Contains(r.Header.Get("Accept"), "text/html") {
+			http.NotFound(w, r)
+			return
+		}
 	}
 
 	path := strings.TrimPrefix(r.URL.Path, "/")

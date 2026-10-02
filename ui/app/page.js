@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { notFound, usePathname } from "next/navigation";
 import AppHeader from "../components/AppHeader";
 import StatusBar from "../components/StatusBar";
 import WorkbenchSidebar from "../components/WorkbenchSidebar";
@@ -17,11 +16,6 @@ import { useTheme } from "../lib/use-theme";
 import { computeBlastRadius, extractBlastSubgraph } from "../lib/blast-radius";
 
 export default function Home() {
-  const pathname = usePathname();
-  if (pathname && pathname !== "/" && pathname !== "") {
-    notFound();
-  }
-
   const { theme, toggleTheme } = useTheme();
 
   const [graphData, setGraphData] = useState(null);

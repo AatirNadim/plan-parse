@@ -3,7 +3,6 @@ package server
 import (
 	"embed"
 	"fmt"
-	"io"
 	"io/fs"
 	"log"
 	"net"
@@ -16,6 +15,9 @@ import (
 
 //go:embed all:ui/out
 var defaultUIFS embed.FS
+
+//go:embed not_found.html
+var notFoundHTML []byte
 
 // Server represents the HTTP server serving the REST API and embedded UI.
 type Server struct {
@@ -83,23 +85,14 @@ func (s *Server) routes() {
 	s.router.HandleFunc("/", s.handleStatic)
 }
 
-// handleStatic serves static files from the embedded filesystem with SPA fallback to index.html.
+// handleStatic serves static files from the embedded filesystem or directly serves the not-found page with HTTP 404.
 func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, "/api/") {
-		// If a browser requests an unmapped API route (e.g. GET /api/parse with Accept: text/html),
-		// fall through to SPA index.html so the UI application renders the not-found guidance page.
-		if r.Method != http.MethodGet || !strings.Contains(r.Header.Get("Accept"), "text/html") {
-			http.NotFound(w, r)
-			return
-		}
-	}
-
 	path := strings.TrimPrefix(r.URL.Path, "/")
 	if path == "" {
 		path = "index.html"
 	}
 
-	// Attempt opening requested file
+	// Attempt opening requested static file
 	f, err := s.fs.Open(path)
 	if err == nil {
 		stat, statErr := f.Stat()
@@ -111,16 +104,18 @@ func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
 		_ = f.Close()
 	}
 
-	// Fallback to index.html for client-side routing
-	indexFile, err := s.fs.Open("index.html")
-	if err != nil {
-		http.Error(w, "UI index.html not found", http.StatusInternalServerError)
-		return
+	// For programmatic API requests on unmapped /api/ routes, return standard plain-text 404
+	if strings.HasPrefix(r.URL.Path, "/api/") {
+		if r.Method != http.MethodGet || !strings.Contains(r.Header.Get("Accept"), "text/html") {
+			http.NotFound(w, r)
+			return
+		}
 	}
-	defer indexFile.Close()
 
+	// Directly serve the high-craft not-found page with HTTP 404
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = io.Copy(w, indexFile)
+	w.WriteHeader(http.StatusNotFound)
+	_, _ = w.Write(notFoundHTML)
 }
 
 // Start listens on addr:port and serves incoming requests.

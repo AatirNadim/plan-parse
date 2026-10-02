@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 - Route Not Found | Plan Parse</title>
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('plan-parse-theme');
+        if (t === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+          document.documentElement.style.colorScheme = 'light';
+        } else {
+          document.documentElement.classList.remove('light');
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root, html.dark {
+      color-scheme: dark;
+      --canvas-bg: #090a0f;
+      --header-bg: #0c0e14;
+      --panel-bg: #0f121a;
+      --subpanel-bg: #151924;
+      --card-bg: #181d2a;
+      --border-color: #232936;
+      --hover-bg: #1c2230;
+      --muted-color: #717d96;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --dot-color: #1a2233;
+      --code-bg: #020617;
+      --code-border: #1e293b;
+    }
+
+    html.light {
+      color-scheme: light;
+      --canvas-bg: #f8fafc;
+      --header-bg: #ffffff;
+      --panel-bg: #ffffff;
+      --subpanel-bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --hover-bg: #f1f5f9;
+      --muted-color: #64748b;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --dot-color: #cbd5e1;
+      --code-bg: #020617;
+      --code-border: #1e293b;
+    }
+
+    body {
+      background-color: var(--canvas-bg);
+      color: var(--text-main);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .canvas-bg {
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .font-mono {
+      font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #3a455a;
+    }
+
+    /* Pulse animation */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+    .animate-pulse {
+      animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Focus visible */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #0284c7;
+      outline-offset: 1px;
+    }
+
+    /* Hover interactions */
+    .btn-primary {
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-primary:hover {
+      background-color: #0369a1 !important;
+      border-color: #0369a1 !important;
+    }
+    .copy-btn {
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .copy-btn:hover {
+      background-color: var(--hover-bg) !important;
+      border-color: var(--muted-color) !important;
+    }
+    .filter-tab {
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .filter-tab:not(.active):hover {
+      color: var(--text-main) !important;
+      background-color: var(--hover-bg) !important;
+    }
+    #themeToggleBtn:hover {
+      background-color: var(--hover-bg) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Persistent Header Bar -->
+  <header style="height: 44px; width: 100%; border-bottom: 1px solid var(--border-color); background: var(--header-bg); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 20; user-select: none;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="/" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;" title="Return to Visualization Dashboard">
+        <img src="/icon.svg" alt="Plan Parse Logo" style="width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;" />
+        <span class="font-mono" style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+          PLAN-PARSE
+        </span>
+      </a>
+      <span class="font-mono" style="color: var(--muted-color); font-size: 12px;">/</span>
+      <span class="font-mono" style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.25); font-weight: 600;">
+        <span class="animate-pulse" style="width: 6px; height: 6px; border-radius: 50%; background: #f43f5e;"></span>
+        404 // ROUTE_UNMAPPED
+      </span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <!-- Theme Toggle Button -->
+      <button id="themeToggleBtn" style="padding: 4px 10px; border-radius: 4px; font-size: 12px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s ease;" aria-label="Toggle Theme">
+        <span id="themeIcon"></span>
+        <span id="themeLabel" class="font-mono" style="font-size: 11px;">Theme</span>
+      </button>
+
+      <!-- Dashboard Button -->
+      <a href="/" style="padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; color: #ffffff; background: #0284c7; border: 1px solid #0284c7; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" class="font-mono btn-primary">
+        <span>Dashboard</span>
+        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Scrollable Canvas Area -->
+  <main class="canvas-bg custom-scrollbar" style="flex: 1; overflow-y: auto; padding: 24px 16px;">
+    <div style="max-width: 896px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+      <!-- Hero Diagnostic Card -->
+      <div style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+            <span class="font-mono" style="padding: 2px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 4px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color);">
+              HTTP 404
+            </span>
+            <span id="pathBadge" class="font-mono" style="padding: 2px 10px; font-size: 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color); display: none;">
+              path: <strong id="pathText" style="color: #0284c7;"></strong>
+            </span>
+            <span id="apiWarningBadge" class="font-mono" style="padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25); display: none;">
+              Backend Server Endpoint
+            </span>
+          </div>
+
+          <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.025em; color: var(--text-main); line-height: 1.25;">
+            Route Not Found
+          </h1>
+
+          <p id="contextualDesc" style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 680px;">
+            The requested route does not map to any view or static file. The Plan Parse web interface is a focused single-page visualization workspace hosted at <code class="font-mono" style="padding: 2px 6px; border-radius: 4px; background: var(--subpanel-bg); color: #0284c7; font-weight: 600; font-size: 12px;">/</code>.
+          </p>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 8px;">
+            <a href="/" style="padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; color: #ffffff; background: #0284c7; border: 1px solid #0284c7; display: inline-flex; align-items: center; gap: 8px;" class="font-mono btn-primary">
+              <span>Open Visualization Dashboard</span>
+              <kbd style="padding: 2px 5px; font-size: 10px; border-radius: 3px; background: rgba(0,0,0,0.25); color: #e0f2fe;">ESC</kbd>
+            </a>
+            <a href="#server-endpoints" style="padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; color: var(--text-main); background: var(--subpanel-bg); border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 6px;" class="font-mono">
+              <svg style="width: 14px; height: 14px; color: var(--muted-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>View Server REST Endpoints</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Server Architecture Explainer -->
+      <div style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px;">
+        <div class="font-mono" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; color: var(--text-main);">
+          <svg style="width: 16px; height: 16px; color: #0284c7;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Server REST API Architecture</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+          Plan Parse executes as a single Go binary embedding the web dashboard. The server exposes headless REST API endpoints (default: <code class="font-mono" style="color: #0284c7;">127.0.0.1:9000</code>) for CI/CD automation, pipeline integration, and plan parsing. These routes are designed for <strong>HTTP clients, scripts, and cURL</strong>, not direct web browser navigation.
+        </p>
+      </div>
+
+      <!-- Endpoints Reference Section -->
+      <div id="server-endpoints" style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              <svg style="width: 16px; height: 16px; color: var(--muted-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span>Backend Server Endpoints Reference</span>
+            </h2>
+            <p style="font-size: 12px; color: var(--text-muted);">
+              HTTP contracts, required parameters, and execution examples for daemon endpoints.
+            </p>
+          </div>
+
+          <!-- Filter Tabs -->
+          <div class="font-mono" style="display: flex; align-items: center; gap: 4px; background: var(--subpanel-bg); padding: 2px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 11px;">
+            <button class="filter-tab active" data-filter="all" style="padding: 2px 8px; border-radius: 3px; border: none; background: var(--panel-bg); color: var(--text-main); font-weight: 600; cursor: pointer;">All (4)</button>
+            <button class="filter-tab" data-filter="GET" style="padding: 2px 8px; border-radius: 3px; border: none; background: transparent; color: var(--text-muted); cursor: pointer;">GET (3)</button>
+            <button class="filter-tab" data-filter="POST" style="padding: 2px 8px; border-radius: 3px; border: none; background: transparent; color: var(--text-muted); cursor: pointer;">POST (1)</button>
+          </div>
+        </div>
+
+        <!-- Endpoint 1: GET /api/health -->
+        <div class="endpoint-card" data-method="GET" data-id="health" style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: border-color 0.15s ease;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--header-bg); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="font-mono" style="padding: 2px 6px; font-size: 11px; font-weight: 700; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">GET</span>
+              <code class="font-mono" style="font-size: 13px; font-weight: 600; color: var(--text-main);">/api/health</code>
+              <span class="font-mono" style="padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-muted); border: 1px solid var(--border-color);">Liveness Probe</span>
+              <span class="match-badge font-mono" style="display: none; padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); font-weight: 600;">
+                <span class="animate-pulse" style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #0284c7; margin-right: 4px;"></span>Path Match
+              </span>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Server health & liveness verification</span>
+          </div>
+
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+              Returns HTTP 200 with JSON payload confirming the plan-parse server is operational, bound to its socket, and ready to accept requests.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Parameters</span>
+                <span class="font-mono" style="color: var(--text-main);">None</span>
+              </div>
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Headers</span>
+                <span class="font-mono" style="color: var(--text-main);">Accept: application/json</span>
+              </div>
+            </div>
+
+            <!-- cURL snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Example cURL</span>
+                <button class="copy-btn font-mono" data-copy="curl -s http://127.0.0.1:9000/api/health" style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy cURL</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>curl -s http://127.0.0.1:9000/api/health</code></pre>
+            </div>
+
+            <!-- Response snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Sample Response (JSON)</span>
+                <button class="copy-btn font-mono" data-copy='{"alive": true}' style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy JSON</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>{
+  "alive": true
+}</code></pre>
+            </div>
+
+            <div class="font-mono" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; color: var(--muted-color); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Note:</strong> Used by container orchestrators, health checks, and CI/CD readiness probes.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint 2: GET /api/status -->
+        <div class="endpoint-card" data-method="GET" data-id="status" style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: border-color 0.15s ease;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--header-bg); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="font-mono" style="padding: 2px 6px; font-size: 11px; font-weight: 700; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">GET</span>
+              <code class="font-mono" style="font-size: 13px; font-weight: 600; color: var(--text-main);">/api/status</code>
+              <span class="font-mono" style="padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-muted); border: 1px solid var(--border-color);">CLI Plan State</span>
+              <span class="match-badge font-mono" style="display: none; padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); font-weight: 600;">
+                <span class="animate-pulse" style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #0284c7; margin-right: 4px;"></span>Path Match
+              </span>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Disclose startup CLI plan state & lock status</span>
+          </div>
+
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+              Reports whether a Terraform plan was loaded at startup via <code>-plan &lt;file&gt;</code> or <code>-dir &lt;path&gt;</code>. Operates with a single-use lifecycle: initial call returns <code>cli_loaded: true, disabled: true</code>; subsequent browser reloads return <code>cli_loaded: false</code>.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Parameters</span>
+                <span class="font-mono" style="color: var(--text-main);">None</span>
+              </div>
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Headers</span>
+                <span class="font-mono" style="color: var(--text-main);">Accept: application/json</span>
+              </div>
+            </div>
+
+            <!-- cURL snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Example cURL</span>
+                <button class="copy-btn font-mono" data-copy="curl -s http://127.0.0.1:9000/api/status" style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy cURL</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>curl -s http://127.0.0.1:9000/api/status</code></pre>
+            </div>
+
+            <!-- Response snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Sample Response (JSON)</span>
+                <button class="copy-btn font-mono" data-copy='{"cli_loaded": true, "disabled": true}' style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy JSON</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>{
+  "cli_loaded": true,
+  "disabled": true
+}</code></pre>
+            </div>
+
+            <div class="font-mono" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; color: var(--muted-color); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Note:</strong> Prevents state contamination on UI browser refreshes while preserving initial CLI arguments.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint 3: GET /api/graph -->
+        <div class="endpoint-card" data-method="GET" data-id="graph" style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: border-color 0.15s ease;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--header-bg); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="font-mono" style="padding: 2px 6px; font-size: 11px; font-weight: 700; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">GET</span>
+              <code class="font-mono" style="font-size: 13px; font-weight: 600; color: var(--text-main);">/api/graph</code>
+              <span class="font-mono" style="padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-muted); border: 1px solid var(--border-color);">DAG Payload</span>
+              <span class="match-badge font-mono" style="display: none; padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); font-weight: 600;">
+                <span class="animate-pulse" style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #0284c7; margin-right: 4px;"></span>Path Match
+              </span>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Retrieve pre-parsed dependency graph structure</span>
+          </div>
+
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+              Fetches the parsed Directed Acyclic Graph (DAG) containing nodes (resources, modules, variables, outputs), edges (dependencies), and change summary statistics.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Parameters</span>
+                <span class="font-mono" style="color: var(--text-main);">None</span>
+              </div>
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Headers</span>
+                <span class="font-mono" style="color: var(--text-main);">Accept: application/json</span>
+              </div>
+            </div>
+
+            <!-- cURL snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Example cURL</span>
+                <button class="copy-btn font-mono" data-copy="curl -s http://127.0.0.1:9000/api/graph" style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy cURL</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>curl -s http://127.0.0.1:9000/api/graph</code></pre>
+            </div>
+
+            <!-- Response snippet -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Sample Response (JSON)</span>
+                <button class="copy-btn font-mono" data-copy='{"nodes":[{"id":"aws_vpc.main","type":"resource","action":"create"}],"edges":[],"summary":{"total":1,"create":1}}' style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy JSON</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>{
+  "nodes": [
+    { "id": "aws_vpc.main", "type": "resource", "action": "create" }
+  ],
+  "edges": [],
+  "summary": { "total": 1, "create": 1, "update": 0, "delete": 0, "replace": 0 }
+}</code></pre>
+            </div>
+
+            <div class="font-mono" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; color: var(--muted-color); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Note:</strong> Consumes the startup CLI plan buffer upon retrieval; subsequent requests return an empty graph structure.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint 4: POST /api/parse -->
+        <div class="endpoint-card" data-method="POST" data-id="parse" style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: border-color 0.15s ease;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--header-bg); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="font-mono" style="padding: 2px 6px; font-size: 11px; font-weight: 700; border-radius: 3px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25);">POST</span>
+              <code class="font-mono" style="font-size: 13px; font-weight: 600; color: var(--text-main);">/api/parse</code>
+              <span class="font-mono" style="padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-muted); border: 1px solid var(--border-color);">Plan Ingestion Engine</span>
+              <span class="match-badge font-mono" style="display: none; padding: 1px 6px; font-size: 10px; text-transform: uppercase; border-radius: 3px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600;">
+                <span class="animate-pulse" style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #10b981; margin-right: 4px;"></span>Path Match
+              </span>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Ingest & parse Terraform plan JSON without session storage</span>
+          </div>
+
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+              Parses an uploaded Terraform plan JSON and returns the resolved DAG graph without mutating or retaining server state. Supports raw JSON body or multipart/form-data with field <code>file</code> or <code>plan</code> up to 50MB.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; font-size: 12px;">
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Parameters</span>
+                <span class="font-mono" style="color: var(--text-main);">Raw JSON body OR multipart field 'file' / 'plan'</span>
+              </div>
+              <div style="padding: 8px 12px; border-radius: 4px; background: var(--subpanel-bg); border: 1px solid var(--border-color);">
+                <span class="font-mono" style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Headers</span>
+                <span class="font-mono" style="color: var(--text-main);">Content-Type: application/json OR multipart/form-data</span>
+              </div>
+            </div>
+
+            <!-- cURL snippets -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Example cURL (Raw JSON)</span>
+                <button class="copy-btn font-mono" data-copy="curl -X POST http://127.0.0.1:9000/api/parse -H 'Content-Type: application/json' --data-binary @tf_plan.json" style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy cURL</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>curl -X POST http://127.0.0.1:9000/api/parse \
+  -H "Content-Type: application/json" \
+  --data-binary @tf_plan.json</code></pre>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Example cURL (Multipart Upload)</span>
+                <button class="copy-btn font-mono" data-copy='curl -X POST http://127.0.0.1:9000/api/parse -F "file=@tf_plan.json"' style="padding: 2px 8px; font-size: 11px; border-radius: 3px; background: var(--subpanel-bg); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer;">Copy cURL</button>
+              </div>
+              <pre class="font-mono custom-scrollbar" style="padding: 10px 14px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; color: #e2e8f0; overflow-x: auto;"><code>curl -X POST http://127.0.0.1:9000/api/parse -F "file=@tf_plan.json"</code></pre>
+            </div>
+
+            <div class="font-mono" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; color: var(--muted-color); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Note:</strong> Fully stateless; enables rapid CI automation without file persistence or session tokens.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Return Banner -->
+      <div style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div>
+          <h3 style="font-size: 14px; font-weight: 600; color: var(--text-main);">Ready to visualize Terraform dependencies?</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">Return to the interactive DAG canvas, blast-radius calculator, and targeted apply engine.</p>
+        </div>
+        <a href="/" style="padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; color: #ffffff; background: #0284c7; border: 1px solid #0284c7; display: inline-flex; align-items: center; gap: 6px;" class="font-mono btn-primary">
+          <span>Return to Dashboard</span>
+          <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      // Dynamic Path Detection
+      var pathname = window.location.pathname || '';
+      if (pathname && pathname !== '/') {
+        var pathBadge = document.getElementById('pathBadge');
+        var pathText = document.getElementById('pathText');
+        if (pathBadge && pathText) {
+          pathText.textContent = pathname;
+          pathBadge.style.display = 'inline-block';
+        }
+
+        var isApi = pathname.indexOf('/api') === 0 || pathname === '/health' || pathname === '/status' || pathname === '/graph' || pathname === '/parse';
+        if (isApi) {
+          var apiBadge = document.getElementById('apiWarningBadge');
+          if (apiBadge) apiBadge.style.display = 'inline-block';
+          var desc = document.getElementById('contextualDesc');
+          if (desc) {
+            desc.innerHTML = 'You requested a backend server endpoint in the browser (<code class="font-mono" style="padding: 2px 6px; border-radius: 4px; background: var(--subpanel-bg); color: #0284c7; font-weight: 600; font-size: 12px;">' + pathname + '</code>). Plan Parse server endpoints are headless REST APIs engineered for automated CI pipelines, parsers, and cURL, not interactive web browser views.';
+          }
+        }
+
+        // Highlight matching endpoint
+        var matchedId = null;
+        if (pathname.indexOf('health') !== -1) matchedId = 'health';
+        else if (pathname.indexOf('status') !== -1) matchedId = 'status';
+        else if (pathname.indexOf('graph') !== -1) matchedId = 'graph';
+        else if (pathname.indexOf('parse') !== -1) matchedId = 'parse';
+
+        if (matchedId) {
+          var card = document.querySelector('.endpoint-card[data-id="' + matchedId + '"]');
+          if (card) {
+            card.style.borderColor = '#0284c7';
+            card.style.boxShadow = '0 0 0 1px rgba(2, 132, 199, 0.4)';
+            var mb = card.querySelector('.match-badge');
+            if (mb) mb.style.display = 'inline-flex';
+          }
+        }
+      }
+
+      // Escape key returns to dashboard
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          window.location.href = '/';
+        }
+      });
+
+      // Filter tabs
+      var filterTabs = document.querySelectorAll('.filter-tab');
+      var cards = document.querySelectorAll('.endpoint-card');
+      filterTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          filterTabs.forEach(function(t) {
+            t.style.background = 'transparent';
+            t.style.color = 'var(--text-muted)';
+            t.style.fontWeight = 'normal';
+          });
+          tab.style.background = 'var(--panel-bg)';
+          tab.style.color = 'var(--text-main)';
+          tab.style.fontWeight = '600';
+
+          var filter = tab.getAttribute('data-filter');
+          cards.forEach(function(card) {
+            if (filter === 'all' || card.getAttribute('data-method') === filter) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // Copy to clipboard
+      document.querySelectorAll('.copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var text = btn.getAttribute('data-copy');
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+              var orig = btn.textContent;
+              btn.textContent = 'Copied!';
+              btn.style.color = '#10b981';
+              setTimeout(function() {
+                btn.textContent = orig;
+                btn.style.color = 'var(--text-main)';
+              }, 2000);
+            });
+          }
+        });
+      });
+
+      // Theme toggle
+      var themeToggleBtn = document.getElementById('themeToggleBtn');
+      var themeIcon = document.getElementById('themeIcon');
+      var themeLabel = document.getElementById('themeLabel');
+
+      function updateThemeUI() {
+        var isLight = document.documentElement.classList.contains('light');
+        if (isLight) {
+          themeIcon.innerHTML = '<svg style="width: 14px; height: 14px; color: #f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>';
+          themeLabel.textContent = 'Light';
+        } else {
+          themeIcon.innerHTML = '<svg style="width: 14px; height: 14px; color: #38bdf8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>';
+          themeLabel.textContent = 'Dark';
+        }
+      }
+
+      updateThemeUI();
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function() {
+          var isDark = document.documentElement.classList.contains('dark');
+          if (isDark) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            document.documentElement.style.colorScheme = 'light';
+            try { localStorage.setItem('plan-parse-theme', 'light'); } catch(e) {}
+          } else {
+            document.documentElement.classList.remove('light');
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+            try { localStorage.setItem('plan-parse-theme', 'dark'); } catch(e) {}
+          }
+          updateThemeUI();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

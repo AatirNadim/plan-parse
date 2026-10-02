@@ -1,0 +1,101 @@
+name: 🐛 Bug Report
+description: Report unexpected behavior, crashes, or rendering issues in plan-parse.
+title: "[Bug]: "
+labels: ["kind/bug", "status/triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill out the form below as completely as possible.
+        Before submitting, ensure you have searched existing issues to verify this is not a duplicate.
+
+  - type: checkboxes
+    id: pre-flight-check
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing [open and closed issues](https://github.com/AatirNadim/plan-parse/issues?q=is%3Aissue) and confirmed that this is not a duplicate.
+          required: true
+        - label: I have verified that this issue does not contain any sensitive cloud credentials, secrets, or confidential infrastructure data.
+          required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which sub-system is affected?
+      options:
+        - "Core Parser (pkg/core)"
+        - "Terraform CLI Runner (pkg/runner)"
+        - "Embedded Server / REST API (pkg/server)"
+        - "Developer Workbench UI (ui)"
+        - "Docker Container / Packaging"
+        - "Other / Unknown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the problem you encountered in detail...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can maintainers reproduce this issue?
+      placeholder: |
+        1. Run CLI command: `plan-parse -plan ...`
+        2. Open browser to `http://localhost:8080`
+        3. Click on resource node `module.vpc.aws_subnet.public[0]`
+        4. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened instead?
+      placeholder: What occurred instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment & Versions
+      description: Please share your environment details.
+      value: |
+        - **plan-parse version**: (e.g. `v0.1.0` or git SHA)
+        - **Operating System & Architecture**: (e.g. Ubuntu 22.04 x86_64, macOS 14.4 M2)
+        - **Terraform / OpenTofu version**: (e.g. `Terraform v1.8.2` or `OpenTofu v1.7.0`)
+        - **Browser**: (e.g. Chrome 124, Firefox 125, Safari 17.4 - if UI related)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs-and-payloads
+    attributes:
+      label: Logs, Sanitized Plan JSON, or Error Output
+      description: Paste terminal output, browser console logs, or a minimal reproducible Terraform plan snippet. Please sanitize any sensitive credentials!
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or visual recordings here.

@@ -387,6 +387,17 @@ flowchart TD
 
 ---
 
+## Contributing & Community
+
+Contributions are warmly welcomed! Whether you are fixing bugs, proposing visual DAG features, improving documentation, or sharing sanitized plan fixtures:
+
+- **[Contribution Guidelines](CONTRIBUTING.md)**: Development setup, issue search process, tag monitoring taxonomy, and PR workflow.
+- **[Code of Conduct](CODE_OF_CONDUCT.md)**: Standards and expectations for an inclusive and welcoming community.
+- **[Security Policy](SECURITY.md)**: Vulnerability disclosure procedure and reporting guidelines.
+- **[Support & Help](SUPPORT.md)**: Getting assistance, asking questions, and community discussions.
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

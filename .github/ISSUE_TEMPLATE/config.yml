@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a Question / General Discussion
+    url: https://github.com/AatirNadim/plan-parse/discussions
+    about: Ask questions, get help, or share ideas about plan-parse with the community.
+  - name: Report a Security Vulnerability
+    url: https://github.com/AatirNadim/plan-parse/security/advisories/new
+    about: Privately report a suspected security vulnerability to maintainers.
+  - name: Contributing Guidelines
+    url: https://github.com/AatirNadim/plan-parse/blob/main/CONTRIBUTING.md
+    about: Read our guidelines on how to contribute code, report issues, and monitor issue tags.

@@ -11,6 +11,10 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -33,19 +37,48 @@ jobs:
       contents: write
     outputs:
       tag: ${{ steps.resolve-tag.outputs.tag }}
+      is_latest: ${{ steps.resolve-tag.outputs.is_latest }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Resolve and validate release tag
         id: resolve-tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          TAG="${{ inputs.tag || github.ref_name }}"
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "::error::Release tag '$TAG' is not a valid semver tag (must match pattern ^v[0-9]+\.[0-9]+\.[0-9]+)"
+          TAG="${INPUT_TAG:-$REF_NAME}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Release tag '$TAG' is not a valid semver tag (must match pattern ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$)"
             exit 1
           fi
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          # Fetch all git tags
+          git fetch --tags --force
+
+          # Filter only stable SemVer tags for highest tag comparison:
+          EXISTING_STABLE_TAGS=$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)
+          HIGHEST_TAG=""
+          if [ -n "$EXISTING_STABLE_TAGS" ]; then
+            HIGHEST_TAG=$(echo "$EXISTING_STABLE_TAGS" | sort -V | tail -n 1 || true)
+          fi
+
+          IS_LATEST=false
+          if [[ "$TAG" =~ - ]]; then
+            echo "Release $TAG is a pre-release. Will not update 'latest' pointers."
+            IS_LATEST=false
+          elif [ -n "$HIGHEST_TAG" ] && [ "$(printf '%s\n%s\n' "$TAG" "$HIGHEST_TAG" | sort -V | tail -n 1)" != "$TAG" ]; then
+            echo "Release $TAG is a backport release (higher tag $HIGHEST_TAG exists). Will not update 'latest' pointers."
+            IS_LATEST=false
+          else
+            echo "Release $TAG is the latest release."
+            IS_LATEST=true
+          fi
+          echo "is_latest=${IS_LATEST}" >> "$GITHUB_OUTPUT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -121,6 +154,8 @@ jobs:
             dist/plan-parse_*
             dist/checksums.txt
           generate_release_notes: true
+          make_latest: ${{ steps.resolve-tag.outputs.is_latest }}
+          prerelease: ${{ contains(steps.resolve-tag.outputs.tag, '-') }}
 
   docker:
     name: Publish Docker Image
@@ -129,4 +164,5 @@ jobs:
     with:
       push: true
       version: ${{ needs.release.outputs.tag }}
+      is_latest: ${{ needs.release.outputs.is_latest }}
     secrets: inherit

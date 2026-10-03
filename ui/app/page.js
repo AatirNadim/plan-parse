@@ -176,6 +176,39 @@ export default function Home() {
     }
   }, [theme]);
 
+  // Handle dynamic resizing of Cytoscape viewport across all engines and window changes
+  useEffect(() => {
+    if (!cyContainerRef.current) return;
+    const container = cyContainerRef.current;
+    let rafId = null;
+
+    const scheduleResize = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (cyRef.current && !cyRef.current.destroyed()) {
+          cyRef.current.resize();
+        }
+      });
+    };
+
+    let observer = null;
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(scheduleResize);
+      observer.observe(container);
+    } else {
+      window.addEventListener("resize", scheduleResize);
+    }
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (observer) {
+        observer.disconnect();
+      } else {
+        window.removeEventListener("resize", scheduleResize);
+      }
+    };
+  }, [cyReady]);
+
   // Handle resizing of Cytoscape viewport when sidebars toggle
   useEffect(() => {
     if (!cyRef.current) return;
@@ -738,7 +771,7 @@ export default function Home() {
     : originalEdgeCount;
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-workbench-bg text-slate-800 dark:text-slate-200 overflow-hidden font-sans select-none transition-colors duration-150">
+    <div className="w-full h-full h-screen h-[100dvh] flex flex-col bg-workbench-bg text-slate-800 dark:text-slate-200 overflow-hidden font-sans select-none transition-colors duration-150">
       {/* Grounded Top Application Header */}
       <AppHeader
         cliLoaded={cliLoaded}
@@ -765,7 +798,7 @@ export default function Home() {
       />
 
       {/* Main Workbench Middle Area */}
-      <div className="flex-1 flex relative overflow-hidden">
+      <div className="flex-1 flex min-h-0 relative overflow-hidden">
         {/* Docked Left Sidebar */}
         <WorkbenchSidebar
           isOpen={isSidebarOpen}
@@ -788,7 +821,7 @@ export default function Home() {
           {/* Floating Transitive Blast Radius Canvas HUD */}
           {hasGraph && (currentBlastRadius?.stats?.totalCount > 0 || isBlastIsolated) && (
             <div className="absolute top-3 left-3 z-20 flex items-center gap-2 p-1.5 px-3 rounded-md border border-workbench-border bg-workbench-panel/95 backdrop-blur-md shadow-lg shadow-black/20 text-xs font-mono select-none pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="flex items-center gap-1.5 truncate">
+              <div className="flex items-center gap-1.5 truncate min-w-0">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
                 <span className="font-semibold text-slate-800 dark:text-slate-100">
                   {isBlastIsolated ? "Isolated Subgraph:" : "Blast Radius:"}

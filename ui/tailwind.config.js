@@ -10,8 +10,29 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["'DM Sans'", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
-        mono: ["'DM Mono'", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+        sans: [
+          "'DM Sans'",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'Segoe UI'",
+          "Roboto",
+          "'Helvetica Neue'",
+          "Arial",
+          "sans-serif",
+        ],
+        mono: [
+          "'DM Mono'",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "'Liberation Mono'",
+          "'Courier New'",
+          "monospace",
+        ],
       },
       colors: {
         workbench: {

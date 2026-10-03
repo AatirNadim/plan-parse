@@ -244,7 +244,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
         </div>
 
         {/* Modal Body: Monospace Diff Typography with Sticky Line Gutter */}
-        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-workbench-panel select-text">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 custom-scrollbar bg-workbench-panel select-text">
           {/* View 1: Unified HCL Diff */}
           {viewMode === "unified" && (
             <div className="font-mono text-[12px] leading-relaxed rounded-lg border border-workbench-border bg-workbench-header overflow-x-auto custom-scrollbar">
@@ -305,12 +305,12 @@ function NodeDiffModal({ isOpen, node, onClose }) {
           {viewMode === "split" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-[12px] h-full">
               {/* Left Pane: Current State (Before) */}
-              <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col">
+              <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col min-h-0">
                 <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px] font-semibold">
                   <span>Current State (Before)</span>
                   <span className="text-rose-500 font-bold">- DELETIONS</span>
                 </div>
-                <div className="p-3 space-y-1.5 flex-1 overflow-y-auto max-h-[55vh] custom-scrollbar">
+                <div className="p-3 space-y-1.5 flex-1 min-h-0 overflow-y-auto max-h-[55vh] custom-scrollbar">
                   {filteredAttributes.length > 0 ? (
                     filteredAttributes.map((attr) => (
                       <div
@@ -338,12 +338,12 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               </div>
 
               {/* Right Pane: Planned State (After) */}
-              <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col">
+              <div className="border border-workbench-border rounded-lg bg-workbench-header overflow-hidden flex flex-col min-h-0">
                 <div className="px-3.5 py-2 bg-workbench-subpanel border-b border-workbench-border flex items-center justify-between text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px] font-semibold">
                   <span>Planned State (After)</span>
                   <span className="text-emerald-500 font-bold">+ ADDITIONS</span>
                 </div>
-                <div className="p-3 space-y-1.5 flex-1 overflow-y-auto max-h-[55vh] custom-scrollbar">
+                <div className="p-3 space-y-1.5 flex-1 min-h-0 overflow-y-auto max-h-[55vh] custom-scrollbar">
                   {filteredAttributes.length > 0 ? (
                     filteredAttributes.map((attr) => (
                       <div

@@ -225,7 +225,7 @@ function NodeInspector({
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar text-xs">
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-4 custom-scrollbar text-xs">
         {/* Tab 1: Diff View */}
         {activeTab === "diff" && (
           <div className="space-y-3">

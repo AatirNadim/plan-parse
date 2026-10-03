@@ -31,3 +31,18 @@ export const siteMetadata = {
     images: ["/icon.svg"],
   },
 };
+
+/**
+ * Viewport configuration ensuring mobile rendering adaptability across all engines.
+ * Configures interactive viewport fit, device-width, initial scale, and dynamic theme colors.
+ */
+export const siteViewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#090a0f" },
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+  ],
+};
+

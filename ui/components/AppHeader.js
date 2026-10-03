@@ -69,7 +69,7 @@ function AppHeader({
   }, [isExportMenuOpen]);
 
   return (
-    <header className="h-11 w-full border-b border-workbench-border bg-workbench-header px-3.5 flex items-center justify-between shrink-0 select-none z-20">
+    <header className="h-11 w-full border-b border-workbench-border bg-workbench-header px-3.5 flex items-center justify-between shrink-0 select-none z-20 safe-area-top">
       {/* Left: Brand + Context + Blast Radius */}
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -86,7 +86,7 @@ function AppHeader({
           </svg>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <img
             src="/icon.svg"
             alt="Plan Parse DAG Icon"
@@ -101,9 +101,9 @@ function AppHeader({
         </div>
 
         {/* Source Badge */}
-        <div className="flex items-center gap-1.5 truncate">
+        <div className="flex items-center gap-1.5 truncate min-w-0">
           {cliLoaded ? (
-            <span className="px-2 py-0.5 text-[10px] font-mono font-medium rounded uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            <span className="px-2 py-0.5 text-[10px] font-mono font-medium rounded uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">
               CLI Mode
             </span>
           ) : planName ? (
@@ -111,7 +111,7 @@ function AppHeader({
               {planName}
             </span>
           ) : (
-            <span className="text-xs font-mono text-slate-400 dark:text-slate-500">
+            <span className="text-xs font-mono text-slate-400 dark:text-slate-500 shrink-0">
               No Plan Loaded
             </span>
           )}
@@ -119,7 +119,7 @@ function AppHeader({
 
         {/* Blast Radius Micro-Chips */}
         {hasGraph && (
-          <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-workbench-border">
+          <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-workbench-border shrink-0">
             {counts.create > 0 && (
               <span
                 className="px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
@@ -162,7 +162,7 @@ function AppHeader({
           onClick={onOpenCommandPalette}
           className="flex items-center justify-between w-64 md:w-80 px-2.5 py-1 bg-workbench-subpanel hover:bg-workbench-hover border border-workbench-border rounded text-xs text-slate-600 dark:text-slate-400 transition cursor-pointer"
         >
-          <div className="flex items-center gap-2 truncate">
+          <div className="flex items-center gap-2 truncate min-w-0">
             <svg className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -197,7 +197,7 @@ function AppHeader({
               </svg>
               <span>{isCollapsed ? "Mutations Only" : "Collapse"}</span>
               {isCollapsed && collapsedCount > 0 && (
-                <span className="px-1.5 py-0.2 text-[10px] rounded bg-sky-500/20 dark:bg-sky-500/30 text-sky-700 dark:text-sky-200 border border-sky-500/40 font-mono">
+                <span className="px-1.5 py-[1px] text-[10px] rounded bg-sky-500/20 dark:bg-sky-500/30 text-sky-700 dark:text-sky-200 border border-sky-500/40 font-mono">
                   ({collapsedCount})
                 </span>
               )}
@@ -350,7 +350,7 @@ function AppHeader({
             </svg>
           )}
           <span className="hidden sm:inline">{theme === "light" ? "Light" : "Dark"}</span>
-          <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
+          <kbd className="hidden sm:inline-block px-1 py-[1px] text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
             T
           </kbd>
         </button>
@@ -365,7 +365,7 @@ function AppHeader({
             <path strokeLinecap="round" strokeWidth="1.8" d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 13h.01M17 13h.01M10 14h4" />
           </svg>
           <span className="hidden sm:inline">Shortcuts</span>
-          <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
+          <kbd className="hidden sm:inline-block px-1 py-[1px] text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
             ?
           </kbd>
         </button>

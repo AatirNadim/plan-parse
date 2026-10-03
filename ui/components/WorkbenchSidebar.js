@@ -315,7 +315,7 @@ function WorkbenchSidebar({
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="h-1.5 w-full rounded bg-workbench-bg border border-workbench-border flex overflow-hidden p-0.2 gap-0.5">
+                  <div className="h-1.5 w-full rounded bg-workbench-bg border border-workbench-border flex overflow-hidden p-[1px] gap-0.5">
                     {distributionSegments.map((seg) => (
                       <div
                         key={seg.action}

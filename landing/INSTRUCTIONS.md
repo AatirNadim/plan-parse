@@ -61,7 +61,7 @@ Adhering to the `/hybrid-designer` and `craft-ui` standards, the landing site fo
 
 ```
 landing/
-├── package.json               # Independent package with Next.js 14 & Tailwind CSS
+├── package.json               # Independent package with Next.js 16 & Tailwind CSS
 ├── next.config.js             # output: 'export', distDir: 'out', trailingSlash: true
 ├── tailwind.config.js         # Styled with plan-parse workbench color tokens & fonts
 ├── postcss.config.js
@@ -252,7 +252,7 @@ All SVGs will be created in `landing/public/images/features/` with:
 ## 6. Implementation Phasing
 
 1. **Phase 1: Project Scaffolding & Setup**
-   - Initialize `landing/package.json` with Next.js 14, Tailwind CSS, PostCSS.
+   - Initialize `landing/package.json` with Next.js 16, Tailwind CSS, PostCSS.
    - Configure `landing/next.config.js` with `output: 'export'`.
    - Setup `landing/tailwind.config.js` with the exact color tokens, dark theme `#090a0f`, and fonts.
    - Implement root `layout.js`, `ThemeProvider.js`, and `use-theme.js`.

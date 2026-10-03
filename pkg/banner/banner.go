@@ -18,14 +18,14 @@ const (
 
 	// UI Theme TrueColor 24-bit ANSI codes matching ui/tailwind.config.js & assets/banner.svg
 	ColorSky     = "\x1b[38;2;56;189;248m"  // #38BDF8 (Brand Sky)
-	ColorIndigo  = "\x1b[38;2;99;102;241m" // #6366F1 (Brand Indigo)
-	ColorMuted   = "\x1b[38;2;148;163;184m"// #94A3B8 (Muted Text)
-	ColorBorder  = "\x1b[38;2;35;41;54m"   // #232936 (Workbench Border)
-	ColorCreate  = "\x1b[38;2;16;185;129m" // #10B981 (Action Create +)
-	ColorUpdate  = "\x1b[38;2;2;132;199m"  // #0284C7 (Action Update ~)
-	ColorDelete  = "\x1b[38;2;244;63;94m"  // #F43F5E (Action Delete -)
-	ColorReplace = "\x1b[38;2;245;158;11m" // #F59E0B (Action Replace ±)
-	ColorWhite   = "\x1b[38;2;255;255;255m"// #FFFFFF (High-contrast text)
+	ColorIndigo  = "\x1b[38;2;99;102;241m"  // #6366F1 (Brand Indigo)
+	ColorMuted   = "\x1b[38;2;148;163;184m" // #94A3B8 (Muted Text)
+	ColorBorder  = "\x1b[38;2;35;41;54m"    // #232936 (Workbench Border)
+	ColorCreate  = "\x1b[38;2;16;185;129m"  // #10B981 (Action Create +)
+	ColorUpdate  = "\x1b[38;2;2;132;199m"   // #0284C7 (Action Update ~)
+	ColorDelete  = "\x1b[38;2;244;63;94m"   // #F43F5E (Action Delete -)
+	ColorReplace = "\x1b[38;2;245;158;11m"  // #F59E0B (Action Replace ±)
+	ColorWhite   = "\x1b[38;2;255;255;255m" // #FFFFFF (High-contrast text)
 )
 
 // Subtitle is the brand tagline displayed under the ASCII logo.

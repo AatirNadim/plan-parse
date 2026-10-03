@@ -27,7 +27,7 @@ function StatusBar({
   const { paletteKey } = usePlatformModifier();
 
   return (
-    <footer className="h-7 w-full border-t border-workbench-border bg-workbench-header px-3.5 flex items-center justify-between shrink-0 select-none text-[11px] font-mono text-slate-500 dark:text-slate-400 z-20">
+    <footer className="h-7 w-full border-t border-workbench-border bg-workbench-header px-3.5 flex items-center justify-between shrink-0 select-none text-[11px] font-mono text-slate-500 dark:text-slate-400 z-20 safe-area-bottom">
       {/* Left: Viewport Metrics & Zoom HUD */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">

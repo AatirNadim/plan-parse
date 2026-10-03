@@ -23,5 +23,16 @@
   },
   "overrides": {
     "nanoid": "3.3.7"
-  }
+  },
+  "browserslist": [
+    "> 0.2%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead",
+    "Safari >= 14",
+    "iOS >= 14",
+    "Chrome >= 90",
+    "Firefox >= 90",
+    "Edge >= 90"
+  ]
 }

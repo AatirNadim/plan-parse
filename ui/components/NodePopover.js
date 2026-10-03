@@ -171,7 +171,7 @@ function NodePopover({
       {/* Transitive Blast Radius Footprint */}
       {blastRadius && blastRadius.stats.totalCount > 0 && (
         <div className="mb-2 p-1.5 px-2 rounded bg-workbench-header/80 border border-workbench-border flex items-center justify-between text-[10px] font-mono gap-1">
-          <div className="flex items-center gap-1.5 truncate">
+          <div className="flex items-center gap-1.5 truncate min-w-0">
             <span className="text-amber-500 font-bold shrink-0">⚡ Blast:</span>
             <span className="text-slate-800 dark:text-slate-200 font-medium truncate">
               {blastRadius.stats.directCount} direct • {blastRadius.stats.transitiveCount} transitive

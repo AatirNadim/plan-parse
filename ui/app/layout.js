@@ -1,7 +1,9 @@
 import "./globals.css";
 import { siteMetadata } from "../lib/site-metadata";
+import { siteViewport } from "../lib/site-metadata";
 
 export const metadata = siteMetadata;
+export const viewport = siteViewport;
 
 export default function RootLayout({ children }) {
   return (
@@ -22,7 +24,7 @@ export default function RootLayout({ children }) {
         />
         <script src="/cytoscape-bundle.js" async={false}></script>
       </head>
-      <body className="font-sans bg-workbench-bg text-slate-800 dark:text-slate-200 overflow-hidden w-screen h-screen antialiased transition-colors duration-150">
+      <body className="font-sans bg-workbench-bg text-slate-800 dark:text-slate-200 overflow-hidden w-full h-full h-screen h-[100dvh] antialiased transition-colors duration-150">
         {children}
       </body>
     </html>

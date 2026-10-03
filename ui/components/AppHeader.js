@@ -197,7 +197,7 @@ function AppHeader({
               </svg>
               <span>{isCollapsed ? "Mutations Only" : "Collapse"}</span>
               {isCollapsed && collapsedCount > 0 && (
-                <span className="px-1.5 py-0.2 text-[10px] rounded bg-sky-500/20 dark:bg-sky-500/30 text-sky-700 dark:text-sky-200 border border-sky-500/40 font-mono">
+                <span className="px-1.5 py-[1px] text-[10px] rounded bg-sky-500/20 dark:bg-sky-500/30 text-sky-700 dark:text-sky-200 border border-sky-500/40 font-mono">
                   ({collapsedCount})
                 </span>
               )}
@@ -350,7 +350,7 @@ function AppHeader({
             </svg>
           )}
           <span className="hidden sm:inline">{theme === "light" ? "Light" : "Dark"}</span>
-          <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
+          <kbd className="hidden sm:inline-block px-1 py-[1px] text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
             T
           </kbd>
         </button>
@@ -365,7 +365,7 @@ function AppHeader({
             <path strokeLinecap="round" strokeWidth="1.8" d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 13h.01M17 13h.01M10 14h4" />
           </svg>
           <span className="hidden sm:inline">Shortcuts</span>
-          <kbd className="hidden sm:inline-block px-1 py-0.2 text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
+          <kbd className="hidden sm:inline-block px-1 py-[1px] text-[9px] font-mono bg-workbench-panel border border-workbench-border rounded text-slate-500 dark:text-slate-400">
             ?
           </kbd>
         </button>

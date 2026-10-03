@@ -5,11 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"time"
 
+	"github.com/AatirNadim/plan-parse/pkg/banner"
 	"github.com/AatirNadim/plan-parse/pkg/core"
 	"github.com/AatirNadim/plan-parse/pkg/runner"
 	"github.com/AatirNadim/plan-parse/pkg/server"
@@ -37,6 +39,7 @@ func main() {
 		port        int
 		addr        string
 		noBrowser   bool
+		noBanner    bool
 		showVersion bool
 	)
 
@@ -45,6 +48,7 @@ func main() {
 	flag.IntVar(&port, "port", 9000, "Port to listen on")
 	flag.StringVar(&addr, "addr", "127.0.0.1", "Address to bind to")
 	flag.BoolVar(&noBrowser, "no-browser", false, "Do not automatically open browser")
+	flag.BoolVar(&noBanner, "no-banner", false, "Do not display the startup banner")
 	flag.BoolVar(&showVersion, "version", false, "Print version information and exit")
 	flag.BoolVar(&showVersion, "v", false, "Print version information and exit (shorthand)")
 	flag.Parse()
@@ -118,6 +122,20 @@ func main() {
 	srv := server.NewServer(addr, port, cliGraph)
 
 	serverURL := fmt.Sprintf("http://%s:%d", addr, port)
+
+	if !noBanner {
+		var summary *core.Summary
+		if cliGraph != nil {
+			summary = &cliGraph.Summary
+		}
+		_ = banner.Print(os.Stdout, banner.Config{
+			Version:   version,
+			ServerURL: serverURL,
+			PlanPath:  planPath,
+			DirPath:   dirPath,
+			Summary:   summary,
+		})
+	}
 
 	if !noBrowser {
 		go func() {

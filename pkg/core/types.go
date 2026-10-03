@@ -93,6 +93,9 @@ type PlanSummary struct {
 	Read    int `json:"read"`
 }
 
+// Summary is an alias for PlanSummary to support domain naming.
+type Summary = PlanSummary
+
 // Graph contains the full DAG visualization payload.
 type Graph struct {
 	Nodes   []Node      `json:"nodes"`

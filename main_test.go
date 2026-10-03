@@ -40,3 +40,24 @@ func TestVersionLongFlag(t *testing.T) {
 		t.Fatalf("Expected output %q, got %q", expected, strings.TrimSpace(stdout.String()))
 	}
 }
+
+func TestHelpFlag(t *testing.T) {
+	cmd := exec.Command("go", "run", "main.go", "--help")
+	var output bytes.Buffer
+	cmd.Stdout = &output
+	cmd.Stderr = &output
+
+	// Flag package returns exit code 2 on --help / -h
+	_ = cmd.Run()
+
+	out := output.String()
+	if !strings.Contains(out, "-no-banner") {
+		t.Errorf("Expected --help output to contain -no-banner flag documentation, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Do not display the startup banner") {
+		t.Errorf("Expected --help output to contain banner description, got:\n%s", out)
+	}
+	if !strings.Contains(out, "-version") {
+		t.Errorf("Expected --help output to contain -version, got:\n%s", out)
+	}
+}

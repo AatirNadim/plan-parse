@@ -23,6 +23,7 @@ build-ui:
 build: build-ui
 	@echo "Building plan-parse Go binary ($(VERSION))..."
 	CGO_ENABLED=$(CGO_ENABLED) go build -ldflags="$(LDFLAGS)" -o plan-parse main.go
+	@echo "Build complete. Output binary: plan-parse"
 
 test:
 	@echo "Running all tests..."

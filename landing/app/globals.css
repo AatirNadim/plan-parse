@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+html.dark {
+  color-scheme: dark;
+  --canvas-bg: #090a0f;
+  --header-bg: #0c0e14;
+  --panel-bg: #0f121a;
+  --border-color: #232936;
+
+  /* RGB channels for Tailwind alpha support */
+  --workbench-bg: 9 10 15;        /* #090a0f */
+  --workbench-header: 12 14 20;   /* #0c0e14 */
+  --workbench-panel: 15 18 26;    /* #0f121a */
+  --workbench-subpanel: 22 27 38; /* #161b26 */
+  --workbench-card: 15 18 26;     /* #0f121a */
+  --workbench-border: 35 41 54;   /* #232936 */
+  --workbench-hover: 28 34 48;    /* #1c2230 */
+  --workbench-active: 37 45 61;   /* #252d3d */
+  --workbench-muted: 113 125 150; /* #717d96 */
+}
+
+html.light {
+  color-scheme: light;
+  --canvas-bg: #f8fafc;
+  --header-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --border-color: #e2e8f0;
+
+  /* RGB channels for Tailwind alpha support */
+  --workbench-bg: 248 250 252;     /* #f8fafc */
+  --workbench-header: 255 255 255; /* #ffffff */
+  --workbench-panel: 255 255 255;  /* #ffffff */
+  --workbench-subpanel: 241 245 249; /* #f1f5f9 */
+  --workbench-card: 255 255 255;   /* #ffffff */
+  --workbench-border: 226 232 240; /* #e2e8f0 */
+  --workbench-hover: 241 245 249;  /* #f1f5f9 */
+  --workbench-active: 226 232 240; /* #e2e8f0 */
+  --workbench-muted: 100 116 139;  /* #64748b */
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  color: #e2e8f0;
+  background-color: #090a0f;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html.light body {
+  color: #0f172a;
+  background-color: #f8fafc;
+}
+
+/* Precision Engineering Grid Canvas */
+.canvas-bg {
+  background-color: #090a0f;
+  background-image: radial-gradient(circle, #1e2638 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html.light .canvas-bg {
+  background-color: #f8fafc;
+  background-image: radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* Workbench Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #232936 #0c0e14;
+}
+
+html.light * {
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #232936;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #323b4e;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Selection */
+::selection {
+  background-color: #0ea5e9;
+  color: #ffffff;
+}
+
+/* Interactive SVG Callout Styles */
+.callout-pin {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+}
+
+.callout-pin:hover,
+.callout-pin.is-active {
+  transform: scale(1.15);
+  transform-origin: center;
+}

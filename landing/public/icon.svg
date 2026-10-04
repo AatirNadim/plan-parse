@@ -1,84 +1,173 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Rounded Square Squircle Canvas (Solid Workbench Obsidian - No Gradient Slop) -->
-  <rect width="512" height="512" rx="112" fill="#090A0F"/>
-  <rect x="6" y="6" width="500" height="500" rx="106" stroke="#232936" stroke-width="2"/>
+  <defs>
+    <style>
+      :root {
+        --logo-bg: #090A0F;
+        --logo-border: #232936;
+        --logo-gutter-bg: #0F121A;
+        --logo-gutter-border: #232936;
+        --logo-gutter-rule: #232936;
+        --logo-track-border: #3B4861;
+        --logo-track-casing: #1F2638;
+        --logo-chord: #94A3B8;
+        --logo-node-bg: #0C0E14;
+        --logo-node-halo-opacity: 0.25;
+
+        --logo-token-indigo: #6366F1;
+        --logo-token-sky: #38BDF8;
+        --logo-token-slate-1: #94A3B8;
+        --logo-token-slate-2: #717D96;
+        --logo-token-slate-3: #475569;
+        --logo-token-emerald: #10B981;
+        --logo-token-mint: #34D399;
+        --logo-token-amber: #F59E0B;
+        --logo-token-fuchsia: #D946EF;
+        --logo-token-dark-slate: #334155;
+
+        --logo-tube-blue: #38BDF8;
+        --logo-tube-green: #34D399;
+        --logo-tube-yellow: #FBBF24;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --logo-bg: #F0F5FA;
+          --logo-border: #CBD5E1;
+          --logo-gutter-bg: #FFFFFF;
+          --logo-gutter-border: #CBD5E1;
+          --logo-gutter-rule: #CBD5E1;
+          --logo-track-border: #94A3B8;
+          --logo-track-casing: #E2E8F0;
+          --logo-chord: #64748B;
+          --logo-node-bg: #FFFFFF;
+          --logo-node-halo-opacity: 0.15;
+
+          --logo-token-indigo: #4F46E5;
+          --logo-token-sky: #0284C7;
+          --logo-token-slate-1: #64748B;
+          --logo-token-slate-2: #64748B;
+          --logo-token-slate-3: #94A3B8;
+          --logo-token-emerald: #059669;
+          --logo-token-mint: #10B981;
+          --logo-token-amber: #D97706;
+          --logo-token-fuchsia: #C026D3;
+          --logo-token-dark-slate: #94A3B8;
+
+          --logo-tube-blue: #0284C7;
+          --logo-tube-green: #059669;
+          --logo-tube-yellow: #D97706;
+        }
+      }
+      .logo-bg { fill: var(--logo-bg, #090A0F); }
+      .logo-border { stroke: var(--logo-border, #232936); }
+      .logo-gutter-bg { fill: var(--logo-gutter-bg, #0F121A); }
+      .logo-gutter-border { stroke: var(--logo-gutter-border, #232936); }
+      .logo-gutter-rule { stroke: var(--logo-gutter-rule, #232936); }
+      .logo-track-border { stroke: var(--logo-track-border, #3B4861); }
+      .logo-track-casing { stroke: var(--logo-track-casing, #1F2638); }
+      .logo-chord { stroke: var(--logo-chord, #94A3B8); }
+      .logo-node-bg { fill: var(--logo-node-bg, #0C0E14); }
+      .logo-node-halo { fill-opacity: var(--logo-node-halo-opacity, 0.25); }
+      .logo-token-indigo { fill: var(--logo-token-indigo, #6366F1); }
+      .logo-token-sky { fill: var(--logo-token-sky, #38BDF8); }
+      .logo-token-slate-1 { fill: var(--logo-token-slate-1, #94A3B8); }
+      .logo-token-slate-2 { fill: var(--logo-token-slate-2, #717D96); }
+      .logo-token-slate-3 { fill: var(--logo-token-slate-3, #475569); }
+      .logo-token-emerald { fill: var(--logo-token-emerald, #10B981); }
+      .logo-token-mint { fill: var(--logo-token-mint, #34D399); }
+      .logo-token-amber { fill: var(--logo-token-amber, #F59E0B); }
+      .logo-token-fuchsia { fill: var(--logo-token-fuchsia, #D946EF); }
+      .logo-token-dark-slate { fill: var(--logo-token-dark-slate, #334155); }
+      .logo-tube-blue { stroke: var(--logo-tube-blue, #38BDF8); }
+      .logo-tube-green { stroke: var(--logo-tube-green, #34D399); }
+      .logo-tube-yellow { stroke: var(--logo-tube-yellow, #FBBF24); }
+      .logo-badge-blue-stroke { stroke: var(--logo-tube-blue, #38BDF8); }
+      .logo-badge-blue-fill { fill: var(--logo-tube-blue, #38BDF8); }
+      .logo-badge-green-stroke { stroke: var(--logo-tube-green, #34D399); }
+      .logo-badge-green-fill { fill: var(--logo-tube-green, #34D399); }
+      .logo-badge-yellow-stroke { stroke: var(--logo-tube-yellow, #FBBF24); }
+      .logo-badge-yellow-fill { fill: var(--logo-tube-yellow, #FBBF24); }
+    </style>
+  </defs>
+
+  <!-- Rounded Square Squircle Canvas -->
+  <rect width="512" height="512" rx="112" class="logo-bg" fill="#090A0F"/>
+  <rect x="6" y="6" width="500" height="500" rx="106" class="logo-border" stroke="#232936" stroke-width="2"/>
 
   <!-- Left: Wide Code Gutter Column (Workbench Panel Style) -->
-  <rect x="100" y="96" width="116" height="320" rx="20" fill="#0F121A" stroke="#232936" stroke-width="2"/>
+  <rect x="100" y="96" width="116" height="320" rx="20" class="logo-gutter-bg logo-gutter-border" fill="#0F121A" stroke="#232936" stroke-width="2"/>
 
   <!-- Editor Gutter Margin / Rule Line -->
-  <line x1="122" y1="112" x2="122" y2="400" stroke="#232936" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="122" y1="112" x2="122" y2="400" class="logo-gutter-rule" stroke="#232936" stroke-width="1.5" stroke-dasharray="3 3"/>
 
   <!-- Syntax-Highlighted Horizontal Code Tubes (Terraform HCL AST) -->
   <!-- Block 1: Resource keyword + name (Module Indigo & Sky tokens) -->
-  <rect x="132" y="122" width="68" height="14" rx="7" fill="#6366F1"/>
-  <rect x="144" y="146" width="52" height="12" rx="6" fill="#38BDF8"/>
-  <rect x="144" y="168" width="60" height="12" rx="6" fill="#94A3B8" opacity="0.8"/>
-  <rect x="144" y="190" width="38" height="12" rx="6" fill="#717D96" opacity="0.6"/>
-  <rect x="132" y="212" width="22" height="12" rx="6" fill="#475569" opacity="0.7"/>
+  <rect x="132" y="122" width="68" height="14" rx="7" class="logo-token-indigo" fill="#6366F1"/>
+  <rect x="144" y="146" width="52" height="12" rx="6" class="logo-token-sky" fill="#38BDF8"/>
+  <rect x="144" y="168" width="60" height="12" rx="6" class="logo-token-slate-1" fill="#94A3B8" opacity="0.8"/>
+  <rect x="144" y="190" width="38" height="12" rx="6" class="logo-token-slate-2" fill="#717D96" opacity="0.6"/>
+  <rect x="132" y="212" width="22" height="12" rx="6" class="logo-token-slate-3" fill="#475569" opacity="0.7"/>
 
   <!-- Block 2: Plan Diff Block (Added Emerald & Changed Amber tokens) -->
-  <rect x="132" y="244" width="64" height="14" rx="7" fill="#10B981"/>
-  <rect x="144" y="268" width="56" height="12" rx="6" fill="#34D399" opacity="0.9"/>
-  <rect x="144" y="290" width="44" height="12" rx="6" fill="#F59E0B" opacity="0.9"/>
-  <rect x="132" y="312" width="24" height="12" rx="6" fill="#475569" opacity="0.7"/>
+  <rect x="132" y="244" width="64" height="14" rx="7" class="logo-token-emerald" fill="#10B981"/>
+  <rect x="144" y="268" width="56" height="12" rx="6" class="logo-token-mint" fill="#34D399" opacity="0.9"/>
+  <rect x="144" y="290" width="44" height="12" rx="6" class="logo-token-amber" fill="#F59E0B" opacity="0.9"/>
+  <rect x="132" y="312" width="24" height="12" rx="6" class="logo-token-slate-3" fill="#475569" opacity="0.7"/>
 
   <!-- Block 3: Stem Descender / Execution Output (Fuchsia & Slate) -->
-  <rect x="132" y="344" width="60" height="14" rx="7" fill="#D946EF" opacity="0.85"/>
-  <rect x="144" y="368" width="48" height="12" rx="6" fill="#717D96" opacity="0.6"/>
-  <rect x="132" y="390" width="26" height="10" rx="5" fill="#334155" opacity="0.5"/>
+  <rect x="132" y="344" width="60" height="14" rx="7" class="logo-token-fuchsia" fill="#D946EF" opacity="0.85"/>
+  <rect x="144" y="368" width="48" height="12" rx="6" class="logo-token-slate-2" fill="#717D96" opacity="0.6"/>
+  <rect x="132" y="390" width="26" height="10" rx="5" class="logo-token-dark-slate" fill="#334155" opacity="0.5"/>
 
   <!-- Right: Perfect Semicircular Half-Tube Track (The Parsed DAG) -->
   <!-- Track Outer Border Outline (Crisp Geometry) -->
   <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
-        stroke="#3B4861" stroke-width="50" stroke-linecap="round" stroke-linejoin="round"/>
+        class="logo-track-border" stroke="#3B4861" stroke-width="50" stroke-linecap="round" stroke-linejoin="round"/>
   <!-- Track Outer Casing (Workbench Subpanel Slate) -->
   <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
-        stroke="#1F2638" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+        class="logo-track-casing" stroke="#1F2638" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Abrupt Color Transitions on Conduit Core (No Gradients, High-Visibility Vivid Tones) -->
+  <!-- Conduit Core (Vivid Action Phasing) -->
   <!-- 1. BLUE Segment: From Gutter entry (216, 148) around upper curve to cut point (361.8, 186.0) -->
   <path d="M 216 148 H 296 A 76 76 0 0 1 361.8 186.0" 
-        stroke="#38BDF8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        class="logo-tube-blue" stroke="#38BDF8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- 2. GREEN Segment: Abrupt transition at (361.8, 186.0), wrapping apex to (361.8, 262.0) -->
   <path d="M 361.8 186.0 A 76 76 0 0 1 361.8 262.0" 
-        stroke="#34D399" stroke-width="12" stroke-linecap="butt"/>
+        class="logo-tube-green" stroke="#34D399" stroke-width="12" stroke-linecap="butt"/>
 
   <!-- 3. YELLOW Segment: Abrupt transition at (361.8, 262.0), lower curve to gutter return (216, 300) -->
   <path d="M 361.8 262.0 A 76 76 0 0 1 296 300 H 216" 
-        stroke="#FBBF24" stroke-width="12" stroke-linecap="butt" stroke-linejoin="round"/>
+        class="logo-tube-yellow" stroke="#FBBF24" stroke-width="12" stroke-linecap="butt" stroke-linejoin="round"/>
 
   <!-- Internal DAG Dependency Chord (Cross-edge connecting Root to Exit) -->
-  <path d="M 252 148 L 336 270" stroke="#94A3B8" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.8"/>
+  <path d="M 252 148 L 336 270" class="logo-chord" stroke="#94A3B8" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.8"/>
 
-  <!-- DAG Action Nodes on the Half-Tube (Crisp Flat Badges - No Fuzzy Glow Slop) -->
+  <!-- DAG Action Nodes on the Half-Tube -->
 
   <!-- Node 1: UPDATE Node (Upper Blue Arm at x=252, y=148) -->
   <g transform="translate(252, 148)">
-    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#38BDF8" stroke-width="3"/>
-    <circle cx="0" cy="0" r="13" fill="#38BDF8" fill-opacity="0.25"/>
+    <circle cx="0" cy="0" r="19" class="logo-node-bg logo-badge-blue-stroke" fill="#0C0E14" stroke="#38BDF8" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" class="logo-badge-blue-fill logo-node-halo" fill="#38BDF8" fill-opacity="0.25"/>
     <!-- Update Symbol (~) -->
-    <path d="M-6 0C-4 -3 -2 -3 0 0C2 3 4 3 6 0" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M-6 0C-4 -3 -2 -3 0 0C2 3 4 3 6 0" class="logo-badge-blue-stroke" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 
   <!-- Node 2: CREATE Node (Apex Green Crest of Half-Tube Arc at x=372, y=224) -->
   <g transform="translate(372, 224)">
-    <circle cx="0" cy="0" r="22" fill="#0C0E14" stroke="#34D399" stroke-width="3.5"/>
-    <circle cx="0" cy="0" r="15" fill="#34D399" fill-opacity="0.25"/>
+    <circle cx="0" cy="0" r="22" class="logo-node-bg logo-badge-green-stroke" fill="#0C0E14" stroke="#34D399" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="15" class="logo-badge-green-fill logo-node-halo" fill="#34D399" fill-opacity="0.25"/>
     <!-- Create Symbol (+) -->
-    <path d="M-7 0H7M0 -7V7" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-7 0H7M0 -7V7" class="logo-badge-green-stroke" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
   </g>
 
   <!-- Node 3: REPLACE Node (Lower Yellow Return Arm at x=268, y=300) -->
   <g transform="translate(268, 300)">
-    <circle cx="0" cy="0" r="19" fill="#0C0E14" stroke="#FBBF24" stroke-width="3"/>
-    <circle cx="0" cy="0" r="13" fill="#FBBF24" fill-opacity="0.25"/>
+    <circle cx="0" cy="0" r="19" class="logo-node-bg logo-badge-yellow-stroke" fill="#0C0E14" stroke="#FBBF24" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" class="logo-badge-yellow-fill logo-node-halo" fill="#FBBF24" fill-opacity="0.25"/>
     <!-- Replace Symbol (±) -->
-    <path d="M-5 -2H5M0 -7V3M-5 6H5" stroke="#FBBF24" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M-5 -2H5M0 -7V3M-5 6H5" class="logo-badge-yellow-stroke" stroke="#FBBF24" stroke-width="2.2" stroke-linecap="round"/>
   </g>
 
   <!-- Return Flow Indicator into Gutter -->
-  <path d="M 228 294 L 218 300 L 228 306" stroke="#FBBF24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 228 294 L 218 300 L 228 306" class="logo-badge-yellow-stroke" stroke="#FBBF24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-

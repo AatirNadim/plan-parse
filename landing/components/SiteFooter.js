@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "./BrandLogo";
 import { FEATURES } from "../lib/features-data";
 
 export default function SiteFooter() {
@@ -9,7 +10,7 @@ export default function SiteFooter() {
           {/* Brand info */}
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
-              <img src="/icon.svg" alt="plan-parse icon" className="w-5 h-5" />
+              <BrandLogo className="w-5 h-5 rounded shrink-0" />
               <span className="font-mono font-bold tracking-tight text-slate-900 dark:text-slate-200">
                 PLAN-PARSE
               </span>

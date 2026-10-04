@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
+import BrandLogo from "./BrandLogo";
 import { FEATURES } from "../lib/features-data";
 import GithubIcon from "./icons/github";
 import DockerIcon from "./icons/docker";
@@ -28,6 +29,7 @@ export default function SiteHeader() {
         {/* Brand */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2.5 group">
+            <BrandLogo className="w-6 h-6 rounded-md shadow-xs transition-transform group-hover:scale-105" />
             <span className="font-bold font-mono tracking-tight text-base sm:text-lg text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
               plan-parse
             </span>

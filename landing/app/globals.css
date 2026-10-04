@@ -20,6 +20,33 @@ html.dark {
   --workbench-hover: 28 34 48;    /* #1c2230 */
   --workbench-active: 37 45 61;   /* #252d3d */
   --workbench-muted: 113 125 150; /* #717d96 */
+
+  /* Adaptive Brand Logo Variables - Dark Mode (Obsidian & Vivid Tones) */
+  --logo-bg: #090A0F;
+  --logo-border: #232936;
+  --logo-gutter-bg: #0F121A;
+  --logo-gutter-border: #232936;
+  --logo-gutter-rule: #232936;
+  --logo-track-border: #3B4861;
+  --logo-track-casing: #1F2638;
+  --logo-chord: #94A3B8;
+  --logo-node-bg: #0C0E14;
+  --logo-node-halo-opacity: 0.25;
+
+  --logo-token-indigo: #6366F1;
+  --logo-token-sky: #38BDF8;
+  --logo-token-slate-1: #94A3B8;
+  --logo-token-slate-2: #717D96;
+  --logo-token-slate-3: #475569;
+  --logo-token-emerald: #10B981;
+  --logo-token-mint: #34D399;
+  --logo-token-amber: #F59E0B;
+  --logo-token-fuchsia: #D946EF;
+  --logo-token-dark-slate: #334155;
+
+  --logo-tube-blue: #38BDF8;
+  --logo-tube-green: #34D399;
+  --logo-tube-yellow: #FBBF24;
 }
 
 html.light {
@@ -39,6 +66,33 @@ html.light {
   --workbench-hover: 226 236 246;     /* #e2ecf6 */
   --workbench-active: 213 227 240;    /* #d5e3f0 */
   --workbench-muted: 100 120 145;     /* #647891 */
+
+  /* Adaptive Brand Logo Variables - Light Mode (Crisp Blueprint/Slate & Punchy Accents) */
+  --logo-bg: #F0F5FA;
+  --logo-border: #CBD5E1;
+  --logo-gutter-bg: #FFFFFF;
+  --logo-gutter-border: #CBD5E1;
+  --logo-gutter-rule: #CBD5E1;
+  --logo-track-border: #94A3B8;
+  --logo-track-casing: #E2E8F0;
+  --logo-chord: #64748B;
+  --logo-node-bg: #FFFFFF;
+  --logo-node-halo-opacity: 0.15;
+
+  --logo-token-indigo: #4F46E5;
+  --logo-token-sky: #0284C7;
+  --logo-token-slate-1: #64748B;
+  --logo-token-slate-2: #64748B;
+  --logo-token-slate-3: #94A3B8;
+  --logo-token-emerald: #059669;
+  --logo-token-mint: #10B981;
+  --logo-token-amber: #D97706;
+  --logo-token-fuchsia: #C026D3;
+  --logo-token-dark-slate: #94A3B8;
+
+  --logo-tube-blue: #0284C7;
+  --logo-tube-green: #059669;
+  --logo-tube-yellow: #D97706;
 }
 
 html,
@@ -234,3 +288,50 @@ html.light ::-webkit-scrollbar-thumb:hover {
   fill: #090a0f !important;
   font-weight: 800 !important;
 }
+
+/* Adaptive Brand Logo SVG Transitions and Theme Styles */
+.brand-logo-svg {
+  transition: transform 0.25s ease;
+}
+
+.brand-logo-svg path,
+.brand-logo-svg rect,
+.brand-logo-svg circle,
+.brand-logo-svg line {
+  transition: fill 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              fill-opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-bg { fill: var(--logo-bg); }
+.logo-border { stroke: var(--logo-border); }
+.logo-gutter-bg { fill: var(--logo-gutter-bg); }
+.logo-gutter-border { stroke: var(--logo-gutter-border); }
+.logo-gutter-rule { stroke: var(--logo-gutter-rule); }
+.logo-track-border { stroke: var(--logo-track-border); }
+.logo-track-casing { stroke: var(--logo-track-casing); }
+.logo-chord { stroke: var(--logo-chord); }
+.logo-node-bg { fill: var(--logo-node-bg); }
+.logo-node-halo { fill-opacity: var(--logo-node-halo-opacity); }
+.logo-token-indigo { fill: var(--logo-token-indigo); }
+.logo-token-sky { fill: var(--logo-token-sky); }
+.logo-token-slate-1 { fill: var(--logo-token-slate-1); }
+.logo-token-slate-2 { fill: var(--logo-token-slate-2); }
+.logo-token-slate-3 { fill: var(--logo-token-slate-3); }
+.logo-token-emerald { fill: var(--logo-token-emerald); }
+.logo-token-mint { fill: var(--logo-token-mint); }
+.logo-token-amber { fill: var(--logo-token-amber); }
+.logo-token-fuchsia { fill: var(--logo-token-fuchsia); }
+.logo-token-dark-slate { fill: var(--logo-token-dark-slate); }
+.logo-tube-blue { stroke: var(--logo-tube-blue); }
+.logo-tube-green { stroke: var(--logo-tube-green); }
+.logo-tube-yellow { stroke: var(--logo-tube-yellow); }
+.logo-badge-blue-stroke { stroke: var(--logo-tube-blue); }
+.logo-badge-blue-fill { fill: var(--logo-tube-blue); }
+.logo-badge-green-stroke { stroke: var(--logo-tube-green); }
+.logo-badge-green-fill { fill: var(--logo-tube-green); }
+.logo-badge-yellow-stroke { stroke: var(--logo-tube-yellow); }
+.logo-badge-yellow-fill { fill: var(--logo-tube-yellow); }
+

@@ -1,0 +1,83 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded Square Squircle Canvas (Light Mode Blueprint/Slate) -->
+  <rect width="512" height="512" rx="112" fill="#F0F5FA"/>
+  <rect x="6" y="6" width="500" height="500" rx="106" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Left: Wide Code Gutter Column (Light Mode Clean Editor Panel) -->
+  <rect x="100" y="96" width="116" height="320" rx="20" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Editor Gutter Margin / Rule Line -->
+  <line x1="122" y1="112" x2="122" y2="400" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Syntax-Highlighted Horizontal Code Tubes (Terraform HCL AST) -->
+  <!-- Block 1: Resource keyword + name (Module Indigo & Sky tokens) -->
+  <rect x="132" y="122" width="68" height="14" rx="7" fill="#4F46E5"/>
+  <rect x="144" y="146" width="52" height="12" rx="6" fill="#0284C7"/>
+  <rect x="144" y="168" width="60" height="12" rx="6" fill="#64748B" opacity="0.85"/>
+  <rect x="144" y="190" width="38" height="12" rx="6" fill="#64748B" opacity="0.6"/>
+  <rect x="132" y="212" width="22" height="12" rx="6" fill="#94A3B8" opacity="0.7"/>
+
+  <!-- Block 2: Plan Diff Block (Added Emerald & Changed Amber tokens) -->
+  <rect x="132" y="244" width="64" height="14" rx="7" fill="#059669"/>
+  <rect x="144" y="268" width="56" height="12" rx="6" fill="#10B981" opacity="0.9"/>
+  <rect x="144" y="290" width="44" height="12" rx="6" fill="#D97706" opacity="0.9"/>
+  <rect x="132" y="312" width="24" height="12" rx="6" fill="#94A3B8" opacity="0.7"/>
+
+  <!-- Block 3: Stem Descender / Execution Output (Fuchsia & Slate) -->
+  <rect x="132" y="344" width="60" height="14" rx="7" fill="#C026D3" opacity="0.85"/>
+  <rect x="144" y="368" width="48" height="12" rx="6" fill="#64748B" opacity="0.6"/>
+  <rect x="132" y="390" width="26" height="10" rx="5" fill="#94A3B8" opacity="0.6"/>
+
+  <!-- Right: Perfect Semicircular Half-Tube Track (The Parsed DAG) -->
+  <!-- Track Outer Border Outline (Crisp Geometry) -->
+  <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
+        stroke="#94A3B8" stroke-width="50" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Track Outer Casing (Workbench Subpanel Recessed Channel) -->
+  <path d="M 210 148 H 296 A 76 76 0 0 1 296 300 H 210" 
+        stroke="#E2E8F0" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Abrupt Color Transitions on Conduit Core -->
+  <!-- 1. BLUE Segment: From Gutter entry (216, 148) around upper curve to cut point (361.8, 186.0) -->
+  <path d="M 216 148 H 296 A 76 76 0 0 1 361.8 186.0" 
+        stroke="#0284C7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 2. GREEN Segment: Abrupt transition at (361.8, 186.0), wrapping apex to (361.8, 262.0) -->
+  <path d="M 361.8 186.0 A 76 76 0 0 1 361.8 262.0" 
+        stroke="#059669" stroke-width="12" stroke-linecap="butt"/>
+
+  <!-- 3. YELLOW Segment: Abrupt transition at (361.8, 262.0), lower curve to gutter return (216, 300) -->
+  <path d="M 361.8 262.0 A 76 76 0 0 1 296 300 H 216" 
+        stroke="#D97706" stroke-width="12" stroke-linecap="butt" stroke-linejoin="round"/>
+
+  <!-- Internal DAG Dependency Chord (Cross-edge connecting Root to Exit) -->
+  <path d="M 252 148 L 336 270" stroke="#64748B" stroke-width="2.5" stroke-dasharray="5 5" opacity="0.8"/>
+
+  <!-- DAG Action Nodes on the Half-Tube -->
+
+  <!-- Node 1: UPDATE Node (Upper Blue Arm at x=252, y=148) -->
+  <g transform="translate(252, 148)">
+    <circle cx="0" cy="0" r="19" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" fill="#0284C7" fill-opacity="0.15"/>
+    <!-- Update Symbol (~) -->
+    <path d="M-6 0C-4 -3 -2 -3 0 0C2 3 4 3 6 0" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Node 2: CREATE Node (Apex Green Crest of Half-Tube Arc at x=372, y=224) -->
+  <g transform="translate(372, 224)">
+    <circle cx="0" cy="0" r="22" fill="#FFFFFF" stroke="#059669" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="15" fill="#059669" fill-opacity="0.15"/>
+    <!-- Create Symbol (+) -->
+    <path d="M-7 0H7M0 -7V7" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Node 3: REPLACE Node (Lower Yellow Return Arm at x=268, y=300) -->
+  <g transform="translate(268, 300)">
+    <circle cx="0" cy="0" r="19" fill="#FFFFFF" stroke="#D97706" stroke-width="3"/>
+    <circle cx="0" cy="0" r="13" fill="#D97706" fill-opacity="0.15"/>
+    <!-- Replace Symbol (±) -->
+    <path d="M-5 -2H5M0 -7V3M-5 6H5" stroke="#D97706" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Return Flow Indicator into Gutter -->
+  <path d="M 228 294 L 218 300 L 228 306" stroke="#D97706" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

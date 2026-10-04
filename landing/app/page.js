@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CodeBlock from "../components/CodeBlock";
+import BrandLogo from "../components/BrandLogo";
 import { FEATURES } from "../lib/features-data";
 
 export default function HomePage() {
@@ -19,14 +20,8 @@ export default function HomePage() {
             {/* Ambient lighting wash tailored to icon tones */}
             <div className="absolute -inset-2 bg-gradient-to-br from-sky-500/20 via-indigo-500/15 to-emerald-500/15 rounded-3xl blur-xl opacity-60 dark:opacity-30 group-hover:opacity-90 dark:group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" />
 
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 rounded-2xl sm:rounded-3xl bg-[#090A0F] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:ring-1 light:ring-slate-900/5 light:shadow-xl shadow-2xl p-2.5 sm:p-3.5 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.02] group-hover:border-sky-500/40">
-              <img
-                src="/icon.svg"
-                alt="plan-parse: Code Gutter to Dependency DAG Engine"
-                className="w-full h-full object-contain select-none"
-                width={176}
-                height={176}
-              />
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 rounded-2xl sm:rounded-3xl bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F0F5FA] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:ring-1 light:ring-slate-900/5 light:shadow-xl shadow-2xl p-2.5 sm:p-3.5 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.02] group-hover:border-sky-500/40">
+              <BrandLogo className="w-full h-full" />
             </div>
             {/* Visual caption under icon */}
             <div className="mt-2.5 hidden sm:flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 light:text-slate-600">

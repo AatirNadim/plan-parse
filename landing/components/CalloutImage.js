@@ -72,19 +72,19 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
   return (
     <div className="rounded-xl border border-workbench-border bg-workbench-panel overflow-hidden shadow-xl my-8">
       {/* Visual Window Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-workbench-border bg-[#0b0e16] dark:bg-[#0b0e16] light:bg-[#f1f5f9] text-xs">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-workbench-border bg-workbench-subpanel text-xs">
         <div className="flex items-center space-x-2">
           <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
-          <span className="ml-2 font-mono text-[11px] text-slate-300 dark:text-slate-300 light:text-slate-700 font-medium">
+          <span className="ml-2 font-mono text-[11px] text-slate-700 dark:text-slate-300 font-medium">
             {title} — Interactive Diagram
           </span>
         </div>
-        <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-400">
+        <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-500 dark:text-slate-400">
           <span>16:9 Wide Vector</span>
           <span>•</span>
-          <span className="text-sky-400">Bidirectional Pin Sync Active</span>
+          <span className="text-sky-500 dark:text-sky-400">Bidirectional Pin Sync Active</span>
         </div>
       </div>
 
@@ -110,8 +110,8 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
       </div>
 
       {/* Synchronized Callout Legend / Badges */}
-      <div className="p-4 sm:p-6 border-t border-workbench-border bg-[#0e121a] dark:bg-[#0e121a] light:bg-[#ffffff]">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-3 font-semibold">
+      <div className="p-4 sm:p-6 border-t border-workbench-border bg-workbench-panel">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 font-semibold">
           Annotated Architectural Callouts (Hover card or pin to highlight)
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -126,7 +126,7 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
                 className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer ${
                   isHighlighted
                     ? "border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500/30"
-                    : "border-workbench-border/80 bg-workbench-panel/50 hover:bg-workbench-hover/80 hover:border-slate-600"
+                    : "border-workbench-border/80 bg-workbench-subpanel/50 hover:bg-workbench-hover/80 hover:border-slate-400 dark:hover:border-slate-600"
                 }`}
               >
                 <div className="flex items-start space-x-3">
@@ -140,10 +140,10 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
                     {item.pin}
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-slate-200 dark:text-slate-200 light:text-slate-800">
+                    <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                       {item.title}
                     </h4>
-                    <p className="text-[11px] text-slate-400 light:text-slate-600 mt-0.5 leading-relaxed">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                       {item.description}
                     </p>
                   </div>

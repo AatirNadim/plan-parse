@@ -858,13 +858,13 @@ export default function Home() {
                 <span className="text-sky-600 dark:text-sky-400 font-medium">
                   {currentBlastRadius?.stats?.directCount || 0} direct
                 </span>
-                <span className="text-slate-400">•</span>
+                <span className="text-slate-400 dark:text-slate-500">•</span>
                 <span className="text-purple-600 dark:text-purple-400 font-medium">
                   {currentBlastRadius?.stats?.transitiveCount || 0} transitive
                 </span>
                 {currentBlastRadius?.stats?.mutatingCount > 0 && (
                   <>
-                    <span className="text-slate-400">•</span>
+                    <span className="text-slate-400 dark:text-slate-500">•</span>
                     <span className="text-rose-600 dark:text-rose-400 font-semibold">
                       {currentBlastRadius.stats.mutatingCount} mutating
                     </span>
@@ -885,13 +885,13 @@ export default function Home() {
                 title="Toggle Blast Radius Subgraph Isolation (B)"
               >
                 <span>{isBlastIsolated ? "Exit Isolation" : "Isolate Subgraph"}</span>
-                <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-500">B</kbd>
+                <kbd className="px-1 text-[9px] bg-workbench-panel rounded border border-workbench-border text-slate-600 dark:text-slate-400">B</kbd>
               </button>
 
               {/* Depth & Mutation Filter Controls when Isolated */}
               {isBlastIsolated && (
                 <div className="flex items-center gap-1 pl-1.5 border-l border-workbench-border shrink-0">
-                  <span className="text-[10px] text-slate-400 mr-0.5">Depth:</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 mr-0.5 font-medium">Depth:</span>
                   {["all", 1, 2].map((depth) => (
                     <button
                       key={depth}
@@ -950,7 +950,7 @@ export default function Home() {
               <span className="text-sky-600 dark:text-sky-400 font-medium">
                 {displayNodeCount} resources
               </span>
-              <span className="text-slate-400">•</span>
+              <span className="text-slate-400 dark:text-slate-500">•</span>
               <span className="text-slate-600 dark:text-slate-300 font-medium">
                 {displayEdgeCount} dependencies
               </span>
@@ -1011,7 +1011,7 @@ export default function Home() {
                   </p>
 
                   <div className="p-3 bg-workbench-header border border-workbench-border rounded text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
-                    <div className="text-slate-500 dark:text-slate-500 font-semibold text-[10px] uppercase">Export Command:</div>
+                    <div className="text-slate-600 dark:text-slate-400 font-semibold text-[10px] uppercase">Export Command:</div>
                     <div className="text-sky-600 dark:text-sky-400 select-all font-mono">
                       terraform show -json tfplan &gt; plan.json
                     </div>

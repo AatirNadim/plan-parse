@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className="min-h-screen bg-workbench-bg text-slate-200 dark:text-slate-200 light:text-slate-800 font-sans antialiased transition-colors duration-150 flex flex-col">
+      <body className="min-h-screen bg-workbench-bg text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-150 flex flex-col">
         <ThemeProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

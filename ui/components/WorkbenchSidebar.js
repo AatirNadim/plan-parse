@@ -429,7 +429,7 @@ function WorkbenchSidebar({
               className={`p-1 rounded border text-[10px] font-mono transition cursor-pointer ${
                 groupByModule
                   ? "bg-workbench-subpanel text-slate-700 dark:text-slate-300 border-workbench-border"
-                  : "text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300"
+                  : "text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300"
               }`}
             >
               MOD
@@ -439,7 +439,7 @@ function WorkbenchSidebar({
           {/* Hierarchical Resource Tree */}
           <div className="flex-1 overflow-y-auto p-1.5 space-y-2.5 custom-scrollbar">
             {filteredResources.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
+              <div className="p-6 text-center text-xs text-slate-500 dark:text-slate-400 font-mono">
                 {totalCount === 0 && totalEntities === 0 ? "No plan loaded" : "No matching resources"}
               </div>
             ) : (
@@ -474,7 +474,7 @@ function WorkbenchSidebar({
                             {copiedModule === groupName ? "Copied!" : "-target"}
                           </button>
                         )}
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{items.length}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{items.length}</span>
                       </div>
                     </div>
                   )}
@@ -605,7 +605,7 @@ function WorkbenchSidebar({
                 <div className="text-xs font-mono text-slate-700 dark:text-slate-200">
                   {selectedFile ? selectedFile.name : "Drop plan.json here or click to browse"}
                 </div>
-                <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                   {selectedFile ? formatBytes(selectedFile.size) : "JSON output of 'terraform show -json'"}
                 </div>
               </div>

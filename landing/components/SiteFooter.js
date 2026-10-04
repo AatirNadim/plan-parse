@@ -10,17 +10,17 @@ export default function SiteFooter() {
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <img src="/icon.svg" alt="plan-parse icon" className="w-5 h-5" />
-              <span className="font-mono font-semibold tracking-tight text-slate-900 dark:text-slate-200">
+              <span className="font-mono font-bold tracking-tight text-slate-900 dark:text-slate-200">
                 PLAN-PARSE
               </span>
-              <span className="px-1.5 py-0.2 text-[10px] font-mono rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+              <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 font-bold light:shadow-xs">
                 v1.0.0
               </span>
             </div>
-            <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed max-w-sm">
+            <p className="text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium text-xs leading-relaxed max-w-sm">
               Visual Infrastructure Assurance for Terraform & OpenTofu. Transforming dense JSON execution plans into interactive, hierarchical DAGs with blast radius isolation.
             </p>
-            <div className="pt-2 flex items-center space-x-3 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+            <div className="pt-2 flex items-center space-x-3 text-[11px] font-mono text-slate-500 dark:text-slate-400 light:text-slate-600 light:font-medium">
               <span className="inline-flex items-center space-x-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>Zero Telemetry</span>
@@ -34,15 +34,15 @@ export default function SiteFooter() {
 
           {/* Features Navigation */}
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-700 dark:text-slate-300 font-semibold">
+            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-900 dark:text-slate-300 font-bold">
               Deep-Dive Chapters
             </div>
-            <ul className="space-y-1.5">
+            <ul className="space-y-1.5 light:font-medium">
               {FEATURES.slice(0, 4).map((f) => (
                 <li key={f.id}>
                   <Link
                     href={`/features/${f.slug}/`}
-                    className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+                    className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors"
                   >
                     {f.navTitle}
                   </Link>
@@ -53,22 +53,22 @@ export default function SiteFooter() {
 
           {/* Features Navigation Part 2 */}
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-700 dark:text-slate-300 font-semibold">
+            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-900 dark:text-slate-300 font-bold">
               More Chapters
             </div>
-            <ul className="space-y-1.5">
+            <ul className="space-y-1.5 light:font-medium">
               {FEATURES.slice(4).map((f) => (
                 <li key={f.id}>
                   <Link
                     href={`/features/${f.slug}/`}
-                    className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+                    className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors"
                   >
                     {f.navTitle}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/#workflow" className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors">
+                <Link href="/#workflow" className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors">
                   Workflow Guide
                 </Link>
               </li>
@@ -77,16 +77,16 @@ export default function SiteFooter() {
 
           {/* Resources & Distribution */}
           <div className="space-y-2">
-            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-700 dark:text-slate-300 font-semibold">
+            <div className="font-mono text-[11px] uppercase tracking-wider text-slate-900 dark:text-slate-300 font-bold">
               Distribution & Links
             </div>
-            <ul className="space-y-1.5">
+            <ul className="space-y-1.5 light:font-medium">
               <li>
                 <a
                   href="https://github.com/AatirNadim/plan-parse/releases"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors flex items-center space-x-1"
+                  className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors flex items-center space-x-1"
                 >
                   <span>GitHub Releases (Binaries)</span>
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,7 +99,7 @@ export default function SiteFooter() {
                   href="https://hub.docker.com/r/aatir0docking/plan-parse"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors flex items-center space-x-1"
+                  className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors flex items-center space-x-1"
                 >
                   <span>Docker Hub Image</span>
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,7 +112,7 @@ export default function SiteFooter() {
                   href="https://github.com/AatirNadim/plan-parse"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors flex items-center space-x-1"
+                  className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors flex items-center space-x-1"
                 >
                   <span>GitHub Repository</span>
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,7 +125,7 @@ export default function SiteFooter() {
                   href="https://github.com/AatirNadim/plan-parse/blob/main/LICENSE"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+                  className="hover:text-sky-500 dark:hover:text-sky-400 light:text-slate-700 hover:light:text-slate-950 transition-colors"
                 >
                   MIT License
                 </a>
@@ -134,7 +134,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-workbench-border flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-8 pt-6 border-t border-workbench-border flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 light:text-slate-600 light:font-medium">
           <div>
             Designed for Terraform & OpenTofu engineers.
           </div>

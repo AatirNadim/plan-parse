@@ -55,11 +55,11 @@
       --panel-bg: #f8fbfe;
       --subpanel-bg: #ebf2f9;
       --card-bg: #f8fbfe;
-      --border-color: #d1dfea;
+      --border-color: #cbd8e6;
       --hover-bg: #e2ecf6;
-      --muted-color: #647891;
-      --text-main: #0f172a;
-      --text-muted: #647891;
+      --muted-color: #475569;
+      --text-main: #090d16;
+      --text-muted: #334155;
       --dot-color: #94a3b8;
       --code-bg: #020617;
       --code-border: #1e293b;
@@ -198,6 +198,30 @@
     }
     #themeToggleBtn:hover {
       background-color: var(--hover-bg) !important;
+    }
+
+    /* Light Theme Typography Bolder Weights & Crisp Text Shadows */
+    html.light body {
+      font-weight: 500;
+    }
+
+    html.light h1 {
+      font-weight: 800 !important;
+      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+
+    html.light h2,
+    html.light h3 {
+      font-weight: 700 !important;
+      text-shadow: 0 1px 1px rgba(15, 23, 42, 0.10);
+    }
+
+    html.light .endpoint-card {
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    }
+
+    html.light .btn-primary {
+      box-shadow: 0 2px 4px 0 rgba(2, 132, 199, 0.25);
     }
   </style>
 </head>

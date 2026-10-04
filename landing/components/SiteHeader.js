@@ -28,14 +28,14 @@ export default function SiteHeader() {
         {/* Brand */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="w-8 h-8 rounded-md bg-[#0f121a] border border-workbench-border flex items-center justify-center p-1 group-hover:border-sky-500/50 transition-colors">
+            <div className="w-8 h-8 rounded-md bg-[#0f121a] border border-workbench-border flex items-center justify-center p-1 group-hover:border-sky-500/50 transition-colors shadow-sm light:shadow-sm">
               <img src="/icon.svg" alt="plan-parse icon" className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono font-semibold tracking-tight text-sm text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
+              <span className="font-bold font-mono tracking-tight text-sm text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
                 PLAN-PARSE
               </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+              <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 font-bold light:shadow-xs">
                 v1.0.0
               </span>
             </div>
@@ -43,13 +43,13 @@ export default function SiteHeader() {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-xs font-medium text-slate-600 dark:text-slate-300">
+        <nav className="hidden md:flex items-center space-x-6 text-xs font-medium light:font-semibold text-slate-700 dark:text-slate-300 light:text-slate-800">
           {/* Features Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               type="button"
-              className="flex items-center space-x-1.5 py-1.5 px-2 rounded hover:text-slate-900 dark:hover:text-slate-100 hover:bg-workbench-hover transition-colors"
+              className="flex items-center space-x-1.5 py-1.5 px-2 rounded hover:text-slate-950 dark:hover:text-slate-100 hover:bg-workbench-hover transition-colors font-medium light:font-semibold"
             >
               <span>Features</span>
               <svg
@@ -65,8 +65,8 @@ export default function SiteHeader() {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute top-full left-0 mt-1.5 w-80 rounded-lg border border-workbench-border bg-workbench-panel p-2 shadow-2xl backdrop-blur-xl z-50">
-                <div className="px-2 py-1.5 mb-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-workbench-border">
+              <div className="absolute top-full left-0 mt-1.5 w-80 rounded-lg border border-workbench-border bg-workbench-panel p-2 shadow-2xl light:shadow-xl light:border-slate-300/80 backdrop-blur-xl z-50">
+                <div className="px-2 py-1.5 mb-1 text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 light:text-slate-700 font-bold border-b border-workbench-border">
                   Core Architectural Features
                 </div>
                 <div className="space-y-1">
@@ -78,14 +78,14 @@ export default function SiteHeader() {
                       className="group flex items-start justify-between p-2 rounded hover:bg-workbench-hover transition-colors"
                     >
                       <div>
-                        <div className="text-xs font-medium text-slate-800 dark:text-slate-200 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
+                        <div className="text-xs font-semibold text-slate-900 dark:text-slate-200 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
                           {feature.navTitle}
                         </div>
-                        <div className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-1">
+                        <div className="text-[11px] text-slate-600 dark:text-slate-400 light:text-slate-700 light:font-medium line-clamp-1">
                           {feature.tagline}
                         </div>
                       </div>
-                      <span className="ml-2 px-1.5 py-0.5 text-[9px] font-mono rounded bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50">
+                      <span className="ml-2 px-1.5 py-0.5 text-[9px] font-mono rounded bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-400 light:text-slate-900 font-bold border border-slate-200 dark:border-slate-700/50">
                         {feature.hotkey}
                       </span>
                     </Link>
@@ -95,19 +95,19 @@ export default function SiteHeader() {
             )}
           </div>
 
-          <Link href="/#the-problem" className="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+          <Link href="/#the-problem" className="hover:text-slate-950 dark:hover:text-slate-100 transition-colors">
             The Problem
           </Link>
-          <Link href="/#accomplishments" className="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+          <Link href="/#accomplishments" className="hover:text-slate-950 dark:hover:text-slate-100 transition-colors">
             Accomplishments
           </Link>
-          <Link href="/#workflow" className="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+          <Link href="/#workflow" className="hover:text-slate-950 dark:hover:text-slate-100 transition-colors">
             Workflow Guide
           </Link>
-          <Link href="/#releases" className="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+          <Link href="/#releases" className="hover:text-slate-950 dark:hover:text-slate-100 transition-colors">
             Releases
           </Link>
-          <Link href="/#docker" className="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+          <Link href="/#docker" className="hover:text-slate-950 dark:hover:text-slate-100 transition-colors">
             Docker
           </Link>
         </nav>
@@ -121,7 +121,7 @@ export default function SiteHeader() {
             target="_blank"
             rel="noopener noreferrer"
             title="Docker Hub Image"
-            className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-mono transition-colors"
+            className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-mono font-medium light:font-bold light:text-slate-900 shadow-sm light:shadow-xs transition-colors"
           >
             <DockerIcon className="w-3.5 h-3.5" />
             <span>Docker</span>
@@ -131,7 +131,7 @@ export default function SiteHeader() {
             href="https://github.com/AatirNadim/plan-parse"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition-colors"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-medium light:font-bold light:text-slate-900 shadow-sm light:shadow-xs transition-colors"
           >
             <GithubIcon />
             <span className="hidden sm:inline">GitHub</span>

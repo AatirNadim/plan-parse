@@ -13,6 +13,7 @@ import (
 type StatusResponse struct {
 	CLILoaded bool `json:"cli_loaded"`
 	Disabled  bool `json:"disabled"`
+	Collapsed bool `json:"collapsed"`
 }
 
 // HealthResponse represents the response payload for GET /api/health.
@@ -44,12 +45,14 @@ func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 		resp = StatusResponse{
 			CLILoaded: true,
 			Disabled:  true,
+			Collapsed: s.collapsed,
 		}
 		s.statusServedOnce = true
 	} else {
 		resp = StatusResponse{
 			CLILoaded: false,
 			Disabled:  false,
+			Collapsed: s.collapsed,
 		}
 	}
 

@@ -60,6 +60,10 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 				i++ // skip next token since consumed
 
 				if _, exists := nodeMap[currentMod]; !exists {
+					classes := "module"
+					if parentMod != rootID {
+						classes = "module nested-module"
+					}
 					addNode(Node{
 						Data: NodeData{
 							ID:          currentMod,
@@ -68,7 +72,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 							Parent:      parentMod,
 							ParentColor: ColorModule,
 						},
-						Classes: "module",
+						Classes: classes,
 					})
 				}
 				parentMod = currentMod
@@ -90,6 +94,14 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 		}
 
 		if _, exists := nodeMap[fileID]; !exists {
+			classes := "fname"
+			if strings.EqualFold(fileName, "main.tf") {
+				if parentModule != "" {
+					classes = "fname main-file module-main-file"
+				} else {
+					classes = "fname main-file"
+				}
+			}
 			addNode(Node{
 				Data: NodeData{
 					ID:          fileID,
@@ -98,7 +110,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 					Parent:      parentModID,
 					ParentColor: ColorModule,
 				},
-				Classes: "fname",
+				Classes: classes,
 			})
 		}
 		return fileID
@@ -684,6 +696,36 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 	if p.plan.Config != nil && p.plan.Config.RootModule != nil {
 		scanConfigModule("", p.plan.Config.RootModule)
 		traverseConfigModule("", p.plan.Config.RootModule)
+	}
+
+	// Identify modules that contain child modules (nested modules) and/or main.tf files
+	childrenByParent := make(map[string][]Node, len(nodeMap))
+	for _, n := range nodeMap {
+		if n.Data.Parent != "" {
+			childrenByParent[n.Data.Parent] = append(childrenByParent[n.Data.Parent], n)
+		}
+	}
+
+	for id, modNode := range nodeMap {
+		if modNode.Data.Type != ResourceTypeModule {
+			continue
+		}
+		hasNestedModule := false
+		hasMainTF := false
+		for _, child := range childrenByParent[modNode.Data.ID] {
+			if child.Data.Type == ResourceTypeModule {
+				hasNestedModule = true
+			}
+			if child.Data.Type == ResourceTypeFile && strings.EqualFold(child.Data.Label, "main.tf") {
+				hasMainTF = true
+			}
+		}
+		if hasNestedModule && hasMainTF {
+			modNode.Classes = strings.TrimSpace(modNode.Classes + " has-nested composite-module")
+		} else if hasNestedModule {
+			modNode.Classes = strings.TrimSpace(modNode.Classes + " has-nested")
+		}
+		nodeMap[id] = modNode
 	}
 
 	// Convert maps to ordered slices

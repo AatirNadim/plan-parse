@@ -9,6 +9,7 @@ import CommandPalette from "../components/CommandPalette";
 import KeyboardShortcutsModal from "../components/KeyboardShortcutsModal";
 import NodePopover from "../components/NodePopover";
 import NodeDiffModal from "../components/NodeDiffModal";
+import CollapsedToast from "../components/CollapsedToast";
 import { getCytoscapeStyles } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
@@ -32,7 +33,9 @@ export default function Home() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [cliOptionCollapsed, setCliOptionCollapsed] = useState(true);
+  const [isToastDismissed, setIsToastDismissed] = useState(false);
   const [diffModalNode, setDiffModalNode] = useState(null);
   const [popoverState, setPopoverState] = useState(null); // { node, position: { x, y } }
 
@@ -41,6 +44,10 @@ export default function Home() {
   const [blastIsolatedNodeId, setBlastIsolatedNodeId] = useState(null);
   const [blastDepthFilter, setBlastDepthFilter] = useState("all"); // 'all' | 1 | 2
   const [blastMutatingOnly, setBlastMutatingOnly] = useState(false);
+
+  // Workbench loading & layout computation progress states
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLayoutComputing, setIsLayoutComputing] = useState(false);
 
   // Compute collapsed graph representation with transitive edge bridging
   const collapsedGraph = useMemo(() => {
@@ -79,6 +86,7 @@ export default function Home() {
   }, [isBlastIsolated, selectedNode]);
 
   const handleToggleCollapse = useCallback(() => {
+    setIsToastDismissed(true);
     setIsCollapsed((prev) => !prev);
   }, []);
 
@@ -124,13 +132,23 @@ export default function Home() {
     };
   }, []);
 
-  // Initialize status and initial graph from Go server on mount
+  // Initialize status and initial graph from Go server concurrently on mount
   useEffect(() => {
     async function init() {
       try {
-        const statusRes = await fetch("/api/status");
+        const [statusRes, graphRes] = await Promise.all([
+          fetch("/api/status").catch((err) => {
+            console.warn("Failed to fetch /api/status:", err);
+            return null;
+          }),
+          fetch("/api/graph").catch((err) => {
+            console.warn("Failed to fetch /api/graph:", err);
+            return null;
+          }),
+        ]);
+
         let isCli = false;
-        if (statusRes.ok) {
+        if (statusRes && statusRes.ok) {
           const status = await statusRes.json();
           isCli = Boolean(status.cli_loaded);
           setCliLoaded(isCli);
@@ -138,10 +156,13 @@ export default function Home() {
           if (isCli) {
             setPlanName("CLI Session Plan");
           }
+          if (typeof status.collapsed === "boolean") {
+            setIsCollapsed(status.collapsed);
+            setCliOptionCollapsed(status.collapsed);
+          }
         }
 
-        const graphRes = await fetch("/api/graph");
-        if (graphRes.ok) {
+        if (graphRes && graphRes.ok) {
           const graph = await graphRes.json();
           if (graph && graph.nodes && graph.nodes.length > 0) {
             setGraphData(graph);
@@ -156,6 +177,8 @@ export default function Home() {
         }
       } catch (err) {
         console.error("Failed to initialize plan-parse:", err);
+      } finally {
+        setIsInitialLoading(false);
       }
     }
 
@@ -391,6 +414,7 @@ export default function Home() {
     // If node is not on canvas because graph is collapsed, expand first and queue smooth navigation
     if ((!node || node.length === 0) && isCollapsed) {
       pendingNavigateNodeIdRef.current = nodeId;
+      setIsToastDismissed(true);
       setIsCollapsed(false);
       return;
     }
@@ -652,6 +676,7 @@ export default function Home() {
       // Run Klay DAG layout with breadthfirst fallback
       const runLayout = () => {
         if (!cy || cy.destroyed()) return;
+        setIsLayoutComputing(true);
         try {
           const layout = cy.layout({
             name: "klay",
@@ -666,6 +691,7 @@ export default function Home() {
             },
           });
           layout.one("layoutstop", () => {
+            setIsLayoutComputing(false);
             if (!cy.destroyed()) {
               if (pendingNavigateNodeIdRef.current) {
                 const targetId = pendingNavigateNodeIdRef.current;
@@ -689,6 +715,7 @@ export default function Home() {
           console.warn("Klay layout error, falling back to breadthfirst:", e);
           const bf = cy.layout({ name: "breadthfirst", directed: true, padding: 50 });
           bf.one("layoutstop", () => {
+            setIsLayoutComputing(false);
             if (!cy.destroyed()) {
               if (pendingNavigateNodeIdRef.current) {
                 const targetId = pendingNavigateNodeIdRef.current;
@@ -727,15 +754,17 @@ export default function Home() {
       cyRef.current = cy;
     } catch (err) {
       console.error("Error setting up Cytoscape:", err);
+      setIsLayoutComputing(false);
     }
 
     return () => {
+      setIsLayoutComputing(false);
       if (cyRef.current) {
         cyRef.current.destroy();
         cyRef.current = null;
       }
     };
-  }, [activeGraphData, cyReady, selectAndFocusNode, theme]);
+  }, [activeGraphData, cyReady, selectAndFocusNode]);
 
   const handlePlanParsed = useCallback((newGraph, fileName) => {
     setGraphData(newGraph);
@@ -744,11 +773,11 @@ export default function Home() {
     setSelectedNode(null);
     setDiffModalNode(null);
     setPopoverState(null);
-    setIsCollapsed(false);
+    setIsCollapsed(cliOptionCollapsed);
     if (fileName) {
       setPlanName(fileName);
     }
-  }, []);
+  }, [cliOptionCollapsed]);
 
   const handleOpenUpload = useCallback(() => {
     setIsSidebarOpen(true);
@@ -911,41 +940,107 @@ export default function Home() {
             />
           )}
 
+          {/* Floating DAG Layout Computing HUD */}
+          {hasGraph && isLayoutComputing && (
+            <div className="absolute top-3 right-3 z-20 flex items-center gap-2 p-1.5 px-3 rounded-md border border-workbench-border bg-workbench-panel/95 backdrop-blur-md shadow-lg shadow-black/20 text-xs font-mono select-none pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-150">
+              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shrink-0" />
+              <span className="font-semibold text-slate-800 dark:text-slate-100">
+                Computing Layout:
+              </span>
+              <span className="text-sky-600 dark:text-sky-400 font-medium">
+                {displayNodeCount} resources
+              </span>
+              <span className="text-slate-400">•</span>
+              <span className="text-slate-600 dark:text-slate-300 font-medium">
+                {displayEdgeCount} dependencies
+              </span>
+            </div>
+          )}
+
           {/* Empty Workbench State (Professional CLI drop target, zero AI clichés) */}
           {!hasGraph && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none">
-              <div className="w-full max-w-md bg-workbench-panel border border-workbench-border rounded p-6 shadow-2xl pointer-events-auto space-y-4 font-mono">
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 border-b border-workbench-border pb-3">
-                  <img
-                    src="/icon.svg"
-                    alt="Plan Parse"
-                    className="w-5 h-5 rounded shrink-0 select-none"
-                    width={20}
-                    height={20}
-                  />
-                  <span className="font-semibold text-slate-900 dark:text-slate-200">Terraform Plan Workbench</span>
-                </div>
+              {isInitialLoading ? (
+                <div className="w-full max-w-md bg-workbench-panel border border-workbench-border rounded p-6 shadow-2xl pointer-events-auto space-y-4 font-mono animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between border-b border-workbench-border pb-3">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <img
+                        src="/icon.svg"
+                        alt="Plan Parse"
+                        className="w-5 h-5 rounded shrink-0 select-none"
+                        width={20}
+                        height={20}
+                      />
+                      <span className="font-semibold text-slate-900 dark:text-slate-200">Terraform Plan Workbench</span>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      CONNECTING
+                    </span>
+                  </div>
 
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  No execution plan loaded in active session. Ingest a Terraform plan JSON to compute and render the dependency DAG.
-                </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Connecting to plan-parse engine and fetching session execution graph...
+                  </p>
 
-                <div className="p-3 bg-workbench-header border border-workbench-border rounded text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
-                  <div className="text-slate-500 dark:text-slate-500 font-semibold text-[10px] uppercase">Export Command:</div>
-                  <div className="text-sky-600 dark:text-sky-400 select-all font-mono">
-                    terraform show -json tfplan &gt; plan.json
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                      <span>Querying /api/status &amp; /api/graph</span>
+                      <span className="text-sky-600 dark:text-sky-400 font-medium animate-pulse">Syncing...</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-workbench-header border border-workbench-border rounded overflow-hidden relative">
+                      <div className="animate-workbench-slide bg-sky-500 rounded" />
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <div className="w-full max-w-md bg-workbench-panel border border-workbench-border rounded p-6 shadow-2xl pointer-events-auto space-y-4 font-mono">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 border-b border-workbench-border pb-3">
+                    <img
+                      src="/icon.svg"
+                      alt="Plan Parse"
+                      className="w-5 h-5 rounded shrink-0 select-none"
+                      width={20}
+                      height={20}
+                    />
+                    <span className="font-semibold text-slate-900 dark:text-slate-200">Terraform Plan Workbench</span>
+                  </div>
 
-                <button
-                  onClick={handleOpenUpload}
-                  className="w-full py-2 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white text-xs font-mono font-semibold transition cursor-pointer"
-                >
-                  Load Plan JSON File
-                </button>
-              </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    No execution plan loaded in active session. Ingest a Terraform plan JSON to compute and render the dependency DAG.
+                  </p>
+
+                  <div className="p-3 bg-workbench-header border border-workbench-border rounded text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
+                    <div className="text-slate-500 dark:text-slate-500 font-semibold text-[10px] uppercase">Export Command:</div>
+                    <div className="text-sky-600 dark:text-sky-400 select-all font-mono">
+                      terraform show -json tfplan &gt; plan.json
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleOpenUpload}
+                    title="This simply opens the sidebar to upload the plan file"
+                    className="w-full py-2 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white text-xs font-mono font-semibold transition cursor-pointer"
+                  >
+                    Load Plan JSON File
+                  </button>
+                </div>
+              )}
             </div>
           )}
+
+          {/* Collapsed State Notification Toast:
+              the graph is collapsed by default, you can toggle it here
+              and you can pass the cli option collapsed as false */}
+          <CollapsedToast
+            cliOptionCollapsed={cliOptionCollapsed}
+            isCollapsed={isCollapsed}
+            hasGraph={hasGraph}
+            isDismissed={isToastDismissed}
+            planName={planName}
+            onToggleCollapse={handleToggleCollapse}
+            onDismiss={() => setIsToastDismissed(true)}
+          />
         </main>
 
         {/* Docked Right Inspector Panel */}

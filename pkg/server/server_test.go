@@ -82,6 +82,9 @@ func TestStatusAndGraphWithoutCLI(t *testing.T) {
 	if statusResp.CLILoaded || statusResp.Disabled {
 		t.Errorf("expected cli_loaded: false, disabled: false, got: %+v", statusResp)
 	}
+	if !statusResp.Collapsed {
+		t.Errorf("expected collapsed: true by default, got: %+v", statusResp)
+	}
 
 	// Graph
 	graphReq := httptest.NewRequest(http.MethodGet, "/api/graph", nil)
@@ -102,11 +105,105 @@ func TestStatusAndGraphWithoutCLI(t *testing.T) {
 	}
 }
 
+func TestServerCollapsedDefaultAndConfiguration(t *testing.T) {
+	// 1. Default collapsed is true
+	srv := server.NewServer("127.0.0.1", 9000, nil)
+	if !srv.Collapsed() {
+		t.Errorf("expected srv.Collapsed() to be true by default")
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/api/status", nil)
+	w := httptest.NewRecorder()
+	srv.ServeHTTP(w, req)
+
+	var resp server.StatusResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode status: %v", err)
+	}
+	if !resp.Collapsed {
+		t.Errorf("expected status.collapsed to be true by default, got %v", resp.Collapsed)
+	}
+
+	// 2. SetCollapsed(false)
+	srv.SetCollapsed(false)
+	if srv.Collapsed() {
+		t.Errorf("expected srv.Collapsed() to be false after SetCollapsed(false)")
+	}
+
+	req2 := httptest.NewRequest(http.MethodGet, "/api/status", nil)
+	w2 := httptest.NewRecorder()
+	srv.ServeHTTP(w2, req2)
+
+	var resp2 server.StatusResponse
+	if err := json.Unmarshal(w2.Body.Bytes(), &resp2); err != nil {
+		t.Fatalf("failed to decode status: %v", err)
+	}
+	if resp2.Collapsed {
+		t.Errorf("expected status.collapsed to be false, got %v", resp2.Collapsed)
+	}
+
+	// 3. SetCollapsed(true)
+	srv.SetCollapsed(true)
+	if !srv.Collapsed() {
+		t.Errorf("expected srv.Collapsed() to be true after SetCollapsed(true)")
+	}
+
+	req3 := httptest.NewRequest(http.MethodGet, "/api/status", nil)
+	w3 := httptest.NewRecorder()
+	srv.ServeHTTP(w3, req3)
+
+	var resp3 server.StatusResponse
+	if err := json.Unmarshal(w3.Body.Bytes(), &resp3); err != nil {
+		t.Fatalf("failed to decode status: %v", err)
+	}
+	if !resp3.Collapsed {
+		t.Errorf("expected status.collapsed to be true, got %v", resp3.Collapsed)
+	}
+}
+
+func TestServerCollapsedWithCLISession(t *testing.T) {
+	cliGraph := loadSampleGraph(t)
+	srv := server.NewServer("127.0.0.1", 9000, cliGraph)
+	srv.SetCollapsed(false)
+
+	// First request with CLI plan
+	req := httptest.NewRequest(http.MethodGet, "/api/status", nil)
+	w := httptest.NewRecorder()
+	srv.ServeHTTP(w, req)
+
+	var resp server.StatusResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode status: %v", err)
+	}
+	if !resp.CLILoaded || !resp.Disabled {
+		t.Errorf("expected cli_loaded: true, disabled: true, got %+v", resp)
+	}
+	if resp.Collapsed {
+		t.Errorf("expected collapsed: false when set to false, got %v", resp.Collapsed)
+	}
+
+	// Subsequent reload request
+	req2 := httptest.NewRequest(http.MethodGet, "/api/status", nil)
+	w2 := httptest.NewRecorder()
+	srv.ServeHTTP(w2, req2)
+
+	var resp2 server.StatusResponse
+	if err := json.Unmarshal(w2.Body.Bytes(), &resp2); err != nil {
+		t.Fatalf("failed to decode status: %v", err)
+	}
+	if resp2.CLILoaded || resp2.Disabled {
+		t.Errorf("expected cli_loaded: false, disabled: false on reload, got %+v", resp2)
+	}
+	if resp2.Collapsed {
+		t.Errorf("expected collapsed: false on reload, got %v", resp2.Collapsed)
+	}
+}
+
 func TestSingleUseCLILifecycle(t *testing.T) {
 	cliGraph := loadSampleGraph(t)
 	srv := server.NewServer("127.0.0.1", 9000, cliGraph)
 
-	// 1. First load: status should indicate CLI loaded and disabled
+	// 1. First load: status should indicate CLI loaded, disabled, and collapsed: true
 	req1 := httptest.NewRequest(http.MethodGet, "/api/status", nil)
 	w1 := httptest.NewRecorder()
 	srv.ServeHTTP(w1, req1)
@@ -115,8 +212,8 @@ func TestSingleUseCLILifecycle(t *testing.T) {
 	if err := json.Unmarshal(w1.Body.Bytes(), &status1); err != nil {
 		t.Fatalf("failed to decode status: %v", err)
 	}
-	if !status1.CLILoaded || !status1.Disabled {
-		t.Errorf("first status: expected cli_loaded: true, disabled: true, got: %+v", status1)
+	if !status1.CLILoaded || !status1.Disabled || !status1.Collapsed {
+		t.Errorf("first status: expected cli_loaded: true, disabled: true, collapsed: true, got: %+v", status1)
 	}
 
 	// 2. First load: graph returns CLI plan data
@@ -144,8 +241,8 @@ func TestSingleUseCLILifecycle(t *testing.T) {
 	if err := json.Unmarshal(w2.Body.Bytes(), &status2); err != nil {
 		t.Fatalf("failed to decode status on reload: %v", err)
 	}
-	if status2.CLILoaded || status2.Disabled {
-		t.Errorf("reload status: expected cli_loaded: false, disabled: false, got: %+v", status2)
+	if status2.CLILoaded || status2.Disabled || !status2.Collapsed {
+		t.Errorf("reload status: expected cli_loaded: false, disabled: false, collapsed: true, got: %+v", status2)
 	}
 
 	// 4. Reload: graph should return empty graph
@@ -201,8 +298,8 @@ func TestDirectGraphConsumptionLifecycle(t *testing.T) {
 	if err := json.Unmarshal(statusW.Body.Bytes(), &status); err != nil {
 		t.Fatalf("failed to decode status: %v", err)
 	}
-	if status.CLILoaded || status.Disabled {
-		t.Errorf("expected cli_loaded: false, disabled: false after graph consumption, got: %+v", status)
+	if status.CLILoaded || status.Disabled || !status.Collapsed {
+		t.Errorf("expected cli_loaded: false, disabled: false, collapsed: true after graph consumption, got: %+v", status)
 	}
 }
 

@@ -252,3 +252,27 @@ html.light .custom-scrollbar {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
+/* Precision Workbench Indeterminate Loader Animation */
+@keyframes workbench-slide {
+  0% {
+    left: -35%;
+    width: 35%;
+  }
+  50% {
+    left: 30%;
+    width: 45%;
+  }
+  100% {
+    left: 100%;
+    width: 35%;
+  }
+}
+
+.animate-workbench-slide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  animation: workbench-slide 1.4s ease-in-out infinite;
+}
+
+

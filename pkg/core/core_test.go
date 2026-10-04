@@ -579,6 +579,203 @@ func TestEmptyWorkingDirFallback(t *testing.T) {
 	}
 }
 
+func TestModuleAndFileBoundaryClasses(t *testing.T) {
+	plan := &tfjson.Plan{
+		FormatVersion:    "1.2",
+		TerraformVersion: "1.5.0",
+		ResourceChanges: []*tfjson.ResourceChange{
+			{
+				Address:       "aws_s3_bucket.root",
+				ModuleAddress: "",
+				Mode:          "managed",
+				Type:          "aws_s3_bucket",
+				Name:          "root",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.parent.aws_instance.parent_res",
+				ModuleAddress: "module.parent",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "parent_res",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.parent.module.child.aws_instance.child_res",
+				ModuleAddress: "module.parent.module.child",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "child_res",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.standalone.aws_instance.solo_res",
+				ModuleAddress: "module.standalone",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "solo_res",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.nested_only.aws_instance.res",
+				ModuleAddress: "module.nested_only",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "res",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+			{
+				Address:       "module.nested_only.module.sub.aws_instance.sub_res",
+				ModuleAddress: "module.nested_only.module.sub",
+				Mode:          "managed",
+				Type:          "aws_instance",
+				Name:          "sub_res",
+				Change: &tfjson.Change{
+					Actions: []tfjson.Action{tfjson.ActionCreate},
+				},
+			},
+		},
+	}
+
+	configs := map[string]*tfconfig.Module{
+		"": {
+			Path: ".",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_s3_bucket.root": {
+					Type: "aws_s3_bucket",
+					Name: "root",
+					Pos:  tfconfig.SourcePos{Filename: "main.tf", Line: 1},
+				},
+			},
+		},
+		"parent": {
+			Path: "modules/parent",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_instance.parent_res": {
+					Type: "aws_instance",
+					Name: "parent_res",
+					Pos:  tfconfig.SourcePos{Filename: "main.tf", Line: 10},
+				},
+			},
+		},
+		"parent.child": {
+			Path: "modules/parent/child",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_instance.child_res": {
+					Type: "aws_instance",
+					Name: "child_res",
+					Pos:  tfconfig.SourcePos{Filename: "child.tf", Line: 5},
+				},
+			},
+		},
+		"standalone": {
+			Path: "modules/standalone",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_instance.solo_res": {
+					Type: "aws_instance",
+					Name: "solo_res",
+					Pos:  tfconfig.SourcePos{Filename: "solo.tf", Line: 3},
+				},
+			},
+		},
+		"nested_only": {
+			Path: "modules/nested_only",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_instance.res": {
+					Type: "aws_instance",
+					Name: "res",
+					Pos:  tfconfig.SourcePos{Filename: "other.tf", Line: 4},
+				},
+			},
+		},
+		"nested_only.sub": {
+			Path: "modules/nested_only/sub",
+			ManagedResources: map[string]*tfconfig.Resource{
+				"aws_instance.sub_res": {
+					Type: "aws_instance",
+					Name: "sub_res",
+					Pos:  tfconfig.SourcePos{Filename: "sub.tf", Line: 6},
+				},
+			},
+		},
+	}
+
+	parser := core.NewParserWithConfigs(plan, configs, "")
+	graph, err := parser.GenerateGraph()
+	if err != nil {
+		t.Fatalf("GenerateGraph failed: %v", err)
+	}
+
+	nodeMap := make(map[string]core.Node)
+	for _, n := range graph.Nodes {
+		nodeMap[n.Data.ID] = n
+	}
+
+	// 1. Top-level standalone module has "module" class
+	standaloneMod, ok := nodeMap["module.standalone"]
+	if !ok {
+		t.Fatal("expected module.standalone node in graph")
+	}
+	if standaloneMod.Classes != "module" {
+		t.Errorf("expected module.standalone classes 'module', got %q", standaloneMod.Classes)
+	}
+
+	// 2. Nested module has "nested-module" class
+	childMod, ok := nodeMap["module.parent.module.child"]
+	if !ok {
+		t.Fatal("expected module.parent.module.child node in graph")
+	}
+	if childMod.Classes != "module nested-module" {
+		t.Errorf("expected child module classes 'module nested-module', got %q", childMod.Classes)
+	}
+
+	// 3. Composite module with nested module & main.tf has "has-nested composite-module" classes
+	parentMod, ok := nodeMap["module.parent"]
+	if !ok {
+		t.Fatal("expected module.parent node in graph")
+	}
+	if parentMod.Classes != "module has-nested composite-module" {
+		t.Errorf("expected composite module classes 'module has-nested composite-module', got %q", parentMod.Classes)
+	}
+
+	// 4. Module with nested module but without main.tf has "has-nested" class
+	nestedOnlyMod, ok := nodeMap["module.nested_only"]
+	if !ok {
+		t.Fatal("expected module.nested_only node in graph")
+	}
+	if nestedOnlyMod.Classes != "module has-nested" {
+		t.Errorf("expected nested_only module classes 'module has-nested', got %q", nestedOnlyMod.Classes)
+	}
+
+	// 5. Module main.tf has "fname main-file module-main-file" classes
+	modMainTF, ok := nodeMap["module.parent/main.tf"]
+	if !ok {
+		t.Fatal("expected module.parent/main.tf node in graph")
+	}
+	if modMainTF.Classes != "fname main-file module-main-file" {
+		t.Errorf("expected module main.tf classes 'fname main-file module-main-file', got %q", modMainTF.Classes)
+	}
+
+	// 6. Root main.tf has "fname main-file" classes
+	rootMainTF, ok := nodeMap["main.tf"]
+	if !ok {
+		t.Fatal("expected main.tf node in graph")
+	}
+	if rootMainTF.Classes != "fname main-file" {
+		t.Errorf("expected root main.tf classes 'fname main-file', got %q", rootMainTF.Classes)
+	}
+}
+
 func TestExportPlanGraphFixture(t *testing.T) {
 	plan, err := core.ValidatePlanFile(getSamplePlanPath())
 	if err != nil {

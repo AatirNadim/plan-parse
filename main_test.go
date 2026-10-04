@@ -178,3 +178,82 @@ func TestPositionalPlanArg_NonExistentFile(t *testing.T) {
 		t.Errorf("expected output to mention plan validation failure or no such file, got: %s", out)
 	}
 }
+
+// func TestAzurePositionalPlanArg(t *testing.T) {
+// 	cmd := exec.Command("go", "run", "main.go", "-no-browser", "-no-banner", "-port=0", "-collapsed=false", "./testdata-azure/tf_plan.json")
+// 	stderrPipe, err := cmd.StderrPipe()
+// 	if err != nil {
+// 		t.Fatalf("failed to create stderr pipe: %v", err)
+// 	}
+
+// 	if err := cmd.Start(); err != nil {
+// 		t.Fatalf("failed to start plan-parse with Azure plan arg: %v", err)
+// 	}
+// 	defer func() {
+// 		if cmd.Process != nil {
+// 			_ = cmd.Process.Kill()
+// 			_ = cmd.Wait()
+// 		}
+// 	}()
+
+// 	scanner := bufio.NewScanner(stderrPipe)
+// 	loaded := false
+// 	validating := false
+// 	for scanner.Scan() {
+// 		line := scanner.Text()
+// 		if strings.Contains(line, "Validating plan file") && strings.Contains(line, "tf_plan.json") {
+// 			validating = true
+// 		}
+// 		if strings.Contains(line, "Successfully loaded plan: 52 resources") {
+// 			loaded = true
+// 			break
+// 		}
+// 	}
+
+// 	if !validating {
+// 		t.Errorf("expected stderr to contain 'Validating plan file', but it did not")
+// 	}
+// 	if !loaded {
+// 		t.Errorf("expected stderr to contain 'Successfully loaded plan: 52 resources', but it did not")
+// 	}
+// }
+
+// func TestAzurePlanFlag(t *testing.T) {
+// 	cmd := exec.Command("go", "run", "main.go", "-no-browser", "-no-banner", "-port=0", "-plan", "./testdata-azure/tf_plan.json")
+// 	stderrPipe, err := cmd.StderrPipe()
+// 	if err != nil {
+// 		t.Fatalf("failed to create stderr pipe: %v", err)
+// 	}
+
+// 	if err := cmd.Start(); err != nil {
+// 		t.Fatalf("failed to start plan-parse with -plan flag: %v", err)
+// 	}
+// 	defer func() {
+// 		if cmd.Process != nil {
+// 			_ = cmd.Process.Kill()
+// 			_ = cmd.Wait()
+// 		}
+// 	}()
+
+// 	scanner := bufio.NewScanner(stderrPipe)
+// 	loaded := false
+// 	validating := false
+// 	for scanner.Scan() {
+// 		line := scanner.Text()
+// 		if strings.Contains(line, "Validating plan file") && strings.Contains(line, "tf_plan.json") {
+// 			validating = true
+// 		}
+// 		if strings.Contains(line, "Successfully loaded plan: 52 resources") {
+// 			loaded = true
+// 			break
+// 		}
+// 	}
+
+// 	if !validating {
+// 		t.Errorf("expected stderr to contain 'Validating plan file', but it did not")
+// 	}
+// 	if !loaded {
+// 		t.Errorf("expected stderr to contain 'Successfully loaded plan: 52 resources', but it did not")
+// 	}
+// }
+

@@ -162,6 +162,27 @@ describe("Theme System & Light/Dark Mode Specification", () => {
         assert.equal(mainFileStyle.style["font-weight"], "600");
       }
     });
+
+    test("Resource type and data type compound containers are configured with top label alignment and proper theme contrast", () => {
+      for (const theme of ["dark", "light"]) {
+        const isLight = theme === "light";
+        const styles = getCytoscapeStyles(theme);
+
+        const resTypeStyle = styles.find((s) => s.selector.includes(".resource-type"));
+        assert.ok(resTypeStyle, `Must define .resource-type selector in ${theme} mode`);
+        assert.equal(resTypeStyle.style["text-valign"], "top", "Must align label at top to avoid occluding child nodes");
+        assert.equal(resTypeStyle.style["text-margin-y"], 8);
+        assert.equal(resTypeStyle.style.padding, "16px");
+        assert.equal(resTypeStyle.style["border-style"], "dashed");
+        assert.equal(resTypeStyle.style["border-color"], isLight ? "#cbd5e1" : "#2a3346");
+        assert.equal(resTypeStyle.style.color, isLight ? "#475569" : "#94a3b8");
+
+        const dataTypeStyle = styles.find((s) => s.selector === ".data-type");
+        assert.ok(dataTypeStyle, `Must define .data-type selector in ${theme} mode`);
+        assert.equal(dataTypeStyle.style["border-color"], isLight ? "#f472b6" : "#be185d");
+        assert.equal(dataTypeStyle.style.color, isLight ? "#db2777" : "#f472b6");
+      }
+    });
   });
 
   describe("Keyboard Shortcuts & Palette Registration", () => {

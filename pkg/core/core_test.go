@@ -30,6 +30,23 @@ func getSamplePlanPath() string {
 	return filepath.Join(getTestDataDir(), "tf_plan.json")
 }
 
+// func getAzureTestDataDir() string {
+// 	candidates := []string{
+// 		filepath.Join("..", "..", "testdata-azure"),
+// 		"testdata-azure",
+// 	}
+// 	for _, c := range candidates {
+// 		if _, err := os.Stat(filepath.Join(c, "tf_plan.json")); err == nil {
+// 			return c
+// 		}
+// 	}
+// 	return filepath.Join("..", "..", "testdata-azure")
+// }
+
+// func getAzureSamplePlanPath() string {
+// 	return filepath.Join(getAzureTestDataDir(), "tf_plan.json")
+// }
+
 func TestValidatePlanFile(t *testing.T) {
 	t.Run("Valid file", func(t *testing.T) {
 		plan, err := core.ValidatePlanFile(getSamplePlanPath())
@@ -796,3 +813,96 @@ func TestExportPlanGraphFixture(t *testing.T) {
 		t.Fatalf("write failed: %v", err)
 	}
 }
+
+// func TestAzurePlanParsing(t *testing.T) {
+// 	planPath := getAzureSamplePlanPath()
+// 	plan, err := core.ValidatePlanFile(planPath)
+// 	if err != nil {
+// 		t.Fatalf("failed to validate Azure plan file: %v", err)
+// 	}
+
+// 	if plan.FormatVersion != "1.2" {
+// 		t.Errorf("expected format_version 1.2, got %s", plan.FormatVersion)
+// 	}
+
+// 	// Verify that non-null resources are used and null_resource is absent
+// 	var hasAzureRM, hasRandom, hasTLS, hasNull bool
+// 	for _, rc := range plan.ResourceChanges {
+// 		if strings.HasPrefix(rc.Type, "azurerm_") {
+// 			hasAzureRM = true
+// 		}
+// 		if strings.HasPrefix(rc.Type, "random_") {
+// 			hasRandom = true
+// 		}
+// 		if strings.HasPrefix(rc.Type, "tls_") {
+// 			hasTLS = true
+// 		}
+// 		if rc.Type == "null_resource" {
+// 			hasNull = true
+// 		}
+// 	}
+
+// 	if !hasAzureRM {
+// 		t.Error("expected Azure plan to contain azurerm_* resources")
+// 	}
+// 	if !hasRandom {
+// 		t.Error("expected Azure plan to contain random_* resources")
+// 	}
+// 	if !hasTLS {
+// 		t.Error("expected Azure plan to contain tls_* resources")
+// 	}
+// 	if hasNull {
+// 		t.Error("expected Azure plan NOT to contain any null_resource")
+// 	}
+
+// 	azureDir := getAzureTestDataDir()
+// 	parser := core.NewParser(plan, azureDir)
+// 	graph, err := parser.GenerateGraph()
+// 	if err != nil {
+// 		t.Fatalf("GenerateGraph failed for Azure plan: %v", err)
+// 	}
+
+// 	if graph.Summary.Total == 0 {
+// 		t.Errorf("expected > 0 total resources in summary, got %d", graph.Summary.Total)
+// 	}
+// 	if graph.Summary.Create != graph.Summary.Total {
+// 		t.Errorf("expected all resources to be create, got %d create out of %d total", graph.Summary.Create, graph.Summary.Total)
+// 	}
+
+// 	// Verify modules in graph
+// 	expectedModules := []string{"networking", "storage", "compute", "database", "function_app", "loadbalancer"}
+// 	nodeIDs := make(map[string]bool)
+// 	for _, node := range graph.Nodes {
+// 		nodeIDs[node.Data.ID] = true
+// 	}
+
+// 	for _, mod := range expectedModules {
+// 		modID := "module." + mod
+// 		if !nodeIDs[modID] {
+// 			t.Errorf("expected module node %q in Azure graph", modID)
+// 		}
+// 	}
+
+// 	// Verify session params in database module
+// 	var foundSessionParam bool
+// 	for _, node := range graph.Nodes {
+// 		if strings.Contains(node.Data.ID, "azurerm_postgresql_flexible_server_configuration") {
+// 			foundSessionParam = true
+// 			break
+// 		}
+// 	}
+// 	if !foundSessionParam {
+// 		t.Error("expected azurerm_postgresql_flexible_server_configuration session parameter resource in graph")
+// 	}
+
+// 	// Export tf_plan_graph.json
+// 	data, err := json.MarshalIndent(graph, "", "  ")
+// 	if err != nil {
+// 		t.Fatalf("marshal failed: %v", err)
+// 	}
+// 	outPath := filepath.Join(azureDir, "tf_plan_graph.json")
+// 	if err := os.WriteFile(outPath, data, 0644); err != nil {
+// 		t.Fatalf("failed to write tf_plan_graph.json: %v", err)
+// 	}
+// }
+

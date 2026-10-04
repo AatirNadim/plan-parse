@@ -136,6 +136,33 @@ export function getCytoscapeStyles(theme = "dark") {
         "font-weight": "600",
       },
     },
+    // Resource type and data type compound containers (Tier 4)
+    {
+      selector: ".resource-type, .data-type",
+      style: {
+        padding: "16px",
+        "font-family": "'DM Mono', monospace",
+        "font-weight": "500",
+        "font-size": "10px",
+        shape: "roundrectangle",
+        "border-width": 1,
+        "border-style": "dashed",
+        "border-color": isLight ? "#cbd5e1" : "#2a3346",
+        "background-color": isLight ? "#f8fafc" : "#0f131d",
+        "background-opacity": isLight ? 0.6 : 0.45,
+        color: isLight ? "#475569" : "#94a3b8",
+        "text-valign": "top",
+        "text-margin-y": 8,
+      },
+    },
+    {
+      selector: ".data-type",
+      style: {
+        "border-color": isLight ? "#f472b6" : "#be185d",
+        "background-color": isLight ? "#fdf2f8" : "#1a0b16",
+        color: isLight ? "#db2777" : "#f472b6",
+      },
+    },
     // Semantic Action styling for Leaf Nodes
     {
       selector: ".create",

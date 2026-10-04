@@ -69,7 +69,7 @@ export function isTargetableNode(node) {
   if (
     classes.includes("resource-name") ||
     classes.includes("data-name") ||
-    classes.includes("module")
+    /\bmodule\b/.test(classes)
   ) {
     return true;
   }

@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function CalloutImage({ svgSrc, title, callouts = [] }) {
-  const [activePin, setActivePin] = useState(null);
+  const [hoveredPin, setHoveredPin] = useState(null);
+  const [selectedPin, setSelectedPin] = useState(null);
+  const activePin = hoveredPin ?? selectedPin;
   const [svgContent, setSvgContent] = useState("");
   const containerRef = useRef(null);
 
@@ -33,38 +35,25 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
       const textEl = pinEl.querySelector("text");
       const pinNum = textEl ? parseInt(textEl.textContent.trim(), 10) : null;
 
-      // Reset base transform if saved
-      const originalTransform = pinEl.getAttribute("data-orig-transform") || pinEl.getAttribute("transform") || "";
-      if (!pinEl.getAttribute("data-orig-transform") && originalTransform) {
-        pinEl.setAttribute("data-orig-transform", originalTransform);
+      let origTransform = pinEl.getAttribute("data-orig-transform");
+      if (!origTransform) {
+        origTransform = pinEl.getAttribute("transform") || "";
+        pinEl.setAttribute("data-orig-transform", origTransform);
       }
 
-      if (pinNum === activePin) {
+      if (pinNum !== null && pinNum === activePin) {
         pinEl.classList.add("is-active");
-        pinEl.style.filter = "drop-shadow(0 0 12px #38bdf8)";
-        pinEl.setAttribute(
-          "transform",
-          `${pinEl.getAttribute("data-orig-transform")} scale(1.22)`
-        );
-        pinEl.style.cursor = "pointer";
+        pinEl.setAttribute("transform", `${origTransform} scale(1.18)`);
       } else {
         pinEl.classList.remove("is-active");
-        pinEl.style.filter = "";
-        pinEl.setAttribute(
-          "transform",
-          pinEl.getAttribute("data-orig-transform") || originalTransform
-        );
-        pinEl.style.cursor = "pointer";
+        pinEl.setAttribute("transform", origTransform);
       }
 
-      pinEl.onmouseenter = () => {
-        if (pinNum) setActivePin(pinNum);
-      };
-      pinEl.onmouseleave = () => {
-        setActivePin(null);
-      };
-      pinEl.onclick = () => {
-        if (pinNum) setActivePin((prev) => (prev === pinNum ? null : pinNum));
+      pinEl.onmouseenter = () => setHoveredPin(pinNum);
+      pinEl.onmouseleave = () => setHoveredPin(null);
+      pinEl.onclick = (e) => {
+        e.stopPropagation();
+        setSelectedPin((prev) => (prev === pinNum ? null : pinNum));
       };
     });
   }, [svgContent, activePin]);
@@ -89,7 +78,10 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
       </div>
 
       {/* SVG Image Container */}
-      <div className="relative p-2 sm:p-4 bg-[#090a0f] flex items-center justify-center overflow-hidden">
+      <div
+        className="relative p-2 sm:p-4 bg-[#090a0f] flex items-center justify-center overflow-hidden"
+        onClick={() => setSelectedPin(null)}
+      >
         <div
           ref={containerRef}
           className="w-full relative aspect-[16/9] rounded-lg border border-workbench-border/60 overflow-hidden bg-[#090a0f] flex items-center justify-center"
@@ -111,19 +103,36 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
 
       {/* Synchronized Callout Legend / Badges */}
       <div className="p-4 sm:p-6 border-t border-workbench-border bg-workbench-panel">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 font-semibold">
-          Annotated Architectural Callouts (Hover card or pin to highlight)
+        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 font-semibold flex items-center justify-between">
+          <span>Annotated Architectural Callouts (Hover card or pin to highlight)</span>
+          {selectedPin !== null && (
+            <button
+              onClick={() => setSelectedPin(null)}
+              className="text-[10px] text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 underline font-normal normal-case focus:outline-none focus:ring-1 focus:ring-sky-500 rounded px-1"
+            >
+              Clear pin
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {callouts.map((item) => {
             const isHighlighted = activePin === item.pin;
+            const isSelected = selectedPin === item.pin;
             return (
               <div
                 key={item.pin}
-                onMouseEnter={() => setActivePin(item.pin)}
-                onMouseLeave={() => setActivePin(null)}
-                onClick={() => setActivePin(activePin === item.pin ? null : item.pin)}
-                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer ${
+                role="button"
+                tabIndex={0}
+                onMouseEnter={() => setHoveredPin(item.pin)}
+                onMouseLeave={() => setHoveredPin(null)}
+                onClick={() => setSelectedPin((prev) => (prev === item.pin ? null : item.pin))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedPin((prev) => (prev === item.pin ? null : item.pin));
+                  }
+                }}
+                className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-500/50 ${
                   isHighlighted
                     ? "border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500/30"
                     : "border-workbench-border/80 bg-workbench-subpanel/50 hover:bg-workbench-hover/80 hover:border-slate-400 dark:hover:border-slate-600"
@@ -134,15 +143,23 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
                     className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs transition-all duration-200 ${
                       isHighlighted
                         ? "bg-sky-500 text-slate-950 ring-2 ring-sky-300 scale-110 shadow-md shadow-sky-500/40"
-                        : "bg-sky-500/20 text-sky-400 border border-sky-500/40"
+                        : "bg-sky-500/10 dark:bg-sky-500/20 text-sky-700 dark:text-sky-400 border border-sky-500/30 dark:border-sky-500/40"
                     }`}
                   >
                     {item.pin}
                   </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                      {item.title}
-                    </h4>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                        {item.title}
+                      </h4>
+                      {isSelected && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/15 dark:bg-sky-500/20 text-sky-700 dark:text-sky-400 border border-sky-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400 animate-pulse" />
+                          Pinned
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                       {item.description}
                     </p>

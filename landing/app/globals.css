@@ -205,11 +205,32 @@ html.light ::-webkit-scrollbar-thumb:hover {
 /* Interactive SVG Callout Styles */
 .callout-pin {
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
 }
 
-.callout-pin:hover,
-.callout-pin.is-active {
-  transform: scale(1.15);
-  transform-origin: center;
+.callout-pin circle {
+  transition: fill 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke-width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.callout-pin text {
+  transition: fill 0.2s ease, font-weight 0.2s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Synchronized Hover and Active Highlight State */
+.callout-pin:hover circle,
+.callout-pin.is-active circle {
+  fill: #38bdf8 !important;
+  stroke: #ffffff !important;
+  stroke-width: 2.5px !important;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.85)) !important;
+}
+
+.callout-pin:hover text,
+.callout-pin.is-active text {
+  fill: #090a0f !important;
+  font-weight: 800 !important;
 }

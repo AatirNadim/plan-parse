@@ -72,7 +72,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 							Parent:      parentMod,
 							ParentColor: ColorModule,
 						},
-						Classes:     classes,
+						Classes: classes,
 					})
 				}
 				parentMod = currentMod
@@ -110,7 +110,7 @@ func (p *Parser) GenerateGraph() (*Graph, error) {
 					Parent:      parentModID,
 					ParentColor: ColorModule,
 				},
-				Classes:     classes,
+				Classes: classes,
 			})
 		}
 		return fileID

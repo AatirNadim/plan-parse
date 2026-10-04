@@ -178,4 +178,3 @@ func TestPositionalPlanArg_NonExistentFile(t *testing.T) {
 		t.Errorf("expected output to mention plan validation failure or no such file, got: %s", out)
 	}
 }
-

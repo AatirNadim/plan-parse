@@ -37,10 +37,12 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className="min-h-screen bg-workbench-bg text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-150 flex flex-col">
+      <body className="min-h-screen bg-workbench-bg text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-150 flex flex-col relative isolate">
         <ThemeProvider>
+          {/* Fixed screen-anchored background canvas */}
+          <div className="fixed inset-0 pointer-events-none -z-10 canvas-bg" aria-hidden="true" />
           <SiteHeader />
-          <main className="flex-1 canvas-bg">{children}</main>
+          <main className="flex-1 relative z-0">{children}</main>
           <SiteFooter />
         </ThemeProvider>
       </body>

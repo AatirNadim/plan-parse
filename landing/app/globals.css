@@ -153,7 +153,7 @@ html.light h4 {
 html.light [class*="bg-clip-text"],
 html.light .bg-clip-text {
   text-shadow: none;
-  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.18));
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.10));
 }
 
 /* Light Theme Contrast & Dynamic Hierarchy */
@@ -204,6 +204,8 @@ html.light .border-workbench-border {
   background-color: #090a0f;
   background-image: radial-gradient(circle, #1e2638 1px, transparent 1px);
   background-size: 24px 24px;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 html.light .canvas-bg {

@@ -1,110 +1,183 @@
 import Link from "next/link";
 import CodeBlock from "../components/CodeBlock";
 import BrandLogo from "../components/BrandLogo";
+import DockerIcon from "../components/icons/docker";
 import { FEATURES } from "../lib/features-data";
 
 export default function HomePage() {
   return (
-    <div className="space-y-24 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      {/* 1. HERO SEGMENT */}
-      <section className="relative pt-8 pb-12 sm:pt-14 sm:pb-20">
-        {/* Subtle static ambient glow behind Hero */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 -z-10 pointer-events-none overflow-hidden opacity-60 dark:opacity-20 select-none">
-          <div className="w-[720px] h-[320px] mx-auto bg-gradient-to-b from-sky-400/20 via-sky-300/10 to-transparent blur-3xl rounded-full" />
-        </div>
+    <div className="space-y-20">
+      {/* 1. HERO BANNER (Full-bleed solid banner fading to canvas dot grid) */}
+      <section className="relative w-full overflow-hidden">
+        {/* Solid banner backdrop fading into dotted canvas-bg at the bottom */}
+        <div className="hero-banner-backdrop" aria-hidden="true" />
 
-        {/* Hero Masthead Lockup: Icon + Banner Text */}
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-center gap-8 lg:gap-12 text-center md:text-left mb-10">
-          {/* Brand Icon (Symbol of Code-to-DAG Transformation) */}
-          <div className="relative shrink-0 group mt-1">
-            {/* Ambient lighting wash tailored to icon tones */}
-            <div className="absolute -inset-2 bg-gradient-to-br from-sky-500/20 via-indigo-500/15 to-emerald-500/15 rounded-3xl blur-xl opacity-60 dark:opacity-30 group-hover:opacity-90 dark:group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" />
+        {/* Subtle bottom border fade rule */}
+        {/* <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-workbench-border to-transparent" aria-hidden="true" /> */}
 
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 rounded-2xl sm:rounded-3xl bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F0F5FA] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:ring-1 light:ring-slate-900/5 light:shadow-xl shadow-2xl p-2.5 sm:p-3.5 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.02] group-hover:border-sky-500/40">
-              <BrandLogo className="w-full h-full" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-16 sm:pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-12 items-center">
+            
+            {/* Left Column: Authoritative Editorial & CTAs (~60% width on desktop) */}
+            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+              {/* Badges / Eyebrow */}
+              <div className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2 px-3.5 py-1.5 rounded-full border border-workbench-border bg-workbench-panel/90 text-xs text-slate-700 dark:text-slate-300 light:font-semibold light:text-slate-900 shadow-xs mb-5 font-mono">
+                <span className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>v1.0.0 Released</span>
+                </span>
+                <span className="text-slate-400 dark:text-slate-500">•</span>
+                <span className="text-sky-500 dark:text-sky-400 light:text-sky-600 font-bold">Zero Telemetry Local Binary</span>
+                <span className="hidden sm:inline text-slate-400 dark:text-slate-500">•</span>
+                <span className="hidden sm:inline text-slate-500 dark:text-slate-400">Client-Side Parser</span>
+              </div>
+
+              {/* Primary Value Proposition Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem] font-bold light:font-extrabold tracking-tight sm:tracking-tighter text-slate-900 dark:text-slate-100 leading-[1.12]">
+                Visual Infrastructure Assurance for{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400">
+                  Terraform &amp; OpenTofu
+                </span>
+              </h1>
+
+              {/* Explanatory Technical Paragraph */}
+              <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed max-w-2xl">
+                Transform dense, thousands-of-lines terminal plan outputs into an interactive, hierarchical DAG. Eliminate cascading destruction, audit transitive blast radius, and inspect 2-tier resource diffs before running apply.
+              </p>
+
+              {/* Action CTAs */}
+              <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3.5">
+                <a
+                  href="https://github.com/AatirNadim/plan-parse/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg bg-sky-500 hover:bg-sky-400 active:bg-sky-600 active:translate-y-[0.5px] text-slate-950 font-bold text-sm transition-all shadow-lg shadow-sky-500/10 light:shadow-lg light:shadow-sky-500/20 active:light:shadow-xs"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span>Download Release Binary</span>
+                </a>
+
+                <a
+                  href="https://github.com/AatirNadim/plan-parse"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-sm font-medium light:font-semibold light:text-slate-900 shadow-xs transition-colors"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>View on GitHub</span>
+                </a>
+
+                <a
+                  href="https://hub.docker.com/r/aatir0docking/plan-parse"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 px-5 py-3 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-sm font-medium light:font-semibold light:text-slate-900 shadow-xs transition-colors"
+                >
+                  <DockerIcon className="w-4 h-4 text-sky-500 shrink-0" />
+                  <span>Docker Hub</span>
+                </a>
+              </div>
+
+              {/* Copyable Quickstart Docker Command */}
+              <div className="max-w-xl w-full mt-6 text-left">
+                <CodeBlock
+                  code="docker pull aatir0docking/plan-parse:latest"
+                  label="Quickstart Docker Pull"
+                />
+              </div>
             </div>
-            {/* Visual caption under icon */}
-            <div className="mt-2.5 hidden sm:flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 light:text-slate-600">
-              <span className="text-sky-500 dark:text-sky-400 font-bold">HCL AST</span>
-              <span>→</span>
-              <span className="text-emerald-500 dark:text-emerald-400 font-bold">Action DAG</span>
+
+            {/* Right Column: Active Engine Core (~40% width on desktop) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-[460px] xl:max-w-[490px] rounded-2xl border border-workbench-border bg-workbench-panel/90 dark:bg-[#0c0e15]/95 light:bg-white/95 backdrop-blur-xl shadow-2xl p-5 sm:p-6 overflow-hidden group">
+                
+                {/* Ambient glow tailored to brand tokens */}
+                <div className="absolute -inset-1 bg-gradient-to-br from-sky-500/20 via-emerald-500/15 to-amber-500/15 rounded-3xl blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none -z-10" />
+
+                {/* Engine Live Status Beacon */}
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-workbench-border/60">
+                  <div className="flex items-center space-x-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
+                      DAG ENGINE CORE
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                      hcl.ast → dag.graph
+                    </span>
+                  </div>
+                  <div className="font-mono text-[10px] flex items-center gap-1.5 select-none shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-emerald-500 dark:text-emerald-400 font-bold">ONLINE</span>
+                  </div>
+                </div>
+
+                {/* Upstream Stream Bar */}
+                <div className="flex items-center justify-between text-[11px] font-mono mb-3.5 px-3 py-1.5 rounded-lg bg-workbench-bg/90 border border-workbench-border">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-sky-500 dark:text-sky-400 font-bold">INPUT:</span>
+                    <span className="text-slate-700 dark:text-slate-300 truncate">main.tfplan.json</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0 font-medium">0 telemetry</span>
+                </div>
+
+                {/* Center Core: BrandLogo Pedestal */}
+                <div className="relative my-2 py-2 flex flex-col items-center justify-center">
+                  <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F0F5FA] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:shadow-md shadow-xl p-3 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.03] group-hover:border-sky-500/40">
+                    <BrandLogo className="w-full h-full" />
+                  </div>
+                  
+                  {/* Transformation Arrow */}
+                  <div className="mt-2.5 flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    <span className="text-sky-500 dark:text-sky-400 font-bold">AST Code</span>
+                    <span>→</span>
+                    <span className="text-emerald-500 dark:text-emerald-400 font-bold">Hierarchical DAG</span>
+                  </div>
+                </div>
+
+                {/* Downstream Computed Mutations Block */}
+                <div className="mt-3 pt-3 border-t border-workbench-border/60 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    <span>Downstream Mutations</span>
+                    <span className="text-emerald-500 dark:text-emerald-400 font-bold">Acyclic Validated</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
+                    {/* Node 1: Update */}
+                    <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-workbench-bg/90 border border-workbench-border hover:border-sky-500/40 transition-colors">
+                      <span className="truncate text-slate-800 dark:text-slate-200 text-[11px]">aws_sg.ingress</span>
+                      <span className="shrink-0 ml-1.5 px-1.5 py-0.5 text-[10px] font-bold rounded bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">~ update</span>
+                    </div>
+
+                    {/* Node 2: Replace with Cascade Warning */}
+                    <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-workbench-bg/90 border border-amber-500/30 hover:border-amber-500/50 transition-colors">
+                      <span className="truncate text-slate-800 dark:text-slate-200 text-[11px]">aws_rds.main</span>
+                      <span className="shrink-0 ml-1.5 px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20">± replace</span>
+                    </div>
+                  </div>
+
+                  {/* Telemetry Footer */}
+                  <div className="pt-1 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>Transitive Blast Radius: <strong className="text-slate-700 dark:text-slate-300">Audited</strong></span>
+                    </span>
+                    <span className="text-emerald-500 dark:text-emerald-400 font-bold">0 cascading destroys</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
+
           </div>
-
-          {/* Banner Text Block */}
-          <div className="flex-1 min-w-0">
-            {/* Badges / Eyebrow */}
-            <div className="inline-flex flex-wrap items-center justify-center md:justify-start gap-2 px-3 py-1 rounded-full border border-workbench-border bg-workbench-panel text-xs text-slate-700 dark:text-slate-300 light:font-semibold light:text-slate-900 shadow-sm light:shadow-sm mb-4 font-mono">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>v1.0.0 Released</span>
-              </span>
-              <span className="text-slate-500 dark:text-slate-400">•</span>
-              <span className="text-sky-500 dark:text-sky-400 light:text-sky-600 font-bold">Zero Telemetry Local Binary</span>
-              <span className="hidden sm:inline text-slate-500 dark:text-slate-400">•</span>
-              <span className="hidden sm:inline text-slate-500 dark:text-slate-400">Client-Side Parser</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold light:font-extrabold tracking-tight sm:tracking-tighter text-slate-900 dark:text-slate-100 leading-tight">
-              Visual Infrastructure Assurance for{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400">
-                Terraform &amp; OpenTofu
-              </span>
-            </h1>
-
-            <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
-              Transform dense, thousands-of-lines terminal plan outputs into an interactive, hierarchical DAG. Eliminate cascading destruction, audit transitive blast radius, and inspect 2-tier resource diffs before running apply.
-            </p>
-          </div>
-        </div>
-
-        {/* Hero CTAs */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="https://github.com/AatirNadim/plan-parse/releases"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg bg-sky-500 hover:bg-sky-400 active:bg-sky-600 active:translate-y-[0.5px] text-slate-950 font-bold text-sm transition-all shadow-lg shadow-sky-500/10 light:shadow-lg light:shadow-sky-500/20 active:light:shadow-xs "
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span>Download Release Binary</span>
-          </a>
-
-          <a
-            href="https://github.com/AatirNadim/plan-parse"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-sm font-medium light:font-semibold light:text-slate-900 shadow-sm light:shadow-lg transition-colors"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
-            <span>View on GitHub</span>
-          </a>
-
-          <a
-            href="https://hub.docker.com/r/aatir0docking/plan-parse"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 px-5 py-3 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-sm font-medium light:font-semibold light:text-slate-900 font-mono shadow-sm light:shadow-lg transition-colors"
-          >
-            <span className="text-sky-500 dark:text-sky-400 light:text-sky-600 font-bold">docker pull</span>
-            <span>aatir0docking/plan-parse</span>
-          </a>
-        </div>
-
-        {/* Copyable Quickstart Docker Command */}
-        <div className="max-w-xl mx-auto mt-6 text-left">
-          <CodeBlock
-            code="docker pull aatir0docking/plan-parse:latest"
-            label="Quickstart Docker Pull"
-          />
         </div>
       </section>
 
-      {/* 2. THE PROBLEM & ACCOMPLISHMENTS (Contrast Grid) */}
+      {/* Main Content Sections wrapped in max-w-7xl mx-auto */}
+      <div className="space-y-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* 2. THE PROBLEM & ACCOMPLISHMENTS (Contrast Grid) */}
       <section id="the-problem" className="pt-8">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 light:text-sky-700 light:font-bold mb-2">
@@ -468,6 +541,7 @@ docker run -it --rm \\
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

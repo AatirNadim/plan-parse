@@ -215,6 +215,30 @@ html.light .canvas-bg {
   background-size: 24px 24px, 100% 100%, 100% 100%;
 }
 
+/* Hero Banner Solid-to-Dotted Fade Backdrop */
+.hero-banner-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #0c0e14 0%,
+    #0c0e14 45%,
+    #090a0f 72%,
+    rgba(9, 10, 15, 0) 100%
+  );
+}
+
+html.light .hero-banner-backdrop {
+  background: linear-gradient(
+    180deg,
+    #f5f9fc 0%,
+    #f5f9fc 45%,
+    #edf3f9 72%,
+    rgba(237, 243, 249, 0) 100%
+  );
+}
+
 /* Workbench Scrollbar */
 * {
   scrollbar-width: thin;

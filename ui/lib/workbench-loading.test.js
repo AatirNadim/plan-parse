@@ -104,5 +104,13 @@ describe("Workbench Loading & Layout Orchestration Specifications", () => {
         "globals.css must define .animate-workbench-slide utility class"
       );
     });
+
+    test("page.js includes hover text on Load Plan JSON File button", () => {
+      assert.ok(
+        pageContent.includes('title="This simply opens the sidebar to upload the plan file"'),
+        "Load Plan JSON File button must have hover text title explaining it opens the sidebar"
+      );
+    });
   });
 });
+

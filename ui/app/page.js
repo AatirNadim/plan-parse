@@ -1019,6 +1019,7 @@ export default function Home() {
 
                   <button
                     onClick={handleOpenUpload}
+                    title="This simply opens the sidebar to upload the plan file"
                     className="w-full py-2 px-3 rounded bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white text-xs font-mono font-semibold transition cursor-pointer"
                   >
                     Load Plan JSON File

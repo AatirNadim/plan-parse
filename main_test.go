@@ -60,4 +60,32 @@ func TestHelpFlag(t *testing.T) {
 	if !strings.Contains(out, "-version") {
 		t.Errorf("Expected --help output to contain -version, got:\n%s", out)
 	}
+	if !strings.Contains(out, "-collapsed") {
+		t.Errorf("Expected --help output to contain -collapsed flag documentation, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Start with graph collapsed to mutating resources") {
+		t.Errorf("Expected --help output to contain -collapsed description, got:\n%s", out)
+	}
+	if !strings.Contains(out, "default true") {
+		t.Errorf("Expected --help output to show default true for -collapsed flag, got:\n%s", out)
+	}
+}
+
+func TestCollapsedFlagHelp(t *testing.T) {
+	cmd := exec.Command("go", "run", "main.go", "--help")
+	var output bytes.Buffer
+	cmd.Stdout = &output
+	cmd.Stderr = &output
+	_ = cmd.Run()
+
+	out := output.String()
+	if !strings.Contains(out, "-collapsed") {
+		t.Fatalf("expected --help to list -collapsed flag, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Start with graph collapsed to mutating resources") {
+		t.Fatalf("expected -collapsed description in --help, got:\n%s", out)
+	}
+	if !strings.Contains(out, "default true") {
+		t.Fatalf("expected default true for -collapsed in --help, got:\n%s", out)
+	}
 }

@@ -41,6 +41,7 @@ func main() {
 		noBrowser   bool
 		noBanner    bool
 		showVersion bool
+		collapsed   bool
 	)
 
 	flag.StringVar(&planPath, "plan", "", "Path to Terraform plan JSON file")
@@ -51,6 +52,7 @@ func main() {
 	flag.BoolVar(&noBanner, "no-banner", false, "Do not display the startup banner")
 	flag.BoolVar(&showVersion, "version", false, "Print version information and exit")
 	flag.BoolVar(&showVersion, "v", false, "Print version information and exit (shorthand)")
+	flag.BoolVar(&collapsed, "collapsed", true, "Start with graph collapsed to mutating resources")
 	flag.Parse()
 
 	if showVersion {
@@ -120,6 +122,7 @@ func main() {
 	}
 
 	srv := server.NewServer(addr, port, cliGraph)
+	srv.SetCollapsed(collapsed)
 
 	serverURL := fmt.Sprintf("http://%s:%d", addr, port)
 

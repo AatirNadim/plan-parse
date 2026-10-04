@@ -9,6 +9,7 @@ import CommandPalette from "../components/CommandPalette";
 import KeyboardShortcutsModal from "../components/KeyboardShortcutsModal";
 import NodePopover from "../components/NodePopover";
 import NodeDiffModal from "../components/NodeDiffModal";
+import CollapsedToast from "../components/CollapsedToast";
 import { getCytoscapeStyles } from "../lib/cytoscape-styles";
 import { exportGraphAsPng, exportGraphAsSvg, registerCytoscapeSvgPlugin } from "../lib/export-image";
 import { collapseGraph } from "../lib/graph-collapse";
@@ -32,7 +33,9 @@ export default function Home() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [cliOptionCollapsed, setCliOptionCollapsed] = useState(true);
+  const [isToastDismissed, setIsToastDismissed] = useState(false);
   const [diffModalNode, setDiffModalNode] = useState(null);
   const [popoverState, setPopoverState] = useState(null); // { node, position: { x, y } }
 
@@ -137,6 +140,10 @@ export default function Home() {
           setDisabled(Boolean(status.disabled));
           if (isCli) {
             setPlanName("CLI Session Plan");
+          }
+          if (typeof status.collapsed === "boolean") {
+            setIsCollapsed(status.collapsed);
+            setCliOptionCollapsed(status.collapsed);
           }
         }
 
@@ -744,11 +751,12 @@ export default function Home() {
     setSelectedNode(null);
     setDiffModalNode(null);
     setPopoverState(null);
-    setIsCollapsed(false);
+    setIsCollapsed(cliOptionCollapsed);
+    setIsToastDismissed(false);
     if (fileName) {
       setPlanName(fileName);
     }
-  }, []);
+  }, [cliOptionCollapsed]);
 
   const handleOpenUpload = useCallback(() => {
     setIsSidebarOpen(true);
@@ -946,6 +954,18 @@ export default function Home() {
               </div>
             </div>
           )}
+
+          {/* Collapsed State Notification Toast:
+              the graph is collapsed by default, you can toggle it here
+              and you can pass the cli option collapsed as false */}
+          <CollapsedToast
+            cliOptionCollapsed={cliOptionCollapsed}
+            isCollapsed={isCollapsed}
+            hasGraph={hasGraph}
+            isDismissed={isToastDismissed}
+            onToggleCollapse={handleToggleCollapse}
+            onDismiss={() => setIsToastDismissed(true)}
+          />
         </main>
 
         {/* Docked Right Inspector Panel */}

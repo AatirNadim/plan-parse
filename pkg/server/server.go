@@ -27,6 +27,7 @@ type Server struct {
 	fs               fs.FS
 	mu               sync.Mutex
 	cliPlan          *core.Graph
+	collapsed        bool
 	statusServedOnce bool
 	graphServedOnce  bool
 	listener         net.Listener
@@ -48,15 +49,30 @@ func NewServer(addr string, port int, cliPlan *core.Graph, customFS ...fs.FS) *S
 	}
 
 	s := &Server{
-		addr:    addr,
-		port:    port,
-		router:  http.NewServeMux(),
-		fs:      targetFS,
-		cliPlan: cliPlan,
+		addr:      addr,
+		port:      port,
+		router:    http.NewServeMux(),
+		fs:        targetFS,
+		cliPlan:   cliPlan,
+		collapsed: true,
 	}
 
 	s.routes()
 	return s
+}
+
+// SetCollapsed configures whether the server advises UI to start in collapsed state.
+func (s *Server) SetCollapsed(collapsed bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.collapsed = collapsed
+}
+
+// Collapsed returns whether collapsed mode is configured.
+func (s *Server) Collapsed() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.collapsed
 }
 
 // EnableCORS writes the CORS headers to the response writer.

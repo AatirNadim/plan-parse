@@ -744,7 +744,7 @@ export default function Home() {
         cyRef.current = null;
       }
     };
-  }, [activeGraphData, cyReady, selectAndFocusNode, theme]);
+  }, [activeGraphData, cyReady, selectAndFocusNode]);
 
   const handlePlanParsed = useCallback((newGraph, fileName) => {
     setGraphData(newGraph);

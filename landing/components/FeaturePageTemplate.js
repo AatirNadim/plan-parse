@@ -11,19 +11,19 @@ export default function FeaturePageTemplate({ feature }) {
       {/* Feature Header */}
       <header className="mb-8">
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold">
+          <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 font-bold light:shadow-xs">
             {feature.badge}
           </span>
-          <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-workbench-panel text-slate-700 dark:text-slate-300 border border-workbench-border">
+          <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-workbench-panel text-slate-700 dark:text-slate-300 light:text-slate-900 border border-workbench-border font-semibold light:shadow-xs">
             Shortcut: [{feature.hotkey}]
           </span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100 leading-tight">
           {feature.title}
         </h1>
 
-        <p className="mt-3 text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p className="mt-3 text-base text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
           {feature.tagline}
         </p>
       </header>
@@ -39,17 +39,17 @@ export default function FeaturePageTemplate({ feature }) {
       <div className="space-y-10 mt-12 text-sm leading-relaxed">
         {/* The Problem */}
         {feature.theProblem && (
-          <section className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] dark:bg-[#120e14]">
+          <section className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] dark:bg-[#120e14] shadow-sm light:shadow-md light:border-rose-400/30">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-              <h2 className="font-mono text-xs uppercase tracking-wider text-rose-400 font-bold">
+              <h2 className="font-mono text-xs uppercase tracking-wider text-rose-500 dark:text-rose-400 font-bold light:text-rose-700">
                 The Problem
               </h2>
             </div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            <h3 className="text-base font-semibold light:font-bold text-slate-900 dark:text-slate-100 mb-2">
               {feature.theProblem.title}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed">
               {feature.theProblem.description}
             </p>
           </section>
@@ -57,17 +57,17 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* The Algorithm / Implementation */}
         {feature.theAlgorithm && (
-          <section className="p-6 rounded-xl border border-sky-500/20 bg-sky-500/[0.02] dark:bg-[#0c131d]">
+          <section className="p-6 rounded-xl border border-sky-500/20 bg-sky-500/[0.02] dark:bg-[#0c131d] shadow-sm light:shadow-md light:border-sky-400/30">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-sky-400"></span>
-              <h2 className="font-mono text-xs uppercase tracking-wider text-sky-400 font-bold">
+              <h2 className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 font-bold light:text-sky-700">
                 Under the Hood: Engine &amp; Algorithm
               </h2>
             </div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            <h3 className="text-base font-semibold light:font-bold text-slate-900 dark:text-slate-100 mb-2">
               {feature.theAlgorithm.title}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed">
               {feature.theAlgorithm.description}
             </p>
           </section>
@@ -75,22 +75,22 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* How to Use */}
         {feature.howToUse && (
-          <section className="p-6 rounded-xl border border-workbench-border bg-workbench-panel">
-            <h2 className="font-mono text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 font-semibold">
+          <section className="p-6 rounded-xl border border-workbench-border bg-workbench-panel shadow-sm light:shadow-md">
+            <h2 className="font-mono text-xs uppercase tracking-wider text-slate-700 dark:text-slate-400 light:text-slate-900 mb-4 font-bold">
               Workstation Flow: How to Use
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {feature.howToUse.map((step) => (
-                <div key={step.step} className="p-4 rounded-lg bg-workbench-subpanel border border-workbench-border">
+                <div key={step.step} className="p-4 rounded-lg bg-workbench-subpanel border border-workbench-border shadow-xs light:shadow-xs">
                   <div className="flex items-center space-x-2 mb-1.5">
-                    <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 font-mono text-[11px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-500 dark:text-sky-400 light:text-sky-700 font-mono text-[11px] font-bold flex items-center justify-center light:shadow-xs">
                       {step.step}
                     </span>
-                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs font-semibold light:font-bold text-slate-900 dark:text-slate-200">
                       {step.label}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
                     {step.detail}
                   </p>
                 </div>
@@ -101,17 +101,17 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* SRE Scenario */}
         {feature.scenario && (
-          <section className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-[#0c1613]">
+          <section className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-[#0c1613] shadow-sm light:shadow-md light:border-emerald-500/40">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <h2 className="font-mono text-xs uppercase tracking-wider text-emerald-400 font-bold">
+              <h2 className="font-mono text-xs uppercase tracking-wider text-emerald-500 dark:text-emerald-400 font-bold light:text-emerald-700">
                 Real-World SRE &amp; Platform Scenario
               </h2>
             </div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            <h3 className="text-base font-semibold light:font-bold text-slate-900 dark:text-slate-100 mb-2">
               {feature.scenario.title}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed">
               {feature.scenario.description}
             </p>
           </section>

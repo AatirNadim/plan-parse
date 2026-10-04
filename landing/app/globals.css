@@ -233,9 +233,9 @@ html.light .canvas-bg {
 html.light .hero-banner-backdrop {
   background: linear-gradient(
     135deg,
-    #e2f0fc 0%,
-    #edf4fb 50%,
-    #e6f4ed 100%
+    #cae6fd 0%,
+    #e4f2fb 48%,
+    #d2f3e4 100%
   );
 }
 

@@ -107,6 +107,82 @@ describe("Theme System & Light/Dark Mode Specification", () => {
         );
       }
     });
+
+    test("Module and main.tf boundary styles are clearly defined in dark and light modes", () => {
+      for (const theme of ["dark", "light"]) {
+        const isLight = theme === "light";
+        const styles = getCytoscapeStyles(theme);
+
+        // .module
+        const moduleStyle = styles.find((s) => s.selector === ".module");
+        assert.ok(moduleStyle, `Must define .module selector in ${theme} mode`);
+        assert.equal(moduleStyle.style["border-width"], 2);
+        assert.equal(moduleStyle.style["border-style"], "solid");
+        assert.equal(moduleStyle.style["border-color"], isLight ? "#9333ea" : "#a855f7");
+        assert.equal(moduleStyle.style["background-color"], isLight ? "#faf5ff" : "#130f26");
+        assert.equal(moduleStyle.style["background-opacity"], isLight ? 0.75 : 0.55);
+        assert.equal(moduleStyle.style.color, isLight ? "#7e22ce" : "#c084fc");
+        assert.equal(moduleStyle.style["font-weight"], "600");
+        assert.equal(moduleStyle.style.padding, "24px");
+
+        // .nested-module
+        const nestedModStyle = styles.find((s) => s.selector === ".nested-module");
+        assert.ok(nestedModStyle, `Must define .nested-module selector in ${theme} mode`);
+        assert.equal(nestedModStyle.style["border-width"], 2);
+        assert.equal(nestedModStyle.style["border-style"], "dashed");
+        assert.equal(nestedModStyle.style["border-color"], isLight ? "#6366f1" : "#818cf8");
+        assert.equal(nestedModStyle.style["background-color"], isLight ? "#eef2ff" : "#0f1322");
+        assert.equal(nestedModStyle.style["background-opacity"], isLight ? 0.75 : 0.6);
+        assert.equal(nestedModStyle.style.color, isLight ? "#4f46e5" : "#a5b4fc");
+        assert.equal(nestedModStyle.style["font-weight"], "600");
+
+        // .has-nested, .composite-module
+        const hasNestedStyle = styles.find((s) => s.selector.includes(".has-nested"));
+        assert.ok(hasNestedStyle, `Must define .has-nested selector in ${theme} mode`);
+        assert.ok(hasNestedStyle.selector.includes(".composite-module"), "Must also cover .composite-module");
+        assert.equal(hasNestedStyle.style["border-width"], 2.5);
+        assert.equal(hasNestedStyle.style["border-style"], "solid");
+        assert.equal(hasNestedStyle.style["border-color"], isLight ? "#7e22ce" : "#c084fc");
+        assert.equal(hasNestedStyle.style["background-color"], isLight ? "#f5f3ff" : "#160e2e");
+        assert.equal(hasNestedStyle.style["background-opacity"], isLight ? 0.8 : 0.6);
+        assert.equal(hasNestedStyle.style.color, isLight ? "#7e22ce" : "#c084fc");
+        assert.equal(hasNestedStyle.style["font-weight"], "600");
+        assert.equal(hasNestedStyle.style.padding, "28px");
+
+        // .main-file, .module-main-file
+        const mainFileStyle = styles.find((s) => s.selector.includes(".main-file"));
+        assert.ok(mainFileStyle, `Must define .main-file selector in ${theme} mode`);
+        assert.ok(mainFileStyle.selector.includes(".module-main-file"), "Must also cover .module-main-file");
+        assert.equal(mainFileStyle.style["border-width"], 1.5);
+        assert.equal(mainFileStyle.style["border-style"], "solid");
+        assert.equal(mainFileStyle.style["border-color"], isLight ? "#0284c7" : "#38bdf8");
+        assert.equal(mainFileStyle.style["background-color"], isLight ? "#f0f9ff" : "#0c1729");
+        assert.equal(mainFileStyle.style["background-opacity"], isLight ? 0.7 : 0.6);
+        assert.equal(mainFileStyle.style.color, isLight ? "#0369a1" : "#7dd3fc");
+        assert.equal(mainFileStyle.style["font-weight"], "600");
+      }
+    });
+
+    test("Resource type and data type compound containers are configured with top label alignment and proper theme contrast", () => {
+      for (const theme of ["dark", "light"]) {
+        const isLight = theme === "light";
+        const styles = getCytoscapeStyles(theme);
+
+        const resTypeStyle = styles.find((s) => s.selector.includes(".resource-type"));
+        assert.ok(resTypeStyle, `Must define .resource-type selector in ${theme} mode`);
+        assert.equal(resTypeStyle.style["text-valign"], "top", "Must align label at top to avoid occluding child nodes");
+        assert.equal(resTypeStyle.style["text-margin-y"], 8);
+        assert.equal(resTypeStyle.style.padding, "16px");
+        assert.equal(resTypeStyle.style["border-style"], "dashed");
+        assert.equal(resTypeStyle.style["border-color"], isLight ? "#cbd5e1" : "#2a3346");
+        assert.equal(resTypeStyle.style.color, isLight ? "#475569" : "#94a3b8");
+
+        const dataTypeStyle = styles.find((s) => s.selector === ".data-type");
+        assert.ok(dataTypeStyle, `Must define .data-type selector in ${theme} mode`);
+        assert.equal(dataTypeStyle.style["border-color"], isLight ? "#f472b6" : "#be185d");
+        assert.equal(dataTypeStyle.style.color, isLight ? "#db2777" : "#f472b6");
+      }
+    });
   });
 
   describe("Keyboard Shortcuts & Palette Registration", () => {

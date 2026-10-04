@@ -6,30 +6,62 @@ export default function HomePage() {
   return (
     <div className="space-y-24 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* 1. HERO SEGMENT */}
-      <section className="relative text-center pt-8 pb-12 sm:pt-14 sm:pb-20">
+      <section className="relative pt-8 pb-12 sm:pt-14 sm:pb-20">
         {/* Subtle static ambient glow behind Hero */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-80 -z-10 pointer-events-none overflow-hidden opacity-60 dark:opacity-20 select-none">
-          <div className="w-[640px] h-[280px] mx-auto bg-gradient-to-b from-sky-400/25 via-sky-300/10 to-transparent blur-3xl rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 -z-10 pointer-events-none overflow-hidden opacity-60 dark:opacity-20 select-none">
+          <div className="w-[720px] h-[320px] mx-auto bg-gradient-to-b from-sky-400/20 via-sky-300/10 to-transparent blur-3xl rounded-full" />
         </div>
 
-        {/* Subtle grid background highlight */}
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-workbench-border bg-workbench-panel text-xs text-slate-700 dark:text-slate-300 light:font-semibold light:text-slate-900 shadow-sm light:shadow-sm mb-6 font-mono">
-          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>v1.0.0 Released</span>
-          <span className="text-slate-500 dark:text-slate-400">•</span>
-          <span className="text-sky-500 dark:text-sky-400 light:text-sky-600 font-bold">Zero Telemetry Local Binary</span>
+        {/* Hero Masthead Lockup: Icon + Banner Text */}
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-center gap-8 lg:gap-12 text-center md:text-left mb-10">
+          {/* Brand Icon (Symbol of Code-to-DAG Transformation) */}
+          <div className="relative shrink-0 group mt-1">
+            {/* Ambient lighting wash tailored to icon tones */}
+            <div className="absolute -inset-2 bg-gradient-to-br from-sky-500/20 via-indigo-500/15 to-emerald-500/15 rounded-3xl blur-xl opacity-60 dark:opacity-30 group-hover:opacity-90 dark:group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" />
+
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 rounded-2xl sm:rounded-3xl bg-[#090A0F] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:ring-1 light:ring-slate-900/5 light:shadow-xl shadow-2xl p-2.5 sm:p-3.5 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.02] group-hover:border-sky-500/40">
+              <img
+                src="/icon.svg"
+                alt="plan-parse: Code Gutter to Dependency DAG Engine"
+                className="w-full h-full object-contain select-none"
+                width={176}
+                height={176}
+              />
+            </div>
+            {/* Visual caption under icon */}
+            <div className="mt-2.5 hidden sm:flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400 light:text-slate-600">
+              <span className="text-sky-500 dark:text-sky-400 font-bold">HCL AST</span>
+              <span>→</span>
+              <span className="text-emerald-500 dark:text-emerald-400 font-bold">Action DAG</span>
+            </div>
+          </div>
+
+          {/* Banner Text Block */}
+          <div className="flex-1 min-w-0">
+            {/* Badges / Eyebrow */}
+            <div className="inline-flex flex-wrap items-center justify-center md:justify-start gap-2 px-3 py-1 rounded-full border border-workbench-border bg-workbench-panel text-xs text-slate-700 dark:text-slate-300 light:font-semibold light:text-slate-900 shadow-sm light:shadow-sm mb-4 font-mono">
+              <span className="flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>v1.0.0 Released</span>
+              </span>
+              <span className="text-slate-500 dark:text-slate-400">•</span>
+              <span className="text-sky-500 dark:text-sky-400 light:text-sky-600 font-bold">Zero Telemetry Local Binary</span>
+              <span className="hidden sm:inline text-slate-500 dark:text-slate-400">•</span>
+              <span className="hidden sm:inline text-slate-500 dark:text-slate-400">Client-Side Parser</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold light:font-extrabold tracking-tight sm:tracking-tighter text-slate-900 dark:text-slate-100 leading-tight">
+              Visual Infrastructure Assurance for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400">
+                Terraform &amp; OpenTofu
+              </span>
+            </h1>
+
+            <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
+              Transform dense, thousands-of-lines terminal plan outputs into an interactive, hierarchical DAG. Eliminate cascading destruction, audit transitive blast radius, and inspect 2-tier resource diffs before running apply.
+            </p>
+          </div>
         </div>
-
-        <h1 className="text-4xl sm:text-6xl font-bold light:font-extrabold tracking-tight sm:tracking-tighter text-slate-900 dark:text-slate-100 max-w-4xl mx-auto leading-tight sm:leading-none">
-          Visual Infrastructure Assurance for{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400">
-            Terraform &amp; OpenTofu
-          </span>
-        </h1>
-
-        <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium max-w-3xl mx-auto leading-relaxed">
-          Transform dense, thousands-of-lines terminal plan outputs into an interactive, hierarchical DAG. Eliminate cascading destruction, audit transitive blast radius, and inspect 2-tier resource diffs before running apply.
-        </p>
 
         {/* Hero CTAs */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -268,7 +300,8 @@ tofu show -json tofuplan > plan.json`}
             </p>
             <CodeBlock
               code={`# Option A: Standalone Binary
-./plan-parse plan.json
+./plan-parse -plan plan.json
+./plan-parse -plan /path/to/tf_plan.json -addr 0.0.0.0 -port 9000 -collapsed=true -no-browser -no-banner
 
 # Option B: Docker Container (read-only mount)
 docker run -it --rm -p 8080:8080 -v $(pwd):/workspace:ro aatir0docking/plan-parse:latest plan.json

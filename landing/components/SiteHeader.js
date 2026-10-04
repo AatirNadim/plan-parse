@@ -27,18 +27,13 @@ export default function SiteHeader() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center space-x-3">
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 rounded-lg bg-[#0f121a] border border-workbench-border flex items-center justify-center p-1.5 group-hover:border-sky-500/50 transition-colors shadow-sm light:shadow-sm">
-              <img src="/icon.svg" alt="plan-parse icon" className="w-6 h-6" />
-            </div>
-            <div className="flex items-center space-x-2.5">
-              <span className="font-bold font-mono tracking-tight text-base sm:text-lg text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
-                PLAN-PARSE
-              </span>
-              <span className="px-2 py-0.5 text-xs font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 font-bold light:shadow-xs">
-                v1.0.0
-              </span>
-            </div>
+          <Link href="/" className="flex items-center space-x-2.5 group">
+            <span className="font-bold font-mono tracking-tight text-base sm:text-lg text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
+              plan-parse
+            </span>
+            <span className="px-2 py-0.5 text-xs font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 group-hover:border-sky-500/40 font-bold light:shadow-xs transition-colors">
+              v1.0.0
+            </span>
           </Link>
         </div>
 

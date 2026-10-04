@@ -193,7 +193,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6" id="accomplishments">
           {/* Column 1: Traditional CLI Pain */}
-          <div className="p-6 rounded-xl border border-rose-500/20 bg-gradient-to-b from-rose-500/[0.04] to-rose-500/[0.01] dark:from-[#130d12] dark:to-[#130d12] space-y-4 shadow-sm light:shadow-md light:border-rose-400/30">
+          <div className="p-6 rounded-xl border border-rose-500/20 bg-gradient-to-b from-rose-500/[0.04] to-rose-500/[0.01] dark:from-rose-500/[0.06] dark:to-rose-500/[0.02] backdrop-blur-[2px] space-y-4 shadow-sm light:shadow-md light:border-rose-400/30">
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
               <h3 className="font-mono text-sm uppercase tracking-wider text-rose-500 dark:text-rose-400 font-bold light:text-rose-700">
@@ -229,7 +229,7 @@ export default function HomePage() {
           </div>
 
           {/* Column 2: plan-parse Visual Assurance */}
-          <div className="p-6 rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent dark:from-[#0c1614] dark:to-[#0c1614] space-y-4 shadow-sm light:shadow-md light:border-emerald-500/40">
+          <div className="p-6 rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent dark:from-emerald-500/[0.06] dark:via-emerald-500/[0.02] dark:to-transparent backdrop-blur-[2px] space-y-4 shadow-sm light:shadow-md light:border-emerald-500/40">
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
               <h3 className="font-mono text-sm uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-bold light:text-emerald-700">

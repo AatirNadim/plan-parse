@@ -215,27 +215,27 @@ html.light .canvas-bg {
   background-size: 24px 24px, 100% 100%, 100% 100%;
 }
 
-/* Hero Banner Solid-to-Dotted Fade Backdrop */
+/* Hero Banner Diagonal Gradient Backdrop with Fade-to-Canvas Mask */
 .hero-banner-backdrop {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
-    180deg,
-    #0c0e14 0%,
-    #0c0e14 45%,
-    #090a0f 72%,
-    rgba(9, 10, 15, 0) 100%
+    135deg,
+    #0e1a2d 0%,
+    #0a0e16 50%,
+    #0a1415 100%
   );
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, rgba(0, 0, 0, 0.6) 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 45%, rgba(0, 0, 0, 0.6) 72%, transparent 100%);
 }
 
 html.light .hero-banner-backdrop {
   background: linear-gradient(
-    180deg,
-    #f5f9fc 0%,
-    #f5f9fc 45%,
-    #edf3f9 72%,
-    rgba(237, 243, 249, 0) 100%
+    135deg,
+    #e2f0fc 0%,
+    #edf4fb 50%,
+    #e6f4ed 100%
   );
 }
 

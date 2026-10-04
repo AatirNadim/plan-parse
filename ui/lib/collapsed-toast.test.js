@@ -11,6 +11,8 @@ import {
   COLLAPSED_TOAST_ACTION,
   COLLAPSED_TOAST_DISMISS,
   COLLAPSED_TOAST_TEXT,
+  COLLAPSED_CLI_COMMAND,
+  getCollapsedCliCommand,
   shouldShowCollapsedToast,
 } from "./collapsed-toast.js";
 
@@ -56,10 +58,32 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
     test("dismiss symbol is standard multiplication/cross sign '×'", () => {
       assert.equal(COLLAPSED_TOAST_DISMISS, "×");
     });
+
+    test("exports copyable CLI command constant matching exact specification", () => {
+      assert.equal(
+        COLLAPSED_CLI_COMMAND,
+        "./plan-parse -collapsed=false ./plan.json"
+      );
+    });
+
+    test("getCollapsedCliCommand helper returns proper CLI command syntax", () => {
+      assert.equal(getCollapsedCliCommand(), COLLAPSED_CLI_COMMAND);
+      assert.equal(getCollapsedCliCommand(null), COLLAPSED_CLI_COMMAND);
+      assert.equal(getCollapsedCliCommand(""), COLLAPSED_CLI_COMMAND);
+      assert.equal(getCollapsedCliCommand("   "), COLLAPSED_CLI_COMMAND);
+      assert.equal(getCollapsedCliCommand("CLI Session Plan"), COLLAPSED_CLI_COMMAND);
+      assert.equal(getCollapsedCliCommand("plan.json"), "./plan-parse -collapsed=false ./plan.json");
+      assert.equal(getCollapsedCliCommand("./plan.json"), "./plan-parse -collapsed=false ./plan.json");
+      assert.equal(getCollapsedCliCommand("my_plan.json"), "./plan-parse -collapsed=false ./my_plan.json");
+      assert.equal(getCollapsedCliCommand("./infra/prod.plan.json"), "./plan-parse -collapsed=false ./infra/prod.plan.json");
+      assert.equal(getCollapsedCliCommand("/tmp/test.json"), "./plan-parse -collapsed=false /tmp/test.json");
+      assert.equal(getCollapsedCliCommand("../plans/prod.json"), "./plan-parse -collapsed=false ../plans/prod.json");
+      assert.equal(getCollapsedCliCommand("my tf plan.json"), './plan-parse -collapsed=false "./my tf plan.json"');
+    });
   });
 
   describe("Toast Visibility Predicate (shouldShowCollapsedToast)", () => {
-    test("shows toast when CLI option is true, graph is collapsed, graph is loaded, and not dismissed", () => {
+    test("a) shows toast on first UI load (when cliOptionCollapsed: true, isCollapsed: true, hasGraph: true, isDismissed: false)", () => {
       const visible = shouldShowCollapsedToast({
         cliOptionCollapsed: true,
         isCollapsed: true,
@@ -109,6 +133,29 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
       assert.equal(visible, false);
     });
 
+    test("if UI was loaded with -collapsed=false, toast is never displayed even if collapse is later toggled on", () => {
+      // First load with cliOptionCollapsed: false
+      assert.equal(
+        shouldShowCollapsedToast({
+          cliOptionCollapsed: false,
+          isCollapsed: false,
+          hasGraph: true,
+          isDismissed: false,
+        }),
+        false
+      );
+      // Toggled on from UI
+      assert.equal(
+        shouldShowCollapsedToast({
+          cliOptionCollapsed: false,
+          isCollapsed: true,
+          hasGraph: true,
+          isDismissed: false,
+        }),
+        false
+      );
+    });
+
     test("defaults cliOptionCollapsed and isCollapsed to true when omitted", () => {
       assert.equal(shouldShowCollapsedToast({ hasGraph: true }), true);
       assert.equal(shouldShowCollapsedToast({ hasGraph: false }), false);
@@ -156,25 +203,30 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
       );
     });
 
-    test("handlePlanParsed defaults isCollapsed to cliOptionCollapsed/true instead of false", () => {
+    test("handleToggleCollapse permanently dismisses the toast (setIsToastDismissed(true))", () => {
+      const handleToggleCollapseSnippet = pageContent.slice(
+        pageContent.indexOf("const handleToggleCollapse ="),
+        pageContent.indexOf("const cyContainerRef =")
+      );
+      assert.ok(
+        handleToggleCollapseSnippet.includes("setIsToastDismissed(true)"),
+        "handleToggleCollapse must call setIsToastDismissed(true)"
+      );
+      assert.ok(
+        handleToggleCollapseSnippet.includes("setIsCollapsed("),
+        "handleToggleCollapse must toggle isCollapsed"
+      );
+    });
+
+    test("handlePlanParsed defaults isCollapsed to cliOptionCollapsed", () => {
       assert.match(
         pageContent,
         /setIsCollapsed\(cliOptionCollapsed\)/,
         "handlePlanParsed must set isCollapsed to cliOptionCollapsed"
       );
-      // Ensure it doesn't hardcode false
-      const handlePlanParsedSnippet = pageContent.slice(
-        pageContent.indexOf("const handlePlanParsed ="),
-        pageContent.indexOf("const handleOpenUpload =")
-      );
-      assert.equal(
-        handlePlanParsedSnippet.includes("setIsCollapsed(false)"),
-        false,
-        "handlePlanParsed must not hardcode setIsCollapsed(false)"
-      );
     });
 
-    test("renders CollapsedToast inside page.js DAG canvas area", () => {
+    test("renders CollapsedToast inside page.js DAG canvas area with planName", () => {
       assert.ok(
         pageContent.includes("<CollapsedToast"),
         "page.js must render <CollapsedToast"
@@ -183,57 +235,72 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
         pageContent.includes("onToggleCollapse={handleToggleCollapse}"),
         "CollapsedToast must receive onToggleCollapse wired to handleToggleCollapse"
       );
+      assert.ok(
+        pageContent.includes("planName={planName}"),
+        "CollapsedToast must receive planName"
+      );
     });
   });
 
   describe("Interactive Toggle & Dismissal Contracts", () => {
-    test("simulates clicking 'here' triggers handleToggleCollapse and hides toast", () => {
-      let collapsedState = true;
+    test("b) once collapse is toggled from UI, toast is dismissed and does NOT re-appear when toggling collapse", () => {
+      let isCollapsed = true;
+      let isDismissed = false;
+
+      // Real handleToggleCollapse implementation from page.js
       const handleToggleCollapse = () => {
-        collapsedState = !collapsedState;
+        isDismissed = true;
+        isCollapsed = !isCollapsed;
       };
 
-      // Initially collapsed with graph loaded
+      // 1. First UI load with graph: toast is visible
       assert.equal(
         shouldShowCollapsedToast({
           cliOptionCollapsed: true,
-          isCollapsed: collapsedState,
+          isCollapsed,
           hasGraph: true,
-          isDismissed: false,
+          isDismissed,
         }),
-        true
+        true,
+        "Toast must be visible on first UI load"
       );
 
-      // User clicks 'here' -> toggles collapsed
+      // 2. Collapse toggled from UI (clicking 'here', header button, 'C' key, command palette)
       handleToggleCollapse();
-      assert.equal(collapsedState, false);
+      assert.equal(isCollapsed, false);
+      assert.equal(isDismissed, true);
 
       // Toast is now hidden
       assert.equal(
         shouldShowCollapsedToast({
           cliOptionCollapsed: true,
-          isCollapsed: collapsedState,
+          isCollapsed,
           hasGraph: true,
-          isDismissed: false,
+          isDismissed,
         }),
-        false
+        false,
+        "Toast must be hidden after first toggle"
       );
 
-      // User toggles back on -> toast is shown again (if not dismissed)
+      // 3. User toggles collapse back to true from UI
       handleToggleCollapse();
-      assert.equal(collapsedState, true);
+      assert.equal(isCollapsed, true);
+      assert.equal(isDismissed, true);
+
+      // Toast must NEVER re-appear even though isCollapsed is true again
       assert.equal(
         shouldShowCollapsedToast({
           cliOptionCollapsed: true,
-          isCollapsed: collapsedState,
+          isCollapsed,
           hasGraph: true,
-          isDismissed: false,
+          isDismissed,
         }),
-        true
+        false,
+        "Toast must NEVER re-appear once collapse has been toggled in UI"
       );
     });
 
-    test("simulates clicking dismiss button '×' updates dismissed state and hides toast", () => {
+    test("simulates clicking dismiss button '×' updates dismissed state and hides toast permanently", () => {
       let isDismissed = false;
       const onDismiss = () => {
         isDismissed = true;
@@ -252,6 +319,7 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
       onDismiss();
       assert.equal(isDismissed, true);
 
+      // Toast is hidden
       assert.equal(
         shouldShowCollapsedToast({
           cliOptionCollapsed: true,
@@ -261,6 +329,98 @@ describe("Collapsed Graph Toast & Default State Specifications", () => {
         }),
         false
       );
+
+      // Toggling collapse afterward still keeps toast hidden
+      assert.equal(
+        shouldShowCollapsedToast({
+          cliOptionCollapsed: true,
+          isCollapsed: false,
+          hasGraph: true,
+          isDismissed,
+        }),
+        false
+      );
+      assert.equal(
+        shouldShowCollapsedToast({
+          cliOptionCollapsed: true,
+          isCollapsed: true,
+          hasGraph: true,
+          isDismissed,
+        }),
+        false
+      );
+    });
+  });
+
+  describe("c) & d) Copyable CLI Syntax & Copy Button Clipboard Interaction", () => {
+    const compContent = fs.readFileSync(componentPath, "utf-8");
+
+    test("c) component renders actual copyable CLI syntax", () => {
+      assert.ok(
+        compContent.includes("getCollapsedCliCommand"),
+        "CollapsedToast must import and use getCollapsedCliCommand"
+      );
+      assert.ok(
+        compContent.includes("data-testid=\"collapsed-cli-command\"") ||
+          compContent.includes("{cliCommand}"),
+        "CollapsedToast must display the generated CLI command"
+      );
+      assert.match(
+        compContent,
+        /<code[^>]*>[^<]*\{cliCommand\}[^<]*<\/code>/,
+        "CollapsedToast must render CLI command inside a styled code element"
+      );
+    });
+
+    test("d) component imports and uses copyToClipboard for clipboard interaction", () => {
+      assert.ok(
+        compContent.includes('import { copyToClipboard } from "../lib/target-command"'),
+        "CollapsedToast must import copyToClipboard from target-command"
+      );
+      assert.ok(
+        compContent.includes("copyToClipboard(cliCommand)"),
+        "CollapsedToast must pass cliCommand to copyToClipboard"
+      );
+    });
+
+    test("d) component renders interactive copy button with feedback state", () => {
+      assert.ok(
+        compContent.includes('aria-label="Copy CLI command"'),
+        "Copy button must have accessible aria-label"
+      );
+      assert.ok(
+        compContent.includes("Copied!"),
+        "Copy button must show 'Copied!' feedback"
+      );
+      assert.match(
+        compContent,
+        /const\s*\[copied,\s*setCopied\]\s*=\s*useState\(false\)/,
+        "CollapsedToast must manage copied feedback state"
+      );
+    });
+
+    test("d) copyToClipboard contract successfully handles the CLI command string", async () => {
+      const { copyToClipboard } = await import("./target-command.js");
+      // In Node environment without navigator.clipboard or DOM document, returns false gracefully
+      const result = await copyToClipboard(COLLAPSED_CLI_COMMAND);
+      assert.equal(typeof result, "boolean");
+
+      // Verify with simulated navigator.clipboard
+      let clipboardText = "";
+      globalThis.navigator = {
+        clipboard: {
+          writeText: async (t) => {
+            clipboardText = t;
+          },
+        },
+      };
+
+      const success = await copyToClipboard(COLLAPSED_CLI_COMMAND);
+      assert.equal(success, true);
+      assert.equal(clipboardText, "./plan-parse -collapsed=false ./plan.json");
+
+      // Clean up mock
+      delete globalThis.navigator;
     });
   });
 

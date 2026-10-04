@@ -8,6 +8,33 @@ export const COLLAPSED_TOAST_PREFIX = "the graph is collapsed by default, you ca
 export const COLLAPSED_TOAST_ACTION = "here";
 export const COLLAPSED_TOAST_DISMISS = "×";
 export const COLLAPSED_TOAST_TEXT = `${COLLAPSED_TOAST_LINE_1}\n${COLLAPSED_TOAST_LINE_2}`;
+export const COLLAPSED_CLI_COMMAND = "./plan-parse -collapsed=false ./plan.json";
+
+/**
+ * Generates the copyable CLI command to launch plan-parse uncollapsed.
+ *
+ * @param {string} [planName] - Optional plan filename or path
+ * @returns {string} CLI command string
+ */
+export function getCollapsedCliCommand(planName) {
+  if (
+    !planName ||
+    typeof planName !== "string" ||
+    planName.trim() === "" ||
+    planName.trim() === "CLI Session Plan"
+  ) {
+    return COLLAPSED_CLI_COMMAND;
+  }
+  const trimmed = planName.trim();
+  let cleanPlanName =
+    trimmed.startsWith("./") || trimmed.startsWith("../") || trimmed.startsWith("/")
+      ? trimmed
+      : `./${trimmed}`;
+  if (cleanPlanName.includes(" ") && !cleanPlanName.startsWith('"') && !cleanPlanName.startsWith("'")) {
+    cleanPlanName = `"${cleanPlanName}"`;
+  }
+  return `./plan-parse -collapsed=false ${cleanPlanName}`;
+}
 
 /**
  * Determines whether the collapsed notification toast should be visible.

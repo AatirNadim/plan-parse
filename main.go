@@ -64,6 +64,16 @@ func main() {
 		log.Fatalf("Error: -plan and -dir flags are mutually exclusive. Please provide either a plan file or a directory, not both.")
 	}
 
+	if planPath == "" && dirPath == "" && flag.NArg() > 0 {
+		arg := flag.Arg(0)
+		fi, err := os.Stat(arg)
+		if err == nil && fi.IsDir() {
+			dirPath = arg
+		} else {
+			planPath = arg
+		}
+	}
+
 	var cliGraph *core.Graph
 
 	if planPath != "" {

@@ -82,6 +82,7 @@ export default function Home() {
   }, [isBlastIsolated, selectedNode]);
 
   const handleToggleCollapse = useCallback(() => {
+    setIsToastDismissed(true);
     setIsCollapsed((prev) => !prev);
   }, []);
 
@@ -398,6 +399,7 @@ export default function Home() {
     // If node is not on canvas because graph is collapsed, expand first and queue smooth navigation
     if ((!node || node.length === 0) && isCollapsed) {
       pendingNavigateNodeIdRef.current = nodeId;
+      setIsToastDismissed(true);
       setIsCollapsed(false);
       return;
     }
@@ -752,7 +754,6 @@ export default function Home() {
     setDiffModalNode(null);
     setPopoverState(null);
     setIsCollapsed(cliOptionCollapsed);
-    setIsToastDismissed(false);
     if (fileName) {
       setPlanName(fileName);
     }
@@ -963,6 +964,7 @@ export default function Home() {
             isCollapsed={isCollapsed}
             hasGraph={hasGraph}
             isDismissed={isToastDismissed}
+            planName={planName}
             onToggleCollapse={handleToggleCollapse}
             onDismiss={() => setIsToastDismissed(true)}
           />

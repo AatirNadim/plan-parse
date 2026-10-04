@@ -151,14 +151,19 @@ export const FEATURES = [
         title: "Attributes JSON Matrix",
         description: "Searchable tabular property inspector with a 'Changed Only' filter toggle for rapid parameter auditing.",
       },
+      {
+        pin: 5,
+        title: "AST Source Filepath Recovery",
+        description: "Pinpoints exact .tf source files and line numbers via AST inspection, with clear provenance badges distinguishing local workspace resolution from standalone plan fallback ('unknown file').",
+      },
     ],
     theProblem: {
       title: "The Terminal Diff Compromise",
       description: "Engineers are forced to choose between truncated summary tables that hide crucial details, or scrolling through 8,000 lines of JSON plan diffs where critical replacement flags are lost in dense text blocks.",
     },
     theAlgorithm: {
-      title: "Progressive Disclosure Engine",
-      description: "plan-parse implements a two-tier inspection architecture. Tier 1 provides instant zero-friction popovers directly on the DAG canvas. Tier 2 delivers deep structural inspection with split-pane HCL, unified diffs, and filtered property matrices.",
+      title: "Progressive Disclosure & AST Recovery Engine",
+      description: "plan-parse implements a two-tier inspection architecture paired with AST code recovery. Terraform plan JSON omits source filenames; when run in a workspace, plan-parse correlates .terraform/modules/modules.json and HCL ASTs to recover exact file paths (e.g. main.tf:15). In standalone plan uploads, unmapped items cleanly fallback to an 'unknown file' compound container with transparent provenance tooltips.",
     },
     howToUse: [
       {
@@ -329,14 +334,19 @@ export const FEATURES = [
         title: "Drag-and-Drop Ingestion Zone",
         description: "100% local, client-side preflight plan schema validator accepting files up to 50MB with zero network egress.",
       },
+      {
+        pin: 5,
+        title: "Source Filepath & AST Provenance",
+        description: "CLI workspace mode extracts AST line numbers and source files; standalone browser uploads cleanly structure unmapped resources under 'unknown file'.",
+      },
     ],
     theProblem: {
       title: "Cumbersome Plan Loading & Dense Hierarchies",
       description: "Engineers need to quickly load plans from their local machines without setting up complex servers, leaking sensitive credentials over the internet, or getting lost in massive module structures.",
     },
     theAlgorithm: {
-      title: "Zero-Transmission Client-Side Ingestion",
-      description: "plan-parse parses the Terraform plan JSON entirely in Web Workers inside the browser. Sensitive variables, credentials, and network topologies never leave the user's localhost machine.",
+      title: "Zero-Transmission Client-Side Ingestion & Dual Modes",
+      description: "plan-parse parses Terraform plan JSON entirely in client-side Web Workers—credentials and configurations never leave localhost. It bridges dual ingestion modes: CLI workspace mode (resolving AST line numbers and source files) and Standalone Plan mode (structuring unmapped resources under 'unknown file' while maintaining full blast radius DAG integrity).",
     },
     howToUse: [
       {

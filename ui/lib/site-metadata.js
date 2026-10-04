@@ -4,7 +4,7 @@
  */
 export const siteMetadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: "Plan Parse - Terraform DAG Visualizer",
+  title: "Workbench - Plan Parse",
   description: "Interactive Terraform Plan DAG Visualizer and Workbench",
   icons: {
     icon: "/icon.svg",

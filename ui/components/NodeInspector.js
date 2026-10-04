@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 import TargetCommandCard from "./TargetCommandCard";
+import FileProvenanceBadge from "./FileProvenanceBadge";
 import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
 import { computeBlastRadius, computeUpstreamLineage } from "../lib/blast-radius";
 
@@ -98,7 +99,7 @@ function NodeInspector({
       {/* Header */}
       <div className="p-3 border-b border-workbench-border bg-workbench-header shrink-0 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span
               className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded uppercase tracking-wider"
               style={{
@@ -110,9 +111,12 @@ function NodeInspector({
               {cfg.symbol} {badgeLabel}
             </span>
             {node.module && (
-              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]">
+              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]" title={`Module: ${node.module}`}>
                 {node.module}
               </span>
+            )}
+            {node.file && (
+              <FileProvenanceBadge file={node.file} line={node.line} align="left" />
             )}
           </div>
           <h2 className="text-xs font-mono font-semibold text-slate-900 dark:text-white break-all leading-snug select-text">

@@ -34,7 +34,7 @@ export default function SiteHeader() {
                 PLAN-PARSE
               </span>
               <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                v0.1.0
+                v1.0.0
               </span>
             </div>
           </Link>
@@ -115,7 +115,7 @@ export default function SiteHeader() {
           <ThemeToggle />
 
           <a
-            href="https://hub.docker.com/r/aatirnadim/plan-parse"
+            href="https://hub.docker.com/r/aatir0docking/plan-parse"
             target="_blank"
             rel="noopener noreferrer"
             title="Docker Hub Image"

@@ -16,7 +16,7 @@ This document specifies the architecture, design contract, page inventory, SVG v
    - It maintains its own `package.json`, build pipeline, and static export target.
 2. **Distribution & Documentation Gateway**:
    - Serves as the primary public entry point explaining why the tool was needed, its technical accomplishments, and how to use it.
-   - Contains direct links to **GitHub Releases** (binary downloads for Linux, macOS, and Windows) and **Docker Hub** (`aatirnadim/plan-parse`).
+   - Contains direct links to **GitHub Releases** (binary downloads for Linux, macOS, and Windows) and **Docker Hub** (`aatir0docking/plan-parse`).
 3. **Dedicated Deep-Dive Feature Pages**:
    - Each major feature has its own independent page featuring a dedicated, zoomed-in SVG diagram mimicking the actual UI styles, annotated with labeled callout badges.
    - A final **Miscellaneous** page documents power-user tools (Command Palette, diagram exports, targeted apply generation, keyboard shortcuts, etc.).
@@ -108,7 +108,7 @@ landing/
 
 ### Page 1: Home / Landing (`/`)
 1. **Site Navigation**:
-   - Logo + `PLAN-PARSE` wordmark + version chip (`v0.1.0`).
+   - Logo + `PLAN-PARSE` wordmark + version chip (`v1.0.0`).
    - "Features" dropdown navigation linking directly to all 7 feature chapters.
    - Quick anchors: *The Problem*, *Accomplishments*, *Workflow Guide*, *Releases*, *Docker*.
    - GitHub icon & Stars link, Docker Hub badge, and Theme Toggle button.
@@ -117,7 +117,7 @@ landing/
    - **Tagline**: Transform dense, thousands-of-lines terminal plan outputs into an interactive, hierarchical DAG. Eliminate cascading destruction, audit transitive blast radius, and inspect 2-tier resource diffs before applying.
    - **Direct Call-to-Actions (CTAs)**:
      - `Download Release Binary` $\rightarrow$ links to `https://github.com/AatirNadim/plan-parse/releases`
-     - Copyable Docker pull snippet: `docker pull aatirnadim/plan-parse:latest`
+     - Copyable Docker pull snippet: `docker pull aatir0docking/plan-parse:latest`
      - `View on GitHub` button
 3. **Problem Statement & Core Accomplishments ("Why It Was Needed")**:
    - Side-by-side contrast grid:

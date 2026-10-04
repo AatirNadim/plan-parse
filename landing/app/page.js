@@ -10,7 +10,7 @@ export default function HomePage() {
         {/* Subtle grid background highlight */}
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-workbench-border bg-workbench-panel text-xs text-slate-300 mb-6 font-mono">
           <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>v0.1.0 Released</span>
+          <span>v1.0.0 Released</span>
           <span className="text-slate-400">•</span>
           <span className="text-sky-400">Zero Telemetry Local Binary</span>
         </div>
@@ -53,20 +53,20 @@ export default function HomePage() {
           </a>
 
           <a
-            href="https://hub.docker.com/r/aatirnadim/plan-parse"
+            href="https://hub.docker.com/r/aatir0docking/plan-parse"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center space-x-2 px-5 py-3 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-200 text-sm font-medium font-mono transition-colors"
           >
             <span className="text-sky-400">docker pull</span>
-            <span>aatirnadim/plan-parse</span>
+            <span>aatir0docking/plan-parse</span>
           </a>
         </div>
 
         {/* Copyable Quickstart Docker Command */}
         <div className="max-w-xl mx-auto mt-6 text-left">
           <CodeBlock
-            code="docker pull aatirnadim/plan-parse:latest"
+            code="docker pull aatir0docking/plan-parse:latest"
             label="Quickstart Docker Pull"
           />
         </div>
@@ -266,7 +266,7 @@ tofu show -json tofuplan > plan.json`}
 ./plan-parse plan.json
 
 # Option B: Docker Container (read-only mount)
-docker run -it --rm -p 8080:8080 -v $(pwd):/workspace:ro aatirnadim/plan-parse:latest plan.json
+docker run -it --rm -p 8080:8080 -v $(pwd):/workspace:ro aatir0docking/plan-parse:latest plan.json
 
 # The workbench will automatically open at http://localhost:8080`}
               label="Launch Options"
@@ -335,7 +335,7 @@ terraform apply -target="module.vpc.aws_subnet.private[0]"`}
                 <span>Standalone Pre-Compiled Binaries</span>
               </h3>
               <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                v0.1.0
+                v1.0.0
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
@@ -420,7 +420,7 @@ terraform apply -target="module.vpc.aws_subnet.private[0]"`}
 docker run -it --rm \\
   -p 8080:8080 \\
   -v $(pwd):/workspace:ro \\
-  aatirnadim/plan-parse:latest plan.json`}
+  aatir0docking/plan-parse:latest plan.json`}
               label="Docker Run Command"
             />
 

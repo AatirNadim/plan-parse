@@ -14,7 +14,7 @@ export default function SiteFooter() {
                 PLAN-PARSE
               </span>
               <span className="px-1.5 py-0.2 text-[10px] font-mono rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                v0.1.0
+                v1.0.0
               </span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
@@ -96,7 +96,7 @@ export default function SiteFooter() {
               </li>
               <li>
                 <a
-                  href="https://hub.docker.com/r/aatirnadim/plan-parse"
+                  href="https://hub.docker.com/r/aatir0docking/plan-parse"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-sky-400 transition-colors flex items-center space-x-1"
@@ -134,9 +134,9 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-workbench-border flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400">
+        <div className="mt-8 pt-6 border-t border-workbench-border flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
           <div>
-            Built with Next.js & Tailwind CSS. Designed for Terraform & OpenTofu engineers.
+            Designed for Terraform & OpenTofu engineers.
           </div>
           <div className="mt-2 sm:mt-0 font-mono">
             plan-parse © 2026 Aatir Nadim. Open Source Software.

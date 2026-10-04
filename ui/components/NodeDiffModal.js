@@ -8,6 +8,7 @@ import {
   getDiffSummary,
   formatHclValue,
 } from "../lib/hcl-diff";
+import FileProvenanceBadge from "./FileProvenanceBadge";
 
 /**
  * NodeDiffModal: Tier 2 Deep IaC Diff Modal.
@@ -137,10 +138,10 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               {/* Full Address & File info */}
               <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                 <span className="select-text truncate text-slate-600 dark:text-slate-400">{address}</span>
-                {fileLocation && (
+                {node.file && (
                   <>
                     <span>•</span>
-                    <span className="text-sky-600 dark:text-sky-400 truncate">{fileLocation}</span>
+                    <FileProvenanceBadge file={node.file} line={node.line} />
                   </>
                 )}
               </div>

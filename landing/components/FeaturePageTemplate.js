@@ -39,7 +39,7 @@ export default function FeaturePageTemplate({ feature }) {
       <div className="space-y-10 mt-12 text-sm leading-relaxed">
         {/* The Problem */}
         {feature.theProblem && (
-          <section className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] dark:bg-[#120e14] shadow-sm light:shadow-md light:border-rose-400/30">
+          <section className="p-6 rounded-xl border border-rose-500/20 bg-gradient-to-b from-rose-500/[0.04] to-rose-500/[0.01] dark:from-rose-500/[0.06] dark:to-rose-500/[0.02] backdrop-blur-[2px] shadow-sm light:shadow-md light:border-rose-400/30">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-rose-500"></span>
               <h2 className="font-mono text-xs uppercase tracking-wider text-rose-500 dark:text-rose-400 font-bold light:text-rose-700">
@@ -57,7 +57,7 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* The Algorithm / Implementation */}
         {feature.theAlgorithm && (
-          <section className="p-6 rounded-xl border border-sky-500/20 bg-sky-500/[0.02] dark:bg-[#0c131d] shadow-sm light:shadow-md light:border-sky-400/30">
+          <section className="p-6 rounded-xl border border-sky-500/20 bg-gradient-to-b from-sky-500/[0.05] via-sky-500/[0.02] to-transparent dark:from-sky-500/[0.06] dark:via-sky-500/[0.02] dark:to-transparent backdrop-blur-[2px] shadow-sm light:shadow-md light:border-sky-400/30">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-sky-400"></span>
               <h2 className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 font-bold light:text-sky-700">
@@ -75,13 +75,13 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* How to Use */}
         {feature.howToUse && (
-          <section className="p-6 rounded-xl border border-workbench-border bg-workbench-panel shadow-sm light:shadow-md">
+          <section className="p-6 rounded-xl border border-workbench-border bg-gradient-to-b from-workbench-panel/90 via-workbench-panel/75 to-workbench-panel/50 dark:from-workbench-panel/80 dark:to-workbench-panel/40 backdrop-blur-[2px] shadow-sm light:shadow-md">
             <h2 className="font-mono text-xs uppercase tracking-wider text-slate-700 dark:text-slate-400 light:text-slate-900 mb-4 font-bold">
               Workstation Flow: How to Use
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {feature.howToUse.map((step) => (
-                <div key={step.step} className="p-4 rounded-lg bg-workbench-subpanel border border-workbench-border shadow-xs light:shadow-xs">
+                <div key={step.step} className="p-4 rounded-lg bg-workbench-subpanel/80 dark:bg-workbench-subpanel/50 border border-workbench-border shadow-xs light:shadow-xs backdrop-blur-[2px]">
                   <div className="flex items-center space-x-2 mb-1.5">
                     <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-500 dark:text-sky-400 light:text-sky-700 font-mono text-[11px] font-bold flex items-center justify-center light:shadow-xs">
                       {step.step}
@@ -101,7 +101,7 @@ export default function FeaturePageTemplate({ feature }) {
 
         {/* SRE Scenario */}
         {feature.scenario && (
-          <section className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-[#0c1613] shadow-sm light:shadow-md light:border-emerald-500/40">
+          <section className="p-6 rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent dark:from-emerald-500/[0.06] dark:via-emerald-500/[0.02] dark:to-transparent backdrop-blur-[2px] shadow-sm light:shadow-md light:border-emerald-500/40">
             <div className="flex items-center space-x-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
               <h2 className="font-mono text-xs uppercase tracking-wider text-emerald-500 dark:text-emerald-400 font-bold light:text-emerald-700">

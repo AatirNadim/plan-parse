@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen bg-workbench-bg text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-150 flex flex-col">
         <ThemeProvider>
           <SiteHeader />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 canvas-bg">{children}</main>
           <SiteFooter />
         </ThemeProvider>
       </body>

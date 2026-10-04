@@ -24,21 +24,21 @@ html.dark {
 
 html.light {
   color-scheme: light;
-  --canvas-bg: #f8fafc;
-  --header-bg: #ffffff;
-  --panel-bg: #ffffff;
-  --border-color: #e2e8f0;
+  --canvas-bg: #edf3f9;
+  --header-bg: #f5f9fc;
+  --panel-bg: #f8fbfe;
+  --border-color: #d1dfea;
 
   /* RGB channels for Tailwind alpha support */
-  --workbench-bg: 248 250 252;     /* #f8fafc */
-  --workbench-header: 255 255 255; /* #ffffff */
-  --workbench-panel: 255 255 255;  /* #ffffff */
-  --workbench-subpanel: 241 245 249; /* #f1f5f9 */
-  --workbench-card: 255 255 255;   /* #ffffff */
-  --workbench-border: 226 232 240; /* #e2e8f0 */
-  --workbench-hover: 241 245 249;  /* #f1f5f9 */
-  --workbench-active: 226 232 240; /* #e2e8f0 */
-  --workbench-muted: 100 116 139;  /* #64748b */
+  --workbench-bg: 237 243 249;        /* #edf3f9 - soothing white with cool blue tint */
+  --workbench-header: 245 249 252;    /* #f5f9fc */
+  --workbench-panel: 248 251 254;     /* #f8fbfe */
+  --workbench-subpanel: 235 242 249;  /* #ebf2f9 */
+  --workbench-card: 248 251 254;      /* #f8fbfe */
+  --workbench-border: 209 223 234;    /* #d1dfea */
+  --workbench-hover: 226 236 246;     /* #e2ecf6 */
+  --workbench-active: 213 227 240;    /* #d5e3f0 */
+  --workbench-muted: 100 120 145;     /* #647891 */
 }
 
 html,
@@ -63,7 +63,7 @@ body {
 
 html.light body {
   color: #0f172a;
-  background-color: #f8fafc;
+  background-color: #edf3f9;
 }
 
 /* Precision Engineering Grid Canvas */
@@ -74,9 +74,12 @@ html.light body {
 }
 
 html.light .canvas-bg {
-  background-color: #f8fafc;
-  background-image: radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px);
-  background-size: 24px 24px;
+  background-color: #edf3f9;
+  background-image:
+    radial-gradient(circle, #94a3b8 1.1px, transparent 1.1px),
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(186, 230, 253, 0.45), transparent 75%),
+    linear-gradient(180deg, #f4f8fc 0%, #edf3f9 100%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
 }
 
 /* Workbench Scrollbar */
@@ -86,7 +89,7 @@ html.light .canvas-bg {
 }
 
 html.light * {
-  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-color: #cbd8e6 #ebf2f9;
 }
 
 ::-webkit-scrollbar {
@@ -105,13 +108,13 @@ html.light * {
 }
 
 html.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #ebf2f9;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #cbd8e6;
 }
 html.light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9ab3c9;
 }
 
 /* Selection */

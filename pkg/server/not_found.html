@@ -50,17 +50,17 @@
 
     html.light {
       color-scheme: light;
-      --canvas-bg: #f8fafc;
-      --header-bg: #ffffff;
-      --panel-bg: #ffffff;
-      --subpanel-bg: #f1f5f9;
-      --card-bg: #ffffff;
-      --border-color: #e2e8f0;
-      --hover-bg: #f1f5f9;
-      --muted-color: #64748b;
+      --canvas-bg: #edf3f9;
+      --header-bg: #f5f9fc;
+      --panel-bg: #f8fbfe;
+      --subpanel-bg: #ebf2f9;
+      --card-bg: #f8fbfe;
+      --border-color: #d1dfea;
+      --hover-bg: #e2ecf6;
+      --muted-color: #647891;
       --text-main: #0f172a;
-      --text-muted: #64748b;
-      --dot-color: #cbd5e1;
+      --text-muted: #647891;
+      --dot-color: #94a3b8;
       --code-bg: #020617;
       --code-border: #1e293b;
     }
@@ -109,9 +109,12 @@
     }
 
     html.light .canvas-bg {
-      background-color: #f8fafc;
-      background-image: radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px);
-      background-size: 24px 24px;
+      background-color: #edf3f9;
+      background-image:
+        radial-gradient(circle, #94a3b8 1.1px, transparent 1.1px),
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(186, 230, 253, 0.45), transparent 75%),
+        linear-gradient(180deg, #f4f8fc 0%, #edf3f9 100%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
     }
 
     .font-mono {
@@ -124,7 +127,7 @@
       scrollbar-color: #232936 #0c0e14;
     }
     html.light * {
-      scrollbar-color: #cbd5e1 #f1f5f9;
+      scrollbar-color: #cbd8e6 #ebf2f9;
     }
 
     /* Precision Workbench Scrollbar matching globals.css */

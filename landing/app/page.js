@@ -7,6 +7,11 @@ export default function HomePage() {
     <div className="space-y-24 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* 1. HERO SEGMENT */}
       <section className="relative text-center pt-8 pb-12 sm:pt-14 sm:pb-20">
+        {/* Subtle static ambient glow behind Hero */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-80 -z-10 pointer-events-none overflow-hidden opacity-60 dark:opacity-20 select-none">
+          <div className="w-[640px] h-[280px] mx-auto bg-gradient-to-b from-sky-400/25 via-sky-300/10 to-transparent blur-3xl rounded-full" />
+        </div>
+
         {/* Subtle grid background highlight */}
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-workbench-border bg-workbench-panel text-xs text-slate-700 dark:text-slate-300 mb-6 font-mono">
           <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -88,7 +93,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6" id="accomplishments">
           {/* Column 1: Traditional CLI Pain */}
-          <div className="p-6 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] dark:bg-[#130d12] space-y-4">
+          <div className="p-6 rounded-xl border border-rose-500/20 bg-gradient-to-b from-rose-500/[0.04] to-rose-500/[0.01] dark:from-[#130d12] dark:to-[#130d12] space-y-4 shadow-sm">
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
               <h3 className="font-mono text-sm uppercase tracking-wider text-rose-400 font-bold">
@@ -124,7 +129,7 @@ export default function HomePage() {
           </div>
 
           {/* Column 2: plan-parse Visual Assurance */}
-          <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.02] dark:bg-[#0c1614] space-y-4">
+          <div className="p-6 rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.05] via-emerald-500/[0.02] to-transparent dark:from-[#0c1614] dark:to-[#0c1614] space-y-4 shadow-sm">
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
               <h3 className="font-mono text-sm uppercase tracking-wider text-emerald-400 font-bold">
@@ -180,7 +185,7 @@ export default function HomePage() {
             <Link
               key={feature.id}
               href={`/features/${feature.slug}/`}
-              className="group p-5 rounded-xl border border-workbench-border bg-workbench-panel hover:bg-workbench-hover hover:border-sky-500/40 transition-all duration-200 flex flex-col justify-between"
+              className="group p-5 rounded-xl border border-workbench-border bg-gradient-to-b from-workbench-panel to-workbench-panel/85 hover:from-workbench-hover/70 hover:to-workbench-panel hover:border-sky-500/40 transition-all duration-200 flex flex-col justify-between shadow-sm"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { FEATURES } from "../lib/features-data";
+import GithubIcon from "./icons/github";
+import DockerIcon from "./icons/docker";
 
 export default function SiteHeader() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -121,9 +123,7 @@ export default function SiteHeader() {
             title="Docker Hub Image"
             className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-mono transition-colors"
           >
-            <svg className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.186.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.186.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.186.186.186m5.893 2.715h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.186.186 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186H8.1a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H5.136a.186.186 0 00-.186.185v1.888c0 .102.084.185.186.185m-2.928 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H2.208a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m21.688 1.258c-.312-.224-.872-.375-1.503-.375-.24 0-.49.022-.728.065-.367-1.127-1.428-1.93-2.678-1.93-.32 0-.628.055-.914.156-.37-.775-1.134-1.306-2.023-1.306-.47 0-.91.144-1.277.393V1.69a.186.186 0 00-.186-.186h-2.12a.185.185 0 00-.185.186v5.82a.185.185 0 00.185.185h4.63c.123 0 .235.047.32.124.084.076.136.184.136.305v.004c0 .24-.194.433-.434.433H1.472a.735.735 0 00-.736.736c0 1.278.337 2.502.977 3.542 1.34 2.18 3.654 3.633 6.36 3.992 1.05.139 2.12.139 3.17 0 2.548-.338 4.743-1.636 6.096-3.606.59-.858.983-1.83 1.145-2.857.48.09 1.02.046 1.487-.206.58-.314.93-.837.93-1.434 0-.458-.198-.823-.49-1.024"/>
-            </svg>
+            <DockerIcon className="w-3.5 h-3.5" />
             <span>Docker</span>
           </a>
 
@@ -133,9 +133,7 @@ export default function SiteHeader() {
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition-colors"
           >
-            <svg className="w-4 h-4 text-slate-600 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
-              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
+            <GithubIcon />
             <span className="hidden sm:inline">GitHub</span>
           </a>
 

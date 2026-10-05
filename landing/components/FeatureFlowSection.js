@@ -92,6 +92,93 @@ const FLOW_TRANSITIONS = [
 ];
 
 /**
+ * Editorial section styling matching the pipeline conduit colors.
+ * Maps each deep-dive chapter to its corresponding conduit theme:
+ * Directional gradients flow from bottom-left to top-right on the left,
+ * and bottom-right to top-left on the right, occluding the background dot grid
+ * with a solid opaque card surface.
+ */
+const SECTION_EDITORIAL_THEMES = [
+  {
+    // Chapter 01: Collapsed Nodes (Conduit: Amber / REPLACE CASCADE)
+    color: "amber",
+    rgb: "245, 158, 11",
+    badgeBg: "bg-amber-500/10",
+    badgeText: "text-amber-700 dark:text-amber-400 font-bold",
+    badgeBorder: "border-amber-500/30",
+    pinBg: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30",
+    cardBorderHover: "hover:border-amber-500/40",
+    ctaHoverText: "hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-500/40",
+  },
+  {
+    // Chapter 02: Blast Radius (Conduit: Sky / IN-PLACE UPDATE)
+    color: "sky",
+    rgb: "14, 165, 233",
+    badgeBg: "bg-sky-500/10",
+    badgeText: "text-sky-700 dark:text-sky-400 font-bold",
+    badgeBorder: "border-sky-500/30",
+    pinBg: "bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30",
+    cardBorderHover: "hover:border-sky-500/40",
+    ctaHoverText: "hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-500/40",
+  },
+  {
+    // Chapter 03: Resource Diff (Conduit: Emerald / CREATION AUDIT)
+    color: "emerald",
+    rgb: "16, 185, 129",
+    badgeBg: "bg-emerald-500/10",
+    badgeText: "text-emerald-700 dark:text-emerald-400 font-bold",
+    badgeBorder: "border-emerald-500/30",
+    pinBg: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+    cardBorderHover: "hover:border-emerald-500/40",
+    ctaHoverText: "hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/40",
+  },
+  {
+    // Chapter 04: Color Grading (Conduit: Purple / LINEAGE INSPECT)
+    color: "purple",
+    rgb: "168, 85, 247",
+    badgeBg: "bg-purple-500/10",
+    badgeText: "text-purple-700 dark:text-purple-400 font-bold",
+    badgeBorder: "border-purple-500/30",
+    pinBg: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
+    cardBorderHover: "hover:border-purple-500/40",
+    ctaHoverText: "hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-500/40",
+  },
+  {
+    // Chapter 05: Resource Panel (Conduit: Cyan / INGESTION STREAM)
+    color: "cyan",
+    rgb: "6, 182, 212",
+    badgeBg: "bg-cyan-500/10",
+    badgeText: "text-cyan-700 dark:text-cyan-400 font-bold",
+    badgeBorder: "border-cyan-500/30",
+    pinBg: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30",
+    cardBorderHover: "hover:border-cyan-500/40",
+    ctaHoverText: "hover:text-cyan-600 dark:hover:text-cyan-400 hover:border-cyan-500/40",
+  },
+  {
+    // Chapter 06: Workbench Sidebar (Conduit: Indigo / WORKSTATION CLI)
+    color: "indigo",
+    rgb: "99, 102, 241",
+    badgeBg: "bg-indigo-500/10",
+    badgeText: "text-indigo-700 dark:text-indigo-400 font-bold",
+    badgeBorder: "border-indigo-500/30",
+    pinBg: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30",
+    cardBorderHover: "hover:border-indigo-500/40",
+    ctaHoverText: "hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-500/40",
+  },
+  {
+    // Chapter 07: Workstation Tools (Closing Terminal Node / Action Teardown)
+    color: "rose",
+    rgb: "244, 63, 94",
+    badgeBg: "bg-rose-500/10",
+    badgeText: "text-rose-700 dark:text-rose-400 font-bold",
+    badgeBorder: "border-rose-500/30",
+    pinBg: "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30",
+    cardBorderHover: "hover:border-rose-500/40",
+    ctaHoverText: "hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-500/40",
+  },
+];
+
+/**
  * Connecting conduit component between two deep dive rows.
  * Implements the brand logo's signature curved tube track:
  * - Outer casing: Dark workbench casing track
@@ -333,65 +420,85 @@ function WorkstationViewport({
  * Editorial Column:
  * Contains the chapter index, title, problem statement, key metrics, and CTA.
  */
-function FeatureEditorial({ feature, index }) {
+function FeatureEditorial({ feature, index, isLeftOnDesktop }) {
   const chapterNumber = String(index + 1).padStart(2, "0");
+  const theme = SECTION_EDITORIAL_THEMES[index % SECTION_EDITORIAL_THEMES.length];
+  const gradientClass = isLeftOnDesktop ? "editorial-gradient-tr" : "editorial-gradient-tl";
 
   return (
-    <div className="flex flex-col justify-center space-y-4">
-      {/* Chapter Eyebrow & Badges */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20">
-          CHAPTER {chapterNumber}
-        </span>
-        <span className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-workbench-panel text-slate-700 dark:text-slate-300 light:text-slate-800 border border-workbench-border">
-          {feature.badge}
-        </span>
-        <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 dark:bg-[#161B26] text-slate-600 dark:text-slate-400 border border-workbench-border">
-          Hotkey: [{feature.hotkey}]
-        </span>
-      </div>
+    <div
+      className={`editorial-card relative rounded-2xl border border-slate-200/90 dark:border-workbench-border/80 ring-1 ring-inset ring-slate-900/5 dark:ring-white/[0.05] bg-white dark:bg-[#0C0E15] shadow-xl ${theme.cardBorderHover} overflow-hidden p-6 sm:p-8 flex flex-col justify-center space-y-4 w-full`}
+      style={{
+        "--theme-rgb": theme.rgb,
+      }}
+    >
+      {/* Directional Conduit Solid Gradient Overlay (Occludes Canvas Dot Grid) */}
+      <div
+        className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${gradientClass}`}
+        aria-hidden="true"
+      />
 
-      {/* Section Title */}
-      <h3 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100 leading-snug">
-        {feature.title}
-      </h3>
+      {/* Card Content (Relative z-10 for interactivity & sharp contrast) */}
+      <div className="relative z-10 space-y-4">
+        {/* Chapter Eyebrow & Badges */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`px-2.5 py-0.5 rounded text-[11px] font-mono font-bold ${theme.badgeBg} ${theme.badgeText} border ${theme.badgeBorder}`}
+          >
+            CHAPTER {chapterNumber}
+          </span>
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 dark:bg-workbench-panel text-slate-700 dark:text-slate-300 light:text-slate-800 border border-slate-200 dark:border-workbench-border">
+            {feature.badge}
+          </span>
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 dark:bg-[#161B26] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-workbench-border">
+            Hotkey: [{feature.hotkey}]
+          </span>
+        </div>
 
-      {/* Core Tagline / Value Proposition */}
-      <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
-        {feature.tagline}
-      </p>
+        {/* Section Title */}
+        <h3 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100 leading-snug">
+          {feature.title}
+        </h3>
 
-      {/* Specific Callout Highlights */}
-      {feature.callouts && feature.callouts.length > 0 && (
-        <ul className="space-y-2 pt-1 font-sans">
-          {feature.callouts.slice(0, 3).map((callout) => (
-            <li
-              key={callout.pin}
-              className="flex items-start space-x-2 text-[13px] text-slate-700 dark:text-slate-300 light:text-slate-700 light:font-medium leading-relaxed"
-            >
-              <span className="mt-0.5 w-4 h-4 rounded-full bg-sky-500/15 text-sky-500 dark:text-sky-400 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-sky-500/30">
-                {callout.pin}
-              </span>
-              <span>
-                <strong className="text-slate-900 dark:text-slate-100 font-bold">
-                  {callout.title}:
-                </strong>{" "}
-                {callout.description}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {/* Core Tagline / Value Proposition */}
+        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
+          {feature.tagline}
+        </p>
 
-      {/* CTA Button */}
-      <div className="pt-2">
-        <Link
-          href={`/features/${feature.slug}/`}
-          className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-lg border border-workbench-border bg-workbench-panel hover:bg-workbench-hover text-slate-800 dark:text-slate-200 hover:text-sky-500 dark:hover:text-sky-400 text-xs sm:text-sm font-semibold light:font-bold transition-all shadow-xs hover:border-sky-500/40 group"
-        >
-          <span>Explore Chapter Specification</span>
-          <span className="group-hover:translate-x-1 transition-transform">→</span>
-        </Link>
+        {/* Specific Callout Highlights */}
+        {feature.callouts && feature.callouts.length > 0 && (
+          <ul className="space-y-2 pt-1 font-sans">
+            {feature.callouts.slice(0, 3).map((callout) => (
+              <li
+                key={callout.pin}
+                className="flex items-start space-x-2 text-[13px] text-slate-700 dark:text-slate-300 light:text-slate-700 light:font-medium leading-relaxed"
+              >
+                <span
+                  className={`mt-0.5 w-4 h-4 rounded-full ${theme.pinBg} font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border`}
+                >
+                  {callout.pin}
+                </span>
+                <span>
+                  <strong className="text-slate-900 dark:text-slate-100 font-bold">
+                    {callout.title}:
+                  </strong>{" "}
+                  {callout.description}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* CTA Button */}
+        <div className="pt-2">
+          <Link
+            href={`/features/${feature.slug}/`}
+            className={`inline-flex items-center space-x-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-workbench-border bg-slate-50 dark:bg-workbench-panel hover:bg-slate-100 dark:hover:bg-workbench-hover text-slate-800 dark:text-slate-200 ${theme.ctaHoverText} text-xs sm:text-sm font-semibold light:font-bold transition-all shadow-xs group`}
+          >
+            <span>Explore Chapter Specification</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -585,7 +692,7 @@ export default function FeatureFlowSection() {
                     <>
                       {/* Left: Editorial (Cols 1-5) */}
                       <div className="lg:col-span-5 order-2 lg:order-1">
-                        <FeatureEditorial feature={feature} index={idx} />
+                        <FeatureEditorial feature={feature} index={idx} isLeftOnDesktop={true} />
                       </div>
                       {/* Right: Viewport Card (Cols 6-12) */}
                       <div className="lg:col-span-7 order-1 lg:order-2">
@@ -616,7 +723,7 @@ export default function FeatureFlowSection() {
                       </div>
                       {/* Right: Editorial (Cols 8-12) */}
                       <div className="lg:col-span-5 order-2">
-                        <FeatureEditorial feature={feature} index={idx} />
+                        <FeatureEditorial feature={feature} index={idx} isLeftOnDesktop={false} />
                       </div>
                     </>
                   )}

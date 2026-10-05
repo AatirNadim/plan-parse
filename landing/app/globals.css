@@ -361,3 +361,17 @@ html.light ::-webkit-scrollbar-thumb:hover {
 .logo-badge-yellow-stroke { stroke: var(--logo-tube-yellow); }
 .logo-badge-yellow-fill { fill: var(--logo-tube-yellow); }
 
+/* Flow Conduit Pulse Animation */
+@keyframes flowPulse {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-flow-pulse {
+  animation: flowPulse 2.4s linear infinite;
+}
+

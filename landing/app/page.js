@@ -2,7 +2,7 @@ import Link from "next/link";
 import CodeBlock from "../components/CodeBlock";
 import BrandLogo from "../components/BrandLogo";
 import DockerIcon from "../components/icons/docker";
-import { FEATURES } from "../lib/features-data";
+import FeatureFlowSection from "../components/FeatureFlowSection";
 
 export default function HomePage() {
   return (
@@ -266,52 +266,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. FEATURE DIRECTORY GRID */}
-      <section className="pt-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 light:text-sky-700 light:font-bold mb-2">
-            Comprehensive Documentation
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
-            Dedicated Architectural Deep-Dives
-          </h2>
-          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
-            Every core capability of plan-parse is documented with interactive diagrams, real Terraform fixtures, and algorithmic explanations.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map((feature, idx) => (
-            <Link
-              key={feature.id}
-              href={`/features/${feature.slug}/`}
-              className="group p-5 rounded-xl border border-workbench-border bg-gradient-to-b from-workbench-panel to-workbench-panel/85 hover:from-workbench-hover/70 hover:to-workbench-panel hover:border-sky-500/40 transition-all duration-200 flex flex-col justify-between shadow-sm light:shadow-sm hover:light:shadow-md"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 light:text-sky-700 border border-sky-500/20 font-bold">
-                    {feature.badge}
-                  </span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-[#161b26] text-slate-700 dark:text-slate-400 light:text-slate-800 light:font-semibold border border-workbench-border">
-                    {feature.hotkey}
-                  </span>
-                </div>
-                <h3 className="text-sm font-semibold light:font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">
-                  {idx + 1}. {feature.title}
-                </h3>
-                <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
-                  {feature.tagline}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-workbench-border/60 flex items-center justify-between text-[11px] font-mono text-sky-600 dark:text-sky-400 light:text-sky-700 light:font-bold">
-                <span>Explore Chapter</span>
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* 3. FLOW-CONNECTED ARCHITECTURAL DEEP-DIVES */}
+      <FeatureFlowSection />
 
       {/* 4. END-USER WORKFLOW GUIDE */}
       <section id="workflow" className="pt-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { FEATURES } from "../lib/features-data";
 import FeatureCleanVisual from "./FeatureCleanVisuals";
@@ -99,58 +99,63 @@ const FLOW_TRANSITIONS = [
  * - Midpoint action node badge with semantic symbol (+, -, ~, ±, ⇲)
  * - Responsive: S-curve across columns on desktop, straight spine on mobile
  */
-function FlowConduit({ transition, isEvenToOdd }) {
+function FlowConduit({ transition, isEvenToOdd, index, hasDynamicPath }) {
   // isEvenToOdd: true = from right column (~71%) to left column (~29%)
   // false = from left column (~29%) to right column (~71%)
   const startX = isEvenToOdd ? 710 : 290;
   const endX = isEvenToOdd ? 290 : 710;
 
-  // SVG curved path: vertical drop -> smooth horizontal elbow -> crossbar -> smooth vertical elbow -> exit drop
+  // Extended fallback SVG curved path (visible when dynamic path is not yet computed, e.g. SSR)
   const pathD = isEvenToOdd
-    ? "M 710 0 V 30 C 710 54, 690 60, 665 60 H 335 C 310 60, 290 66, 290 90 V 120"
-    : "M 290 0 V 30 C 290 54, 310 60, 335 60 H 665 C 690 60, 710 66, 710 90 V 120";
+    ? "M 710 -40 V 30 C 710 54, 690 60, 665 60 H 335 C 310 60, 290 66, 290 90 V 160"
+    : "M 290 -40 V 30 C 290 54, 310 60, 335 60 H 665 C 690 60, 710 66, 710 90 V 160";
 
   return (
-    <div className="relative w-full h-24 sm:h-28 lg:h-32 my-1 flex items-center justify-center select-none">
-      {/* Desktop Curved Flow (lg and above) */}
-      <div className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none">
-        <svg
-          viewBox="0 0 1000 120"
-          fill="none"
-          preserveAspectRatio="none"
-          className="w-full h-full"
-        >
-          {/* Outer Casing Track (Dark obsidian / slate casing from BrandLogo) */}
-          <path
-            d={pathD}
-            className="stroke-[#1F2638] dark:stroke-[#1F2638] light:stroke-[#CBD5E1]"
-            strokeWidth="16"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {/* Intermediate Track Border Outline */}
-          <path
-            d={pathD}
-            className="stroke-[#3B4861] dark:stroke-[#3B4861] light:stroke-[#94A3B8]"
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.8"
-          />
-          {/* Inner Glowing Conduit Wire (Animated Dashed Pulse) */}
-          <path
-            d={pathD}
-            stroke={transition.strokeColor}
-            strokeWidth="2.5"
-            strokeDasharray="8 8"
-            strokeLinecap="round"
-            className="animate-flow-pulse"
-          />
-        </svg>
-      </div>
+    <div className="relative w-full h-24 sm:h-28 lg:h-32 flex items-center justify-center select-none overflow-visible">
+      {/* Desktop Curved Flow (Fallback for SSR / before mount) */}
+      {!hasDynamicPath && (
+        <div className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+          <svg
+            viewBox="0 0 1000 120"
+            fill="none"
+            preserveAspectRatio="none"
+            className="w-full h-full overflow-visible"
+          >
+            {/* Outer Casing Track (Dark obsidian / slate casing from BrandLogo) */}
+            <path
+              d={pathD}
+              fill="none"
+              className="stroke-[#1F2638] dark:stroke-[#1F2638] light:stroke-[#CBD5E1]"
+              strokeWidth="16"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Intermediate Track Border Outline */}
+            <path
+              d={pathD}
+              fill="none"
+              className="stroke-[#3B4861] dark:stroke-[#3B4861] light:stroke-[#94A3B8]"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.8"
+            />
+            {/* Inner Glowing Conduit Wire (Animated Dashed Pulse) */}
+            <path
+              d={pathD}
+              fill="none"
+              stroke={transition.strokeColor}
+              strokeWidth="2.5"
+              strokeDasharray="8 8"
+              strokeLinecap="round"
+              className="animate-flow-pulse"
+            />
+          </svg>
+        </div>
+      )}
 
       {/* Mobile & Tablet Vertical Center Spine (< lg) */}
-      <div className="lg:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="lg:hidden absolute -top-4 -bottom-4 inset-x-0 flex items-center justify-center pointer-events-none">
         <div className="h-full w-4 bg-[#1F2638] dark:bg-[#1F2638] light:bg-[#CBD5E1] rounded-full flex items-center justify-center">
           <div
             className="h-full w-0.5 border-l-2 border-dashed animate-flow-pulse"
@@ -160,7 +165,10 @@ function FlowConduit({ transition, isEvenToOdd }) {
       </div>
 
       {/* Center Action Node Badge (Embedded on the Conduit) */}
-      <div className="relative z-10 flex flex-col items-center">
+      <div
+        id={`transition-badge-${index}`}
+        className="relative z-20 flex flex-col items-center pt-4"
+      >
         <div
           className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full border ${transition.badgeBorder} bg-workbench-panel dark:bg-[#0C0E14] light:bg-white shadow-lg transition-transform hover:scale-105 cursor-default`}
           style={{
@@ -192,16 +200,50 @@ function FlowConduit({ transition, isEvenToOdd }) {
 /**
  * Workstation Viewport Frame:
  * Visual aid card embedding the high-DPI vector SVG diagram inside an authentic IDE canvas.
+ * Now equipped with top and bottom docking ports for seamless pipeline conduit connectivity.
  */
-function WorkstationViewport({ feature, isLeftOnDesktop }) {
+function WorkstationViewport({
+  feature,
+  index,
+  isLeftOnDesktop,
+  showTopPort,
+  showBottomPort,
+  topTransition,
+  bottomTransition,
+}) {
   return (
     <div
-      className={`relative group rounded-2xl border border-slate-200 dark:border-workbench-border bg-white dark:bg-[#0C0E15] shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 overflow-hidden w-full max-w-[90%] mx-auto ${
+      className={`relative group rounded-2xl border border-slate-200 dark:border-workbench-border bg-white dark:bg-[#0C0E15] shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 w-full max-w-[94%] mx-auto ${
         isLeftOnDesktop ? "lg:mr-auto lg:ml-0" : "lg:ml-auto lg:mr-0"
       }`}
     >
+      {/* Top Connector Port (Dock Node) */}
+      {showTopPort && (
+        <div
+          id={`viewport-dock-top-${index}`}
+          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex items-center justify-center pointer-events-none"
+        >
+          <span
+            className="absolute w-5 h-5 rounded-full animate-ping opacity-25"
+            style={{ backgroundColor: topTransition?.strokeColor || "#38BDF8" }}
+          />
+          <span
+            className="w-4 h-4 rounded-full border-2 bg-white dark:bg-[#0C0E15] shadow-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+            style={{
+              borderColor: topTransition?.borderColor || "#38BDF8",
+              boxShadow: `0 0 10px ${topTransition?.glowColor || "rgba(56,189,248,0.6)"}`,
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: topTransition?.strokeColor || "#38BDF8" }}
+            />
+          </span>
+        </div>
+      )}
+
       {/* Viewport macOS/IDE Window Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 dark:border-workbench-border/70 bg-slate-100 dark:bg-[#161B26] text-xs font-mono select-none">
+      <div className="flex items-center justify-between px-4 py-2.5 rounded-t-2xl border-b border-slate-200 dark:border-workbench-border/70 bg-slate-100 dark:bg-[#161B26] text-xs font-mono select-none">
         {/* Window controls & file path */}
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-1.5">
@@ -227,7 +269,7 @@ function WorkstationViewport({ feature, isLeftOnDesktop }) {
       </div>
 
       {/* Viewport Canvas Body (100% Solid Background, Zero Dots) */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#F8FAFC] dark:bg-[#090A0F] flex items-center justify-center">
+      <div className="relative aspect-[16/9] w-full rounded-b-2xl overflow-hidden bg-[#F8FAFC] dark:bg-[#090A0F] flex items-center justify-center">
         {/* Clean, Focused Visual Aid (Zero Numbered Pins, Minimal Overwhelm) */}
         <div className="relative z-10 w-full h-full p-2 sm:p-4 transition-transform duration-500 group-hover:scale-[1.01] flex items-center justify-center">
           <FeatureCleanVisual featureId={feature.id} />
@@ -258,6 +300,31 @@ function WorkstationViewport({ feature, isLeftOnDesktop }) {
           </button>
         </div>
       </div>
+
+      {/* Bottom Connector Port (Dock Node) */}
+      {showBottomPort && (
+        <div
+          id={`viewport-dock-bottom-${index}`}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-30 flex items-center justify-center pointer-events-none"
+        >
+          <span
+            className="absolute w-5 h-5 rounded-full animate-ping opacity-25"
+            style={{ backgroundColor: bottomTransition?.strokeColor || "#38BDF8" }}
+          />
+          <span
+            className="w-4 h-4 rounded-full border-2 bg-white dark:bg-[#0C0E15] shadow-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+            style={{
+              borderColor: bottomTransition?.borderColor || "#38BDF8",
+              boxShadow: `0 0 10px ${bottomTransition?.glowColor || "rgba(56,189,248,0.6)"}`,
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: bottomTransition?.strokeColor || "#38BDF8" }}
+            />
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -335,6 +402,113 @@ function FeatureEditorial({ feature, index }) {
  * Replaces the static 3x2 card grid with an alternating, connected DAG pipeline flow.
  */
 export default function FeatureFlowSection() {
+  const pipelineRef = useRef(null);
+  const [conduitPaths, setConduitPaths] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
+
+  const updatePaths = useCallback(() => {
+    if (!pipelineRef.current) return;
+    const containerRect = pipelineRef.current.getBoundingClientRect();
+
+    const newPaths = [];
+    for (let i = 0; i < FEATURES.length - 1; i++) {
+      const fromEl = document.getElementById(`viewport-dock-bottom-${i}`);
+      const toEl = document.getElementById(`viewport-dock-top-${i + 1}`);
+      const badgeEl = document.getElementById(`transition-badge-${i}`);
+
+      if (fromEl && toEl) {
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2 - containerRect.left;
+        const startY = fromRect.top + fromRect.height / 2 - containerRect.top;
+
+        const endX = toRect.left + toRect.width / 2 - containerRect.left;
+        const endY = toRect.top + toRect.height / 2 - containerRect.top;
+
+        let midY;
+        if (badgeEl) {
+          const badgeRect = badgeEl.getBoundingClientRect();
+          midY = badgeRect.top + badgeRect.height / 2 - containerRect.top;
+        } else {
+          midY = (startY + endY) / 2;
+        }
+
+        const isRightToLeft = startX > endX;
+        const dx = Math.abs(endX - startX);
+
+        // Radius for smooth elbows
+        const r = Math.min(
+          32,
+          Math.max(12, dx / 4),
+          Math.max(8, (midY - startY) * 0.7),
+          Math.max(8, (endY - midY) * 0.7)
+        );
+        const dir = isRightToLeft ? -1 : 1;
+
+        let d = "";
+        if (dx < 30) {
+          d = `M ${startX} ${startY} V ${endY}`;
+        } else {
+          d =
+            `M ${startX} ${startY} ` +
+            `V ${midY - r} ` +
+            `C ${startX} ${midY - r * 0.45}, ${startX + dir * r * 0.45} ${midY}, ${startX + dir * r} ${midY} ` +
+            `H ${endX - dir * r} ` +
+            `C ${endX - dir * r * 0.45} ${midY}, ${endX} ${midY + r * 0.45}, ${endX} ${midY + r} ` +
+            `V ${endY}`;
+        }
+
+        newPaths.push({
+          index: i,
+          transition: FLOW_TRANSITIONS[i],
+          d,
+          startX,
+          startY,
+          endX,
+          endY,
+          midY,
+        });
+      }
+    }
+    setConduitPaths(newPaths);
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+    updatePaths();
+
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined" && pipelineRef.current) {
+      ro = new ResizeObserver(() => {
+        updatePaths();
+      });
+      ro.observe(pipelineRef.current);
+    }
+
+    const handleResize = () => {
+      updatePaths();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    if (typeof document !== "undefined" && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        updatePaths();
+      });
+    }
+
+    const timer1 = setTimeout(updatePaths, 100);
+    const timer2 = setTimeout(updatePaths, 500);
+
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [updatePaths]);
+
   return (
     <section className="pt-8 relative" id="features">
       {/* Section Header */}
@@ -352,52 +526,115 @@ export default function FeatureFlowSection() {
       </div>
 
       {/* Connected Flow Pipeline */}
-      <div className="space-y-4">
-        {FEATURES.map((feature, idx) => {
-          // Alternating layout: even indices have Editorial on Left & Viewport on Right;
-          // odd indices have Viewport on Left & Editorial on Right.
-          const isEven = idx % 2 === 0;
-          const transition = idx < FEATURES.length - 1 ? FLOW_TRANSITIONS[idx] : null;
+      <div className="relative" ref={pipelineRef}>
+        {/* Dynamic Exact Pipeline SVG Layer (Desktop) */}
+        {isMounted && conduitPaths.length > 0 && (
+          <svg
+            className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+            fill="none"
+            aria-hidden="true"
+          >
+            {conduitPaths.map((item) => (
+              <g key={item.index} fill="none">
+                {/* Outer Casing Track */}
+                <path
+                  d={item.d}
+                  fill="none"
+                  className="stroke-[#1F2638] dark:stroke-[#1F2638] light:stroke-[#CBD5E1]"
+                  strokeWidth="16"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {/* Intermediate Track Border Outline */}
+                <path
+                  d={item.d}
+                  fill="none"
+                  className="stroke-[#3B4861] dark:stroke-[#3B4861] light:stroke-[#94A3B8]"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.8"
+                />
+                {/* Inner Glowing Conduit Wire (Animated Dashed Pulse) */}
+                <path
+                  d={item.d}
+                  fill="none"
+                  stroke={item.transition.strokeColor}
+                  strokeWidth="2.5"
+                  strokeDasharray="8 8"
+                  strokeLinecap="round"
+                  className="animate-flow-pulse"
+                />
+              </g>
+            ))}
+          </svg>
+        )}
 
-          return (
-            <div key={feature.id} className="relative">
-              {/* Feature Row Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                {isEven ? (
-                  <>
-                    {/* Left: Editorial (Cols 1-5) */}
-                    <div className="lg:col-span-5 order-2 lg:order-1">
-                      <FeatureEditorial feature={feature} index={idx} />
-                    </div>
-                    {/* Right: Viewport Card (Cols 6-12) */}
-                    <div className="lg:col-span-7 order-1 lg:order-2">
-                      <WorkstationViewport feature={feature} isLeftOnDesktop={false} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Left: Viewport Card (Cols 1-7) */}
-                    <div className="lg:col-span-7 order-1">
-                      <WorkstationViewport feature={feature} isLeftOnDesktop={true} />
-                    </div>
-                    {/* Right: Editorial (Cols 8-12) */}
-                    <div className="lg:col-span-5 order-2">
-                      <FeatureEditorial feature={feature} index={idx} />
-                    </div>
-                  </>
+        <div className="space-y-4">
+          {FEATURES.map((feature, idx) => {
+            // Alternating layout: even indices have Editorial on Left & Viewport on Right;
+            // odd indices have Viewport on Left & Editorial on Right.
+            const isEven = idx % 2 === 0;
+            const transition = idx < FEATURES.length - 1 ? FLOW_TRANSITIONS[idx] : null;
+
+            return (
+              <div key={feature.id} className="relative">
+                {/* Feature Row Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                  {isEven ? (
+                    <>
+                      {/* Left: Editorial (Cols 1-5) */}
+                      <div className="lg:col-span-5 order-2 lg:order-1">
+                        <FeatureEditorial feature={feature} index={idx} />
+                      </div>
+                      {/* Right: Viewport Card (Cols 6-12) */}
+                      <div className="lg:col-span-7 order-1 lg:order-2">
+                        <WorkstationViewport
+                          feature={feature}
+                          index={idx}
+                          isLeftOnDesktop={false}
+                          showTopPort={idx > 0}
+                          showBottomPort={idx < FEATURES.length - 1}
+                          topTransition={idx > 0 ? FLOW_TRANSITIONS[idx - 1] : null}
+                          bottomTransition={idx < FEATURES.length - 1 ? FLOW_TRANSITIONS[idx] : null}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Left: Viewport Card (Cols 1-7) */}
+                      <div className="lg:col-span-7 order-1">
+                        <WorkstationViewport
+                          feature={feature}
+                          index={idx}
+                          isLeftOnDesktop={true}
+                          showTopPort={idx > 0}
+                          showBottomPort={idx < FEATURES.length - 1}
+                          topTransition={idx > 0 ? FLOW_TRANSITIONS[idx - 1] : null}
+                          bottomTransition={idx < FEATURES.length - 1 ? FLOW_TRANSITIONS[idx] : null}
+                        />
+                      </div>
+                      {/* Right: Editorial (Cols 8-12) */}
+                      <div className="lg:col-span-5 order-2">
+                        <FeatureEditorial feature={feature} index={idx} />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Connecting Flow Conduit to Next Step */}
+                {transition && (
+                  <FlowConduit
+                    transition={transition}
+                    isEvenToOdd={isEven}
+                    index={idx}
+                    hasDynamicPath={isMounted && conduitPaths.length > 0}
+                  />
                 )}
               </div>
-
-              {/* Connecting Flow Conduit to Next Step */}
-              {transition && (
-                <FlowConduit
-                  transition={transition}
-                  isEvenToOdd={isEven}
-                />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

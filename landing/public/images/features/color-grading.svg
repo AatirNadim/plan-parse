@@ -16,7 +16,6 @@
 
   <!-- Background -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-cg)" />
 
   <!-- TOP ACTION TOKEN PALETTE BAR (Callout 1 showcase) -->
   <g transform="translate(40, 24)">

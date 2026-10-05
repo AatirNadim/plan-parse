@@ -10,7 +10,6 @@
 
   <!-- Background Canvas -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-rp)" />
 
   <!-- LEFT CANVAS AREA: Selected Node on Canvas -->
   <g transform="translate(60, 200)">

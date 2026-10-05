@@ -10,7 +10,6 @@
 
   <!-- Background Canvas -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-ms)" />
 
   <!-- TOP-LEFT: GLOBAL COMMAND PALETTE (Callout 1) -->
   <g transform="translate(40, 24)">

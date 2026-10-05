@@ -196,12 +196,12 @@ function FlowConduit({ transition, isEvenToOdd }) {
 function WorkstationViewport({ feature, isLeftOnDesktop }) {
   return (
     <div
-      className={`relative group rounded-2xl border border-workbench-border bg-workbench-panel dark:bg-[#0C0E15] light:bg-white shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 overflow-hidden w-full max-w-[90%] mx-auto ${
+      className={`relative group rounded-2xl border border-slate-200 dark:border-workbench-border bg-white dark:bg-[#0C0E15] shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 overflow-hidden w-full max-w-[90%] mx-auto ${
         isLeftOnDesktop ? "lg:mr-auto lg:ml-0" : "lg:ml-auto lg:mr-0"
       }`}
     >
       {/* Viewport macOS/IDE Window Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-workbench-border/70 bg-workbench-subpanel dark:bg-[#161B26] light:bg-[#F1F5F9] text-xs font-mono select-none">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 dark:border-workbench-border/70 bg-slate-100 dark:bg-[#161B26] text-xs font-mono select-none">
         {/* Window controls & file path */}
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-1.5">
@@ -220,48 +220,39 @@ function WorkstationViewport({ feature, isLeftOnDesktop }) {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>DAG CANVAS</span>
           </span>
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-workbench-bg border border-slate-300 dark:border-workbench-border text-slate-900 dark:text-slate-200">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-workbench-bg border border-slate-300 dark:border-workbench-border text-slate-900 dark:text-slate-200">
             [{feature.hotkey}]
           </span>
         </div>
       </div>
 
-      {/* Viewport Canvas Body with Dot Grid & Embedded Vector Graphic */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F8FAFC] flex items-center justify-center">
-        {/* Precise Dot Grid Matrix */}
-        <div
-          className="absolute inset-0 opacity-40 dark:opacity-30 light:opacity-40 pointer-events-none"
-          style={{
-            backgroundImage: "radial-gradient(circle, #3B4861 1.2px, transparent 1.2px)",
-            backgroundSize: "20px 20px",
-          }}
-        />
-
+      {/* Viewport Canvas Body (100% Solid Background, Zero Dots) */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#F8FAFC] dark:bg-[#090A0F] flex items-center justify-center">
         {/* Clean, Focused Visual Aid (Zero Numbered Pins, Minimal Overwhelm) */}
         <div className="relative z-10 w-full h-full p-2 sm:p-4 transition-transform duration-500 group-hover:scale-[1.01] flex items-center justify-center">
           <FeatureCleanVisual featureId={feature.id} />
         </div>
 
         {/* Floating Canvas Controls (Zoom In, Zoom Out, Fit) in corner */}
-        <div className="absolute bottom-3 right-3 z-20 flex flex-col rounded-lg border border-workbench-border/80 bg-workbench-panel dark:bg-[#0C0E14] light:bg-white shadow-md text-slate-400 dark:text-slate-400 light:text-slate-600 text-xs font-mono overflow-hidden">
+        <div className="absolute bottom-3 right-3 z-20 flex flex-col rounded-lg border border-slate-200 dark:border-workbench-border/80 bg-white dark:bg-[#0C0E14] shadow-md text-slate-500 dark:text-slate-400 text-xs font-mono overflow-hidden">
           <button
             type="button"
             title="Zoom In"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-workbench-border/60"
+            className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-slate-200 dark:border-workbench-border/60"
           >
             +
           </button>
           <button
             type="button"
             title="Zoom Out"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-workbench-border/60"
+            className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-slate-200 dark:border-workbench-border/60"
           >
             −
           </button>
           <button
             type="button"
             title="Fit Viewport"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+            className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           >
             ⛶
           </button>
@@ -309,13 +300,13 @@ function FeatureEditorial({ feature, index }) {
           {feature.callouts.slice(0, 3).map((callout) => (
             <li
               key={callout.pin}
-              className="flex items-start space-x-2 text-xs text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed"
+              className="flex items-start space-x-2 text-[13px] text-slate-700 dark:text-slate-300 light:text-slate-700 light:font-medium leading-relaxed"
             >
               <span className="mt-0.5 w-4 h-4 rounded-full bg-sky-500/15 text-sky-500 dark:text-sky-400 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-sky-500/30">
                 {callout.pin}
               </span>
               <span>
-                <strong className="text-slate-900 dark:text-slate-100 font-semibold">
+                <strong className="text-slate-900 dark:text-slate-100 font-bold">
                   {callout.title}:
                 </strong>{" "}
                 {callout.description}

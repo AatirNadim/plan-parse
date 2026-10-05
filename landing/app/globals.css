@@ -49,6 +49,7 @@ html.dark {
   --logo-tube-yellow: #FBBF24;
 
   /* Clean Feature Viewport Tokens (Dark Mode) */
+  --vis-canvas-bg: #090A0F;
   --vis-bg: #0F121A;
   --vis-header: #161B26;
   --vis-border: #232936;
@@ -112,6 +113,7 @@ html.light {
   --logo-tube-yellow: #D97706;
 
   /* Clean Feature Viewport Tokens (Light High-Contrast Mode) */
+  --vis-canvas-bg: #F8FAFC;
   --vis-bg: #FFFFFF;
   --vis-header: #F1F5F9;
   --vis-border: #CBD5E1;
@@ -430,4 +432,5 @@ html.light ::-webkit-scrollbar-thumb:hover {
 .vis-emerald { fill: var(--vis-emerald); }
 .vis-rose { fill: var(--vis-rose); }
 .vis-purple { fill: var(--vis-purple); }
+.vis-canvas-bg { fill: var(--vis-canvas-bg); }
 

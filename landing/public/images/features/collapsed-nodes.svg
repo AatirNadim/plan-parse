@@ -16,7 +16,6 @@
 
   <!-- Canvas Background -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-cn)" />
 
   <!-- Mock Header Toolbar -->
   <rect x="20" y="16" width="920" height="46" rx="8" fill="#0f121a" stroke="#232936" stroke-width="1.5" />

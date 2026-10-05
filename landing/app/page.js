@@ -183,10 +183,10 @@ export default function HomePage() {
           <div className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 light:text-sky-700 light:font-bold mb-2">
             Architectural Motivation
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="text-2xl sm:text-4xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             Why Traditional Plan Reviews Fail at Scale
           </h2>
-          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
             Terraform CLI outputs are linear and text-based. In contrast, cloud infrastructures are non-linear, deeply interdependent Directed Acyclic Graphs.
           </p>
         </div>
@@ -200,7 +200,7 @@ export default function HomePage() {
                 Traditional Terminal Output
               </h3>
             </div>
-            <ul className="space-y-3 text-xs text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed">
+            <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300 light:text-slate-700 light:font-medium leading-relaxed">
               <li className="flex items-start space-x-2">
                 <span className="text-rose-500 font-bold">✕</span>
                 <span>
@@ -236,7 +236,7 @@ export default function HomePage() {
                 plan-parse Visual Assurance
               </h3>
             </div>
-            <ul className="space-y-3 text-xs text-slate-700 dark:text-slate-300 light:text-slate-900 light:font-medium leading-relaxed">
+            <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300 light:text-slate-700 light:font-medium leading-relaxed">
               <li className="flex items-start space-x-2">
                 <span className="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
                 <span>
@@ -275,7 +275,7 @@ export default function HomePage() {
           <div className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 mb-2">
             Execution Flow
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="text-2xl sm:text-4xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             How to Use plan-parse in 4 Steps
           </h2>
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
@@ -381,7 +381,7 @@ terraform apply -target="module.vpc.aws_subnet.private[0]"`}
           <div className="font-mono text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 light:text-sky-700 light:font-bold mb-2">
             Distribution Channels
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="text-2xl sm:text-4xl font-bold light:font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             Binary Downloads &amp; Docker Image
           </h2>
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">

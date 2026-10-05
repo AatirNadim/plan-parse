@@ -14,9 +14,6 @@ export function VisualCollapsedNodes() {
   return (
     <svg viewBox="0 0 640 360" fill="none" className="w-full h-full select-none">
       <defs>
-        <pattern id="cn-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="2" cy="2" r="1" className="fill-[#1E2638] dark:fill-[#1E2638] light:fill-[#CBD5E1]" />
-        </pattern>
         <marker id="cn-arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M 0 1 L 10 5 L 0 9 z" fill="#0EA5E9" className="vis-sky" />
         </marker>
@@ -24,8 +21,7 @@ export function VisualCollapsedNodes() {
           <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748B" className="vis-text-muted" />
         </marker>
       </defs>
-      <rect width="640" height="360" className="fill-[#090A0F] dark:fill-[#090A0F] light:fill-[#F8FAFC]" />
-      <rect width="640" height="360" fill="url(#cn-dots)" />
+      <rect width="640" height="360" className="vis-canvas-bg" fill="var(--vis-canvas-bg, #090A0F)" />
 
       {/* Top Status Pill */}
       <g transform="translate(150, 24)">
@@ -99,9 +95,6 @@ export function VisualBlastRadius() {
   return (
     <svg viewBox="0 0 640 360" fill="none" className="w-full h-full select-none">
       <defs>
-        <pattern id="br-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="2" cy="2" r="1" className="fill-[#1E2638] dark:fill-[#1E2638] light:fill-[#CBD5E1]" />
-        </pattern>
         <marker id="br-arr-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M 0 1 L 10 5 L 0 9 z" fill="#F59E0B" className="vis-amber" />
         </marker>
@@ -109,8 +102,7 @@ export function VisualBlastRadius() {
           <path d="M 0 1 L 10 5 L 0 9 z" fill="#F43F5E" className="vis-rose" />
         </marker>
       </defs>
-      <rect width="640" height="360" className="fill-[#090A0F] dark:fill-[#090A0F] light:fill-[#F8FAFC]" />
-      <rect width="640" height="360" fill="url(#br-dots)" />
+      <rect width="640" height="360" className="vis-canvas-bg" fill="var(--vis-canvas-bg, #090A0F)" />
 
       {/* Clean Floating HUD (Single focused bar, no pins) */}
       <g transform="translate(110, 22)">
@@ -172,7 +164,7 @@ export function VisualBlastRadius() {
 // 3. 2-Tier Progressive Diff
 export function VisualResourceDiff() {
   return (
-    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F8FAFC]">
+    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#F8FAFC] dark:bg-[#090A0F]">
       {/* Code Window Header */}
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-300 dark:border-workbench-border/80 text-[11px]">
         <div className="flex items-center space-x-2">
@@ -214,13 +206,7 @@ export function VisualResourceDiff() {
 export function VisualColorGrading() {
   return (
     <svg viewBox="0 0 640 360" fill="none" className="w-full h-full select-none">
-      <defs>
-        <pattern id="cg-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="2" cy="2" r="1" className="fill-[#1E2638] dark:fill-[#1E2638] light:fill-[#CBD5E1]" />
-        </pattern>
-      </defs>
-      <rect width="640" height="360" className="fill-[#090A0F] dark:fill-[#090A0F] light:fill-[#F8FAFC]" />
-      <rect width="640" height="360" fill="url(#cg-dots)" />
+      <rect width="640" height="360" className="vis-canvas-bg" fill="var(--vis-canvas-bg, #090A0F)" />
 
       {/* Title Pill */}
       <g transform="translate(180, 24)">
@@ -277,7 +263,7 @@ export function VisualColorGrading() {
 // 5. Dedicated Resource Panel (Inspector)
 export function VisualResourcePanel() {
   return (
-    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F8FAFC]">
+    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#F8FAFC] dark:bg-[#090A0F]">
       {/* Inspector Header */}
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-300 dark:border-workbench-border/80">
         <div className="flex items-center space-x-2">
@@ -318,7 +304,7 @@ export function VisualResourcePanel() {
 // 6. Workbench Sidebar & Dropzone
 export function VisualWorkbenchSidebar() {
   return (
-    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F8FAFC]">
+    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#F8FAFC] dark:bg-[#090A0F]">
       {/* Dropzone Confirmation Banner */}
       <div className="p-3 rounded-lg border-2 border-dashed border-sky-500/50 bg-sky-500/10 text-center">
         <div className="text-sky-800 dark:text-sky-400 font-bold text-xs flex items-center justify-center space-x-1.5">
@@ -365,7 +351,7 @@ export function VisualWorkbenchSidebar() {
 // 7. Workstation Utilities (Command Palette)
 export function VisualWorkstationUtilities() {
   return (
-    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F8FAFC]">
+    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between font-mono text-xs select-none bg-[#F8FAFC] dark:bg-[#090A0F]">
       {/* Command Palette Mock Dialog */}
       <div className="rounded-xl border border-sky-500/40 bg-white dark:bg-[#0C0E14] shadow-xl p-3 space-y-2.5">
         {/* Search Bar */}

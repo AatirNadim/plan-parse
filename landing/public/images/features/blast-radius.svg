@@ -16,7 +16,6 @@
 
   <!-- Canvas Background -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-br)" />
 
   <!-- BLAST RADIUS FLOATING HUD (Top-Center Canvas) -->
   <g id="blast-radius-hud" transform="translate(180, 24)">

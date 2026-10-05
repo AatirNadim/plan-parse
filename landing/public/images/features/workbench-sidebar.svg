@@ -10,7 +10,6 @@
 
   <!-- Background Canvas -->
   <rect width="960" height="540" fill="#090a0f" />
-  <rect width="960" height="540" fill="url(#grid-dots-ws)" />
 
   <!-- LEFT DOCKED WORKBENCH SIDEBAR -->
   <g transform="translate(30, 20)">

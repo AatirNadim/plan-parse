@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { FEATURES } from "../lib/features-data";
+import FeatureCleanVisual from "./FeatureCleanVisuals";
 
 /**
  * Transitions metadata between consecutive deep-dive features.
@@ -174,13 +175,13 @@ function FlowConduit({ transition, isEvenToOdd }) {
           </span>
 
           {/* Action Transition Title */}
-          <span className="font-mono text-[11px] font-bold tracking-wider text-slate-800 dark:text-slate-200 uppercase">
+          <span className="font-mono text-[11px] font-extrabold tracking-wider text-slate-900 dark:text-slate-100 uppercase">
             {transition.actionName}
           </span>
         </div>
 
         {/* Micro Sub-label */}
-        <span className="hidden sm:inline-block mt-1 font-mono text-[10px] text-slate-500 dark:text-slate-400 bg-workbench-bg/90 px-2 py-0.5 rounded border border-workbench-border/60">
+        <span className="hidden sm:inline-block mt-1 font-mono text-[10px] text-slate-700 dark:text-slate-300 font-semibold bg-slate-100 dark:bg-workbench-bg/90 px-2 py-0.5 rounded border border-slate-300 dark:border-workbench-border/60">
           {transition.description}
         </span>
       </div>
@@ -194,14 +195,13 @@ function FlowConduit({ transition, isEvenToOdd }) {
  */
 function WorkstationViewport({ feature, isLeftOnDesktop }) {
   return (
-    <div className="relative group rounded-2xl border border-workbench-border bg-workbench-panel/95 dark:bg-[#0C0E15]/95 light:bg-white/95 backdrop-blur-xl shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 overflow-hidden">
-      {/* Top Connector Port (Handle Node) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center pointer-events-none">
-        <span className="w-3.5 h-3.5 rounded-full border-2 border-sky-400 dark:border-sky-400 bg-[#090A0F] dark:bg-[#090A0F] light:bg-white ring-4 ring-sky-500/20 shadow-[0_0_10px_rgba(56,189,248,0.7)]" />
-      </div>
-
+    <div
+      className={`relative group rounded-2xl border border-workbench-border bg-workbench-panel dark:bg-[#0C0E15] light:bg-white shadow-xl hover:shadow-2xl hover:border-sky-500/40 transition-all duration-300 overflow-hidden w-full max-w-[90%] mx-auto ${
+        isLeftOnDesktop ? "lg:mr-auto lg:ml-0" : "lg:ml-auto lg:mr-0"
+      }`}
+    >
       {/* Viewport macOS/IDE Window Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-workbench-border/70 bg-workbench-subpanel/60 text-xs font-mono select-none">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-workbench-border/70 bg-workbench-subpanel dark:bg-[#161B26] light:bg-[#F1F5F9] text-xs font-mono select-none">
         {/* Window controls & file path */}
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-1.5">
@@ -209,18 +209,18 @@ function WorkstationViewport({ feature, isLeftOnDesktop }) {
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
           </div>
-          <span className="ml-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[160px] sm:max-w-[240px]">
+          <span className="ml-2 text-[11px] text-slate-700 dark:text-slate-400 font-bold truncate max-w-[160px] sm:max-w-[240px]">
             {feature.slug}.hcl • dag.viewport
           </span>
         </div>
 
         {/* Live Canvas Beacon & Hotkey */}
         <div className="flex items-center space-x-2">
-          <span className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="hidden sm:inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>DAG CANVAS</span>
           </span>
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-workbench-bg border border-workbench-border text-slate-600 dark:text-slate-300">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-workbench-bg border border-slate-300 dark:border-workbench-border text-slate-900 dark:text-slate-200">
             [{feature.hotkey}]
           </span>
         </div>
@@ -237,43 +237,35 @@ function WorkstationViewport({ feature, isLeftOnDesktop }) {
           }}
         />
 
-        {/* Vector SVG Feature Embed */}
-        <img
-          src={feature.svgFile}
-          alt={feature.title}
-          className="relative z-10 w-full h-full object-contain p-2 sm:p-3 transition-transform duration-500 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
+        {/* Clean, Focused Visual Aid (Zero Numbered Pins, Minimal Overwhelm) */}
+        <div className="relative z-10 w-full h-full p-2 sm:p-4 transition-transform duration-500 group-hover:scale-[1.01] flex items-center justify-center">
+          <FeatureCleanVisual featureId={feature.id} />
+        </div>
 
         {/* Floating Canvas Controls (Zoom In, Zoom Out, Fit) in corner */}
-        <div className="absolute bottom-3 right-3 z-20 flex flex-col rounded-lg border border-workbench-border/80 bg-workbench-panel/90 dark:bg-[#0C0E14]/90 light:bg-white/90 backdrop-blur-md shadow-md text-slate-400 dark:text-slate-400 light:text-slate-600 text-xs font-mono overflow-hidden">
+        <div className="absolute bottom-3 right-3 z-20 flex flex-col rounded-lg border border-workbench-border/80 bg-workbench-panel dark:bg-[#0C0E14] light:bg-white shadow-md text-slate-400 dark:text-slate-400 light:text-slate-600 text-xs font-mono overflow-hidden">
           <button
             type="button"
             title="Zoom In"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-400 transition-colors border-b border-workbench-border/60"
+            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-workbench-border/60"
           >
             +
           </button>
           <button
             type="button"
             title="Zoom Out"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-400 transition-colors border-b border-workbench-border/60"
+            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors border-b border-workbench-border/60"
           >
             −
           </button>
           <button
             type="button"
             title="Fit Viewport"
-            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-400 transition-colors"
+            className="w-7 h-7 flex items-center justify-center hover:bg-workbench-hover hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           >
             ⛶
           </button>
         </div>
-      </div>
-
-      {/* Bottom Connector Port (Handle Node) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 flex items-center justify-center pointer-events-none">
-        <span className="w-3.5 h-3.5 rounded-full border-2 border-sky-400 dark:border-sky-400 bg-[#090A0F] dark:bg-[#090A0F] light:bg-white ring-4 ring-sky-500/20 shadow-[0_0_10px_rgba(56,189,248,0.7)]" />
       </div>
     </div>
   );

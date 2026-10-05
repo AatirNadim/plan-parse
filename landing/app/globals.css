@@ -47,6 +47,23 @@ html.dark {
   --logo-tube-blue: #38BDF8;
   --logo-tube-green: #34D399;
   --logo-tube-yellow: #FBBF24;
+
+  /* Clean Feature Viewport Tokens (Dark Mode) */
+  --vis-bg: #0F121A;
+  --vis-header: #161B26;
+  --vis-border: #232936;
+  --vis-text-primary: #F8FAFC;
+  --vis-text-secondary: #94A3B8;
+  --vis-text-muted: #64748B;
+  --vis-sky: #38BDF8;
+  --vis-amber: #FBBF24;
+  --vis-emerald: #34D399;
+  --vis-rose: #FB7185;
+  --vis-purple: #C084FC;
+  --vis-badge-sky-bg: rgba(14, 165, 233, 0.2);
+  --vis-badge-amber-bg: rgba(245, 158, 11, 0.2);
+  --vis-badge-emerald-bg: rgba(16, 185, 129, 0.2);
+  --vis-badge-rose-bg: rgba(244, 63, 94, 0.2);
 }
 
 html.light {
@@ -93,6 +110,23 @@ html.light {
   --logo-tube-blue: #0284C7;
   --logo-tube-green: #059669;
   --logo-tube-yellow: #D97706;
+
+  /* Clean Feature Viewport Tokens (Light High-Contrast Mode) */
+  --vis-bg: #FFFFFF;
+  --vis-header: #F1F5F9;
+  --vis-border: #CBD5E1;
+  --vis-text-primary: #0F172A;
+  --vis-text-secondary: #334155;
+  --vis-text-muted: #64748B;
+  --vis-sky: #0284C7;
+  --vis-amber: #B45309;
+  --vis-emerald: #047857;
+  --vis-rose: #BE123C;
+  --vis-purple: #7E22CE;
+  --vis-badge-sky-bg: rgba(2, 132, 199, 0.14);
+  --vis-badge-amber-bg: rgba(180, 83, 9, 0.14);
+  --vis-badge-emerald-bg: rgba(4, 120, 87, 0.14);
+  --vis-badge-rose-bg: rgba(190, 18, 60, 0.14);
 }
 
 html,
@@ -374,4 +408,26 @@ html.light ::-webkit-scrollbar-thumb:hover {
 .animate-flow-pulse {
   animation: flowPulse 2.4s linear infinite;
 }
+
+/* Feature Viewport Adaptive Vector Tokens */
+.vis-text-primary { fill: var(--vis-text-primary); }
+.vis-text-secondary { fill: var(--vis-text-secondary); }
+.vis-text-muted { fill: var(--vis-text-muted); }
+.vis-sky-text { fill: var(--vis-sky); }
+.vis-amber-text { fill: var(--vis-amber); }
+.vis-emerald-text { fill: var(--vis-emerald); }
+.vis-rose-text { fill: var(--vis-rose); }
+.vis-purple-text { fill: var(--vis-purple); }
+.vis-node-bg { fill: var(--vis-bg); }
+.vis-node-header { fill: var(--vis-header); }
+.vis-node-border { stroke: var(--vis-border); }
+.vis-badge-sky-bg { fill: var(--vis-badge-sky-bg); }
+.vis-badge-amber-bg { fill: var(--vis-badge-amber-bg); }
+.vis-badge-emerald-bg { fill: var(--vis-badge-emerald-bg); }
+.vis-badge-rose-bg { fill: var(--vis-badge-rose-bg); }
+.vis-sky { fill: var(--vis-sky); }
+.vis-amber { fill: var(--vis-amber); }
+.vis-emerald { fill: var(--vis-emerald); }
+.vis-rose { fill: var(--vis-rose); }
+.vis-purple { fill: var(--vis-purple); }
 

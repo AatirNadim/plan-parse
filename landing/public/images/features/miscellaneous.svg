@@ -192,36 +192,36 @@
   </g>
 
   <!-- PIN 2: High-DPI Diagram Export -->
-  <line x1="720" y1="100" x2="720" y2="150" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
-  <g class="callout-pin" transform="translate(720, 160)">
+  <line x1="720" y1="130" x2="720" y2="200" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(720, 210)">
     <circle cx="0" cy="0" r="14" fill="#090a0f" stroke="#0ea5e9" stroke-width="2.5" filter="url(#glow-ms)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700">2</text>
   </g>
 
   <!-- PIN 3: Targeted Apply Generator -->
-  <line x1="260" y1="360" x2="260" y2="390" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
-  <g class="callout-pin" transform="translate(260, 400)">
+  <line x1="260" y1="380" x2="260" y2="410" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(260, 430)">
     <circle cx="0" cy="0" r="14" fill="#090a0f" stroke="#0ea5e9" stroke-width="2.5" filter="url(#glow-ms)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700">3</text>
   </g>
 
   <!-- PIN 4: Keyboard Shortcuts Cheat Sheet -->
-  <line x1="720" y1="350" x2="720" y2="390" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
-  <g class="callout-pin" transform="translate(720, 400)">
+  <line x1="720" y1="370" x2="720" y2="410" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(720, 420)">
     <circle cx="0" cy="0" r="14" fill="#090a0f" stroke="#0ea5e9" stroke-width="2.5" filter="url(#glow-ms)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700">4</text>
   </g>
 
   <!-- PIN 5: Theme Engine -->
-  <line x1="240" y1="480" x2="240" y2="505" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
+  <line x1="240" y1="490" x2="240" y2="505" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
   <g class="callout-pin" transform="translate(240, 516)">
     <circle cx="0" cy="0" r="14" fill="#090a0f" stroke="#0ea5e9" stroke-width="2.5" filter="url(#glow-ms)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700">5</text>
   </g>
 
   <!-- PIN 6: Diagnostic CLI Errors -->
-  <line x1="680" y1="480" x2="680" y2="505" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
-  <g class="callout-pin" transform="translate(680, 516)">
+  <line x1="685" y1="480" x2="685" y2="505" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(685, 516)">
     <circle cx="0" cy="0" r="14" fill="#090a0f" stroke="#0ea5e9" stroke-width="2.5" filter="url(#glow-ms)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700">6</text>
   </g>

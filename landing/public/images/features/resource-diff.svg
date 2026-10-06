@@ -35,14 +35,14 @@
 
       <!-- Delta Summary Pills -->
       <g transform="translate(12, 46)">
-        <rect x="0" y="0" width="68" height="22" rx="4" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1" />
-        <text x="8" y="15" fill="#34d399" font-family="'DM Mono', monospace" font-size="11" font-weight="600">+12 added</text>
+        <rect x="0" y="0" width="70" height="22" rx="4" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1" />
+        <text x="6" y="15" fill="#34d399" font-family="'DM Mono', monospace" font-size="11" font-weight="600">+12 added</text>
 
-        <rect x="74" y="0" width="76" height="22" rx="4" fill="#0ea5e9" fill-opacity="0.15" stroke="#0ea5e9" stroke-width="1" />
-        <text x="82" y="15" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="11" font-weight="600">~3 modified</text>
+        <rect x="74" y="0" width="83" height="22" rx="4" fill="#0ea5e9" fill-opacity="0.15" stroke="#0ea5e9" stroke-width="1" />
+        <text x="80" y="15" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="11" font-weight="600">~3 modified</text>
 
-        <rect x="156" y="0" width="76" height="22" rx="4" fill="#f43f5e" fill-opacity="0.15" stroke="#f43f5e" stroke-width="1" />
-        <text x="164" y="15" fill="#f43f5e" font-family="'DM Mono', monospace" font-size="11" font-weight="600">-1 removed</text>
+        <rect x="162" y="0" width="76" height="22" rx="4" fill="#f43f5e" fill-opacity="0.15" stroke="#f43f5e" stroke-width="1" />
+        <text x="166" y="15" fill="#f43f5e" font-family="'DM Mono', monospace" font-size="11" font-weight="600">-1 removed</text>
       </g>
 
       <!-- Replacement Warning Pill -->
@@ -158,7 +158,7 @@
   <!-- CALLOUT PINS & LEADER LINES -->
 
   <!-- PIN 1: Tier 1 Quick Popover -->
-  <line x1="170" y1="210" x2="170" y2="440" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2 2" />
+  <line x1="170" y1="310" x2="170" y2="440" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2 2" />
   <g class="callout-pin" transform="translate(170, 452)">
     <circle cx="0" cy="0" r="16" fill="#090a0f" stroke="#38bdf8" stroke-width="2.5" filter="url(#glow-rd)" />
     <text x="0" y="4" text-anchor="middle" fill="#38bdf8" font-family="'DM Sans', sans-serif" font-size="13" font-weight="700">1</text>

@@ -10,6 +10,7 @@ import React from "react";
 export default function BrandLogo({
   className = "w-6 h-6",
   title = "plan-parse: Code Gutter to Dependency DAG Engine",
+  animated = false,
   ...props
 }) {
   return (
@@ -134,7 +135,7 @@ export default function BrandLogo({
       {/* Internal DAG Dependency Chord */}
       <path
         d="M 252 148 L 336 270"
-        className="logo-chord"
+        className={`logo-chord ${animated ? "animate-flow-pulse motion-reduce:animate-none" : ""}`}
         strokeWidth="2.5"
         strokeDasharray="5 5"
         opacity="0.8"
@@ -144,21 +145,21 @@ export default function BrandLogo({
       {/* Node 1: UPDATE Node (Upper Blue Arm at x=252, y=148) */}
       <g transform="translate(252, 148)">
         <circle cx="0" cy="0" r="19" className="logo-node-bg logo-badge-blue-stroke" strokeWidth="3" />
-        <circle cx="0" cy="0" r="13" className="logo-badge-blue-fill logo-node-halo" />
+        <circle cx="0" cy="0" r="13" className={`logo-badge-blue-fill logo-node-halo ${animated ? "animate-pulse motion-reduce:animate-none" : ""}`} />
         <path d="M-6 0C-4 -3 -2 -3 0 0C2 3 4 3 6 0" className="logo-badge-blue-stroke" strokeWidth="2.5" strokeLinecap="round" />
       </g>
 
       {/* Node 2: CREATE Node (Apex Green Crest at x=372, y=224) */}
       <g transform="translate(372, 224)">
         <circle cx="0" cy="0" r="22" className="logo-node-bg logo-badge-green-stroke" strokeWidth="3.5" />
-        <circle cx="0" cy="0" r="15" className="logo-badge-green-fill logo-node-halo" />
+        <circle cx="0" cy="0" r="15" className={`logo-badge-green-fill logo-node-halo ${animated ? "animate-pulse motion-reduce:animate-none" : ""}`} />
         <path d="M-7 0H7M0 -7V7" className="logo-badge-green-stroke" strokeWidth="3" strokeLinecap="round" />
       </g>
 
       {/* Node 3: REPLACE Node (Lower Yellow Return Arm at x=268, y=300) */}
       <g transform="translate(268, 300)">
         <circle cx="0" cy="0" r="19" className="logo-node-bg logo-badge-yellow-stroke" strokeWidth="3" />
-        <circle cx="0" cy="0" r="13" className="logo-badge-yellow-fill logo-node-halo" />
+        <circle cx="0" cy="0" r="13" className={`logo-badge-yellow-fill logo-node-halo ${animated ? "animate-pulse motion-reduce:animate-none" : ""}`} />
         <path d="M-5 -2H5M0 -7V3M-5 6H5" className="logo-badge-yellow-stroke" strokeWidth="2.2" strokeLinecap="round" />
       </g>
 

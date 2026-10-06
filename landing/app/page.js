@@ -3,6 +3,7 @@ import CodeBlock from "../components/CodeBlock";
 import BrandLogo from "../components/BrandLogo";
 import DockerIcon from "../components/icons/docker";
 import FeatureFlowSection from "../components/FeatureFlowSection";
+import HeroConduits from "../components/HeroConduits";
 
 export default function HomePage() {
   return (
@@ -93,41 +94,44 @@ export default function HomePage() {
 
             {/* Right Column: Active Engine Core (~40% width on desktop) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-[460px] xl:max-w-[490px] rounded-2xl border border-workbench-border bg-workbench-panel/90 dark:bg-[#0c0e15]/95 light:bg-white/95 backdrop-blur-xl shadow-2xl p-5 sm:p-6 overflow-hidden group">
-                
-                {/* Ambient glow tailored to brand tokens */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-sky-500/20 via-emerald-500/15 to-amber-500/15 rounded-3xl blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none -z-10" />
+              <div className="relative w-full max-w-[460px]">
+                {/* Outgoing Animated Conduits Layer (Radiates into Dotted Canvas Grid) */}
+                <HeroConduits className="hidden sm:block" />
 
-                {/* Engine Live Status Beacon */}
-                <div className="flex items-center justify-between pb-3 mb-4 border-b border-workbench-border/60">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
-                      DAG ENGINE CORE
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
-                      hcl.ast → dag.graph
-                    </span>
-                  </div>
-                  <div className="font-mono text-[10px] flex items-center gap-1.5 select-none shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-emerald-500 dark:text-emerald-400 font-bold">ONLINE</span>
-                  </div>
-                </div>
+                <div className="relative w-full rounded-2xl border border-workbench-border bg-workbench-panel/90 dark:bg-[#0c0e15]/95 light:bg-white/95 backdrop-blur-xl shadow-2xl p-5 sm:p-6 group">
+                  {/* Ambient glow tailored to brand tokens */}
+                  <div className="absolute -inset-1 bg-gradient-to-br from-sky-500/20 via-emerald-500/15 to-amber-500/15 rounded-3xl blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none -z-10" />
 
-                {/* Upstream Stream Bar */}
-                <div className="flex items-center justify-between text-[11px] font-mono mb-3.5 px-3 py-1.5 rounded-lg bg-workbench-bg/90 border border-workbench-border">
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="text-sky-500 dark:text-sky-400 font-bold">INPUT:</span>
-                    <span className="text-slate-700 dark:text-slate-300 truncate">main.tfplan.json</span>
+                  {/* Engine Live Status Beacon */}
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-workbench-border/60">
+                    <div className="flex items-center space-x-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
+                        DAG ENGINE CORE
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                        hcl.ast → dag.graph
+                      </span>
+                    </div>
+                    <div className="font-mono text-[10px] flex items-center gap-1.5 select-none shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-emerald-500 dark:text-emerald-400 font-bold">ONLINE</span>
+                    </div>
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0 font-medium">0 telemetry</span>
-                </div>
 
-                {/* Center Core: BrandLogo Pedestal */}
-                <div className="relative my-2 py-2 flex flex-col items-center justify-center">
-                  <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F0F5FA] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:shadow-md shadow-xl p-3 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.03] group-hover:border-sky-500/40">
-                    <BrandLogo className="w-full h-full" />
+                  {/* Upstream Stream Bar */}
+                  <div className="flex items-center justify-between text-[11px] font-mono mb-3.5 px-3 py-1.5 rounded-lg bg-workbench-bg/90 border border-workbench-border">
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="text-sky-500 dark:text-sky-400 font-bold">INPUT:</span>
+                      <span className="text-slate-700 dark:text-slate-300 truncate">main.tfplan.json</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0 font-medium">0 telemetry</span>
                   </div>
+
+                  {/* Center Core: BrandLogo Pedestal */}
+                  <div className="relative my-2 py-2 flex flex-col items-center justify-center">
+                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-[#090A0F] dark:bg-[#090A0F] light:bg-[#F0F5FA] border border-workbench-border dark:border-[#232936] light:border-slate-300 light:shadow-md shadow-xl p-3 flex items-center justify-center transition-all duration-300 group-hover:scale-[1.03] group-hover:border-sky-500/40">
+                      <BrandLogo className="w-full h-full" animated={true} />
+                    </div>
                   
                   {/* Transformation Arrow */}
                   <div className="mt-2.5 flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
@@ -167,13 +171,12 @@ export default function HomePage() {
                     <span className="text-emerald-500 dark:text-emerald-400 font-bold">0 cascading destroys</span>
                   </div>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Main Content Sections wrapped in max-w-7xl mx-auto */}
       <div className="space-y-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">

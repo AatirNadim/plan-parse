@@ -48,7 +48,7 @@
 Pull the latest multi-arch image from Docker Hub:
 
 ```bash
-docker pull aatirnadim/plan-parse:latest
+docker pull aatir0docking/plan-parse:latest
 ```
 
 > **Tip**: For immutable production pipelines, you can also pin to specific commit SHA tags published by CI (e.g. `aatirnadim/plan-parse:<commit-sha>`).
@@ -62,7 +62,7 @@ docker pull aatirnadim/plan-parse:latest
 Launch the server in standalone mode and upload Terraform or OpenTofu plan JSON files directly through the browser:
 
 ```bash
-docker run -d --name plan-parse -p 9000:9000 aatirnadim/plan-parse:latest
+docker run -d --name plan-parse -p 9000:9000 aatir0docking/plan-parse:latest
 ```
 
 Open **[http://localhost:9000](http://localhost:9000)** in your browser to drag and drop your `plan.json`.
@@ -80,7 +80,7 @@ docker run --rm -it \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_REGION=$AWS_REGION \
-  aatirnadim/plan-parse:latest -dir /infra -addr 0.0.0.0 -no-browser
+  aatir0docking/plan-parse:latest -dir /infra -addr 0.0.0.0 -no-browser
 ```
 
 > **Notes & Tips**:
@@ -105,7 +105,7 @@ terraform show -json tfplan > plan.json
 docker run --rm -it \
   -p 9000:9000 \
   -v $(pwd)/plan.json:/app/plan.json:ro \
-  aatirnadim/plan-parse:latest -plan /app/plan.json -addr 0.0.0.0 -no-browser
+  aatir0docking/plan-parse:latest -plan /app/plan.json -addr 0.0.0.0 -no-browser
 ```
 
 ---

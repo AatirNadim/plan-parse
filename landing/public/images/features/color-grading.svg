@@ -1,0 +1,179 @@
+<svg width="960" height="540" viewBox="0 0 960 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid-dots-cg" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#1e2638" />
+    </pattern>
+    <filter id="glow-cg" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#10b981" flood-opacity="0.6"/>
+    </filter>
+    <marker id="arrow-cg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b4861"/>
+    </marker>
+    <marker id="arrow-amber-cg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="540" fill="#090a0f" />
+
+  <!-- TOP ACTION TOKEN PALETTE BAR (Callout 1 showcase) -->
+  <g transform="translate(40, 24)">
+    <rect width="880" height="64" rx="8" fill="#0f121a" stroke="#232936" stroke-width="1.5" />
+    <text x="20" y="38" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="12" font-weight="600">ACTION TOKENS</text>
+    
+    <!-- Token 1: CREATE -->
+    <g transform="translate(150, 16)">
+      <rect width="100" height="32" rx="5" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#10b981" />
+      <text x="26" y="20" fill="#34d399" font-family="'DM Mono', monospace" font-size="11" font-weight="700">+ CREATE</text>
+    </g>
+
+    <!-- Token 2: UPDATE -->
+    <g transform="translate(262, 16)">
+      <rect width="100" height="32" rx="5" fill="#0ea5e9" fill-opacity="0.15" stroke="#0ea5e9" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#0ea5e9" />
+      <text x="26" y="20" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="11" font-weight="700">~ UPDATE</text>
+    </g>
+
+    <!-- Token 3: REPLACE -->
+    <g transform="translate(374, 16)">
+      <rect width="110" height="32" rx="5" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#f59e0b" />
+      <text x="26" y="20" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="11" font-weight="700">± REPLACE</text>
+    </g>
+
+    <!-- Token 4: DELETE -->
+    <g transform="translate(496, 16)">
+      <rect width="100" height="32" rx="5" fill="#f43f5e" fill-opacity="0.15" stroke="#f43f5e" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#f43f5e" />
+      <text x="26" y="20" fill="#f43f5e" font-family="'DM Mono', monospace" font-size="11" font-weight="700">- DELETE</text>
+    </g>
+
+    <!-- Token 5: DATA / READ -->
+    <g transform="translate(608, 16)">
+      <rect width="120" height="32" rx="5" fill="#a855f7" fill-opacity="0.15" stroke="#a855f7" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#a855f7" />
+      <text x="26" y="20" fill="#c084fc" font-family="'DM Mono', monospace" font-size="11" font-weight="700">DATA / READ</text>
+    </g>
+
+    <!-- Token 6: NO-OP -->
+    <g transform="translate(740, 16)">
+      <rect width="100" height="32" rx="5" fill="#64748b" fill-opacity="0.15" stroke="#64748b" stroke-width="1.2" />
+      <circle cx="16" cy="16" r="4" fill="#64748b" />
+      <text x="26" y="20" fill="#94a3b8" font-family="'DM Mono', monospace" font-size="11" font-weight="700">= NO-OP</text>
+    </g>
+  </g>
+
+  <!-- COMPOUND MODULE CONTAINER 1: module.vpc (Left Box) -->
+  <g transform="translate(40, 114)">
+    <!-- Compound Container Hull -->
+    <rect width="420" height="370" rx="12" fill="#0f121a" fill-opacity="0.6" stroke="#232936" stroke-width="1.5" stroke-dasharray="6 4" />
+    <!-- Module Header Label -->
+    <rect x="0" y="0" width="160" height="28" rx="12" fill="#161b26" stroke="#232936" />
+    <text x="14" y="18" fill="#8b5cf6" font-family="'DM Mono', monospace" font-size="11" font-weight="700">MODULE: vpc</text>
+
+    <!-- Node Inside Module: aws_vpc.main (NO-OP) -->
+    <g transform="translate(30, 50)">
+      <rect width="160" height="74" rx="6" fill="#161b26" stroke="#475569" stroke-width="1.2" />
+      <rect x="8" y="8" width="54" height="16" rx="3" fill="#64748b" fill-opacity="0.2" />
+      <text x="14" y="20" fill="#94a3b8" font-family="'DM Mono', monospace" font-size="9" font-weight="700">= NO-OP</text>
+      <text x="8" y="44" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="11" font-weight="600">aws_vpc</text>
+      <text x="8" y="60" fill="#64748b" font-family="'DM Mono', monospace" font-size="10">.main</text>
+    </g>
+
+    <!-- Node Inside Module: data.aws_availability_zones (DATA/READ) -->
+    <g transform="translate(220, 50)">
+      <rect width="170" height="74" rx="6" fill="#161b26" stroke="#a855f7" stroke-width="1.5" />
+      <rect x="8" y="8" width="68" height="16" rx="3" fill="#a855f7" fill-opacity="0.2" />
+      <text x="14" y="20" fill="#c084fc" font-family="'DM Mono', monospace" font-size="9" font-weight="700">DATA / READ</text>
+      <text x="8" y="44" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="11" font-weight="600">data.aws_azs</text>
+      <text x="8" y="60" fill="#a855f7" font-family="'DM Mono', monospace" font-size="10">.available</text>
+    </g>
+
+    <!-- Node Inside Module: aws_subnet.public (UPDATE) -->
+    <g transform="translate(30, 160)">
+      <rect width="160" height="74" rx="6" fill="#161b26" stroke="#0ea5e9" stroke-width="1.8" />
+      <rect x="8" y="8" width="56" height="16" rx="3" fill="#0ea5e9" fill-opacity="0.2" />
+      <text x="14" y="20" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="9" font-weight="700">~ UPDATE</text>
+      <text x="8" y="44" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="11" font-weight="600">aws_subnet</text>
+      <text x="8" y="60" fill="#94a3b8" font-family="'DM Mono', monospace" font-size="10">.public[0]</text>
+    </g>
+
+    <!-- Node Inside Module: aws_route_table.public (CREATE) -->
+    <g transform="translate(220, 160)">
+      <rect width="170" height="74" rx="6" fill="#161b26" stroke="#10b981" stroke-width="1.8" />
+      <rect x="8" y="8" width="56" height="16" rx="3" fill="#10b981" fill-opacity="0.2" />
+      <text x="14" y="20" fill="#34d399" font-family="'DM Mono', monospace" font-size="9" font-weight="700">+ CREATE</text>
+      <text x="8" y="44" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="11" font-weight="600">aws_route_table</text>
+      <text x="8" y="60" fill="#34d399" font-family="'DM Mono', monospace" font-size="10">.public_gateway</text>
+    </g>
+
+    <!-- Node Inside Module: aws_internet_gateway.gw (DELETE) -->
+    <g transform="translate(125, 270)">
+      <rect width="170" height="74" rx="6" fill="#161b26" stroke="#f43f5e" stroke-width="1.8" />
+      <rect x="8" y="8" width="56" height="16" rx="3" fill="#f43f5e" fill-opacity="0.2" />
+      <text x="14" y="20" fill="#f43f5e" font-family="'DM Mono', monospace" font-size="9" font-weight="700">- DELETE</text>
+      <text x="8" y="44" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="11" font-weight="600">aws_internet_gw</text>
+      <text x="8" y="60" fill="#f43f5e" font-family="'DM Mono', monospace" font-size="10">.legacy_igw</text>
+    </g>
+
+    <!-- Internal Module Edges -->
+    <path d="M 110 124 L 110 160" stroke="#3b4861" stroke-width="1.5" marker-end="url(#arrow-cg)" />
+    <path d="M 190 197 L 220 197" stroke="#3b4861" stroke-width="1.5" marker-end="url(#arrow-cg)" />
+  </g>
+
+  <!-- COMPOUND MODULE CONTAINER 2: module.database (Right Box) -->
+  <g transform="translate(500, 114)">
+    <rect width="420" height="370" rx="12" fill="#0f121a" fill-opacity="0.6" stroke="#232936" stroke-width="1.5" stroke-dasharray="6 4" />
+    <rect x="0" y="0" width="180" height="28" rx="12" fill="#161b26" stroke="#232936" />
+    <text x="14" y="18" fill="#8b5cf6" font-family="'DM Mono', monospace" font-size="11" font-weight="700">MODULE: database</text>
+
+    <!-- Critical Mutating Node: aws_db_instance.primary (REPLACE) -->
+    <g transform="translate(40, 60)">
+      <rect width="340" height="100" rx="8" fill="#161b26" stroke="#f59e0b" stroke-width="2.5" />
+      <rect x="10" y="10" width="76" height="20" rx="4" fill="#f59e0b" fill-opacity="0.2" />
+      <text x="18" y="24" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="11" font-weight="700">± REPLACE</text>
+      <text x="10" y="56" fill="#ffffff" font-family="'DM Mono', monospace" font-size="13" font-weight="600">aws_db_instance</text>
+      <text x="10" y="76" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="12">.aurora_primary</text>
+      <text x="10" y="92" fill="#f43f5e" font-family="'DM Sans', sans-serif" font-size="10">Forces replacement: storage_encrypted</text>
+    </g>
+
+    <!-- Node 2: aws_db_parameter_group (UPDATE) -->
+    <g transform="translate(40, 210)">
+      <rect width="340" height="80" rx="8" fill="#161b26" stroke="#0ea5e9" stroke-width="1.8" />
+      <rect x="10" y="10" width="60" height="18" rx="4" fill="#0ea5e9" fill-opacity="0.2" />
+      <text x="16" y="23" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="10" font-weight="700">~ UPDATE</text>
+      <text x="10" y="52" fill="#e2e8f0" font-family="'DM Mono', monospace" font-size="12" font-weight="600">aws_db_parameter_group</text>
+      <text x="10" y="70" fill="#94a3b8" font-family="'DM Mono', monospace" font-size="11">.custom_postgres15</text>
+    </g>
+  </g>
+
+  <!-- Cross-Module Dependency Edge (Connecting VPC subnet to DB Instance) -->
+  <path d="M 230 311 Q 480 340 540 220" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-amber-cg)" />
+  <rect x="360" y="320" width="130" height="22" rx="4" fill="#090a0f" stroke="#f59e0b" stroke-width="1" />
+  <text x="368" y="335" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="10" font-weight="600">subnet_ids ref</text>
+
+  <!-- CALLOUT PINS & LEADER LINES -->
+
+  <!-- PIN 1: Semantic Action Tokens -->
+  <line x1="428" y1="88" x2="428" y2="108" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(428, 120)">
+    <circle cx="0" cy="0" r="16" fill="#090a0f" stroke="#10b981" stroke-width="2.5" filter="url(#glow-cg)" />
+    <text x="0" y="4" text-anchor="middle" fill="#34d399" font-family="'DM Sans', sans-serif" font-size="13" font-weight="700">1</text>
+  </g>
+
+  <!-- PIN 2: Compound Module Containers -->
+  <line x1="40" y1="114" x2="20" y2="90" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(18, 76)">
+    <circle cx="0" cy="0" r="16" fill="#090a0f" stroke="#10b981" stroke-width="2.5" filter="url(#glow-cg)" />
+    <text x="0" y="4" text-anchor="middle" fill="#34d399" font-family="'DM Sans', sans-serif" font-size="13" font-weight="700">2</text>
+  </g>
+
+  <!-- PIN 3: Directional Dependency Edges -->
+  <line x1="420" y1="342" x2="420" y2="440" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(420, 452)">
+    <circle cx="0" cy="0" r="16" fill="#090a0f" stroke="#10b981" stroke-width="2.5" filter="url(#glow-cg)" />
+    <text x="0" y="4" text-anchor="middle" fill="#34d399" font-family="'DM Sans', sans-serif" font-size="13" font-weight="700">3</text>
+  </g>
+</svg>

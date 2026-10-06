@@ -275,7 +275,7 @@ function CommandPalette({
         {/* Results List */}
         <div ref={listRef} className="max-h-80 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
           {allFilteredItems.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
+            <div className="p-6 text-center text-xs text-slate-500 dark:text-slate-400 font-mono">
               No matching resources or commands found for "{query}"
             </div>
           ) : (
@@ -304,7 +304,7 @@ function CommandPalette({
                       </span>
                       <div className="min-w-0">
                         <div className="text-xs font-medium font-sans truncate">{item.label}</div>
-                        <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate font-sans">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate font-sans">
                           {item.description}
                         </div>
                       </div>
@@ -375,7 +375,7 @@ function CommandPalette({
             <span>↵ Select</span>
             <span>ESC Close</span>
           </div>
-          <span className="text-[9px] uppercase tracking-wider text-slate-400">plan-parse quick command</span>
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400">plan-parse quick command</span>
         </div>
       </div>
     </div>

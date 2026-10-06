@@ -24,21 +24,21 @@ html.dark {
 
 html.light {
   color-scheme: light;
-  --canvas-bg: #f8fafc;
-  --header-bg: #ffffff;
-  --panel-bg: #ffffff;
-  --border-color: #e2e8f0;
+  --canvas-bg: #edf3f9;
+  --header-bg: #f5f9fc;
+  --panel-bg: #f8fbfe;
+  --border-color: #d1dfea;
 
   /* RGB channels for Tailwind alpha support */
-  --workbench-bg: 248 250 252;     /* #f8fafc */
-  --workbench-header: 255 255 255; /* #ffffff */
-  --workbench-panel: 255 255 255;  /* #ffffff */
-  --workbench-subpanel: 241 245 249; /* #f1f5f9 */
-  --workbench-card: 255 255 255;   /* #ffffff */
-  --workbench-border: 226 232 240; /* #e2e8f0 */
-  --workbench-hover: 241 245 249;  /* #f1f5f9 */
-  --workbench-active: 226 232 240; /* #e2e8f0 */
-  --workbench-muted: 100 116 139;  /* #64748b */
+  --workbench-bg: 237 243 249;        /* #edf3f9 - soothing white with cool blue tint */
+  --workbench-header: 245 249 252;    /* #f5f9fc */
+  --workbench-panel: 248 251 254;     /* #f8fbfe */
+  --workbench-subpanel: 235 242 249;  /* #ebf2f9 */
+  --workbench-card: 248 251 254;      /* #f8fbfe */
+  --workbench-border: 209 223 234;    /* #d1dfea */
+  --workbench-hover: 226 236 246;     /* #e2ecf6 */
+  --workbench-active: 213 227 240;    /* #d5e3f0 */
+  --workbench-muted: 100 120 145;     /* #647891 */
 }
 
 html,
@@ -67,8 +67,68 @@ body {
 }
 
 html.light body {
-  color: #0f172a;
-  background-color: #f8fafc;
+  color: #090d16;
+  background-color: #edf3f9;
+  font-weight: 500;
+}
+
+/* Light Mode Typography Bolder Weights & Crisp Text Shadows */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4 {
+  color: #090d16;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(15, 23, 42, 0.12);
+  letter-spacing: -0.025em;
+}
+
+html.light h1 {
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+}
+
+/* Light Theme Contrast & Dynamic Hierarchy */
+html.light p {
+  color: #1e293b;
+}
+
+html.light .text-slate-600 {
+  color: #334155;
+}
+
+html.light .text-slate-700 {
+  color: #1e293b;
+}
+
+html.light .text-slate-500 {
+  color: #475569;
+}
+
+html.light .font-mono {
+  font-weight: 500;
+}
+
+/* Light Theme Elevation & Tactile Shadows */
+html.light .shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+}
+
+html.light .shadow-md {
+  box-shadow: 0 4px 8px -1px rgba(15, 23, 42, 0.09), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+}
+
+html.light .shadow-lg {
+  box-shadow: 0 10px 18px -3px rgba(15, 23, 42, 0.10), 0 4px 8px -4px rgba(15, 23, 42, 0.06);
+}
+
+html.light .shadow-xl {
+  box-shadow: 0 16px 28px -5px rgba(15, 23, 42, 0.12), 0 8px 12px -6px rgba(15, 23, 42, 0.08);
+}
+
+/* Light theme card borders for crisp separation */
+html.light .border-workbench-border {
+  border-color: #cbd8e6;
 }
 
 /* Cross-engine interactive control normalization */
@@ -116,9 +176,12 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 html.light .canvas-bg {
-  background-color: #f8fafc;
-  background-image: radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px);
-  background-size: 24px 24px;
+  background-color: #edf3f9;
+  background-image:
+    radial-gradient(circle, #94a3b8 1.1px, transparent 1.1px),
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(186, 230, 253, 0.45), transparent 75%),
+    linear-gradient(180deg, #f4f8fc 0%, #edf3f9 100%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
 }
 
 /* Cytoscape Container - Isolated touch and selection behavior across all engines */
@@ -148,7 +211,7 @@ html.light .canvas-bg {
 }
 
 html.light * {
-  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-color: #cbd8e6 #ebf2f9;
 }
 
 /* WebKit & Chromium Workbench Scrollbar */
@@ -168,13 +231,13 @@ html.light * {
 }
 
 html.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #ebf2f9;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #cbd8e6;
 }
 html.light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9ab3c9;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -193,10 +256,10 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 
 html.light .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #cbd8e6;
 }
 html.light .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9ab3c9;
 }
 
 .custom-scrollbar {
@@ -205,7 +268,7 @@ html.light .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 }
 
 html.light .custom-scrollbar {
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: #cbd8e6 transparent;
 }
 
 /* WebKit / Safari Backdrop Filter Vendor Prefix Fallback */

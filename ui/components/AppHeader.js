@@ -97,7 +97,7 @@ function AppHeader({
           <span className="font-mono text-xs font-bold text-slate-900 dark:text-white tracking-wider uppercase">
             PLAN-PARSE
           </span>
-          <span className="text-slate-400 dark:text-slate-600 font-mono">/</span>
+          <span className="text-slate-400 dark:text-slate-500 font-mono">/</span>
         </div>
 
         {/* Source Badge */}
@@ -111,7 +111,7 @@ function AppHeader({
               {planName}
             </span>
           ) : (
-            <span className="text-xs font-mono text-slate-400 dark:text-slate-500 shrink-0">
+            <span className="text-xs font-mono text-slate-500 dark:text-slate-400 shrink-0">
               No Plan Loaded
             </span>
           )}
@@ -266,7 +266,7 @@ function AppHeader({
                 <div className="absolute right-0 top-full mt-1.5 w-72 bg-workbench-panel border border-workbench-border rounded-md shadow-2xl overflow-hidden py-1 z-50 font-mono animate-in fade-in duration-100">
                   <div className="px-3 py-1.5 border-b border-workbench-border/60 flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
                     <span>Export Diagram</span>
-                    <span className="text-[9px] text-slate-400 dark:text-slate-600">Full DAG</span>
+                    <span className="text-[9px] text-slate-500 dark:text-slate-400">Full DAG</span>
                   </div>
 
                   <div className="p-1 space-y-0.5">

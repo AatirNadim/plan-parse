@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { ACTION_CONFIG } from "../lib/action-theme";
 import TargetCommandCard from "./TargetCommandCard";
+import FileProvenanceBadge from "./FileProvenanceBadge";
 import { getNodeTargetAddress, copyToClipboard } from "../lib/target-command";
 import { computeBlastRadius, computeUpstreamLineage } from "../lib/blast-radius";
 
@@ -98,7 +99,7 @@ function NodeInspector({
       {/* Header */}
       <div className="p-3 border-b border-workbench-border bg-workbench-header shrink-0 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span
               className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded uppercase tracking-wider"
               style={{
@@ -110,9 +111,12 @@ function NodeInspector({
               {cfg.symbol} {badgeLabel}
             </span>
             {node.module && (
-              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]">
+              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded truncate max-w-[140px]" title={`Module: ${node.module}`}>
                 {node.module}
               </span>
+            )}
+            {node.file && (
+              <FileProvenanceBadge file={node.file} line={node.line} align="left" />
             )}
           </div>
           <h2 className="text-xs font-mono font-semibold text-slate-900 dark:text-white break-all leading-snug select-text">
@@ -279,7 +283,7 @@ function NodeInspector({
                 </div>
               </div>
             ) : (
-              <div className="p-4 text-center text-slate-400 dark:text-slate-500 font-mono text-xs">
+              <div className="p-4 text-center text-slate-500 dark:text-slate-400 font-mono text-xs">
                 No granular attribute change diff available for this resource.
               </div>
             )}
@@ -310,7 +314,7 @@ function NodeInspector({
                   <span>Downstream Blast Radius</span>
                 </span>
                 {blastRadius && (
-                  <span className="text-[10px] font-mono font-medium text-slate-400">
+                  <span className="text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
                     Max Depth: {blastRadius.maxDepth} {blastRadius.maxDepth === 1 ? "hop" : "hops"}
                   </span>
                 )}
@@ -408,7 +412,7 @@ function NodeInspector({
                                     </span>
                                     <span className="truncate">{item.label || item.id}</span>
                                   </div>
-                                  <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-sky-500 dark:group-hover:text-sky-400 shrink-0 transition">
                                     focus →
                                   </span>
                                 </button>
@@ -451,7 +455,7 @@ function NodeInspector({
                                     </span>
                                     <span className="truncate">{item.label || item.id}</span>
                                   </div>
-                                  <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-sky-500 dark:group-hover:text-sky-400 shrink-0 transition">
                                     focus →
                                   </span>
                                 </button>
@@ -496,7 +500,7 @@ function NodeInspector({
                                       </span>
                                       <span className="truncate">{item.label || item.id}</span>
                                     </div>
-                                    <span className="text-[10px] text-slate-400 group-hover:text-sky-500 shrink-0 transition">
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-sky-500 dark:group-hover:text-sky-400 shrink-0 transition">
                                       focus →
                                     </span>
                                   </button>
@@ -508,7 +512,7 @@ function NodeInspector({
                   </div>
                 </div>
               ) : (
-                <div className="p-2.5 text-slate-500 dark:text-slate-500 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
+                <div className="p-2.5 text-slate-600 dark:text-slate-400 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
                   No downstream dependents (leaf resource with zero blast radius).
                 </div>
               )}
@@ -518,7 +522,7 @@ function NodeInspector({
             <div className="pt-3 border-t border-workbench-border/70 space-y-2">
               <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Depends On ({upstreamLineage ? upstreamLineage.stats.totalCount : (node.outgoers ? node.outgoers.length : 0)})</span>
-                <span className="text-slate-400 dark:text-slate-600">Upstream Prerequisites</span>
+                <span className="text-slate-500 dark:text-slate-400">Upstream Prerequisites</span>
               </div>
               {upstreamLineage && upstreamLineage.stats.totalCount > 0 ? (
                 <div className="space-y-2">
@@ -531,7 +535,7 @@ function NodeInspector({
                         title={item.id}
                       >
                         <span className="truncate">→ {item.label || item.id}</span>
-                        <span className="text-[9px] text-slate-400 px-1 py-0.5 rounded bg-workbench-panel border border-workbench-border/60 shrink-0 ml-1">
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 px-1 py-0.5 rounded bg-workbench-panel border border-workbench-border/60 shrink-0 ml-1">
                           hop {item.lineageDepth}
                         </span>
                       </button>
@@ -551,7 +555,7 @@ function NodeInspector({
                   )}
                 </div>
               ) : (
-                <div className="p-2 text-slate-500 dark:text-slate-600 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
+                <div className="p-2 text-slate-600 dark:text-slate-400 font-mono text-[11px] rounded bg-workbench-header border border-workbench-border">
                   No upstream dependencies (root resource)
                 </div>
               )}

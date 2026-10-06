@@ -429,7 +429,7 @@ function WorkbenchSidebar({
               className={`p-1 rounded border text-[10px] font-mono transition cursor-pointer ${
                 groupByModule
                   ? "bg-workbench-subpanel text-slate-700 dark:text-slate-300 border-workbench-border"
-                  : "text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-700 dark:hover:text-slate-300"
+                  : "text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300"
               }`}
             >
               MOD
@@ -439,7 +439,7 @@ function WorkbenchSidebar({
           {/* Hierarchical Resource Tree */}
           <div className="flex-1 overflow-y-auto p-1.5 space-y-2.5 custom-scrollbar">
             {filteredResources.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500 font-mono">
+              <div className="p-6 text-center text-xs text-slate-500 dark:text-slate-400 font-mono">
                 {totalCount === 0 && totalEntities === 0 ? "No plan loaded" : "No matching resources"}
               </div>
             ) : (
@@ -474,7 +474,7 @@ function WorkbenchSidebar({
                             {copiedModule === groupName ? "Copied!" : "-target"}
                           </button>
                         )}
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{items.length}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{items.length}</span>
                       </div>
                     </div>
                   )}
@@ -605,7 +605,7 @@ function WorkbenchSidebar({
                 <div className="text-xs font-mono text-slate-700 dark:text-slate-200">
                   {selectedFile ? selectedFile.name : "Drop plan.json here or click to browse"}
                 </div>
-                <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                   {selectedFile ? formatBytes(selectedFile.size) : "JSON output of 'terraform show -json'"}
                 </div>
               </div>
@@ -659,6 +659,39 @@ function WorkbenchSidebar({
             <pre className="p-1.5 bg-workbench-subpanel rounded text-slate-800 dark:text-slate-300 overflow-x-auto select-all">
               terraform plan -out=tfplan{"\n"}terraform show -json tfplan &gt; plan.json
             </pre>
+          </div>
+
+          {/* Filepath AST Discovery & Ingestion Modes */}
+          <div className="p-2.5 rounded border border-workbench-border bg-workbench-header space-y-2 text-[11px] font-sans">
+            <div className="flex items-center gap-1.5 text-xs font-mono font-semibold text-slate-800 dark:text-slate-200">
+              <svg className="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Source Filepath &amp; AST Discovery</span>
+            </div>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
+              Terraform plans omit source filepaths. <span className="font-semibold text-slate-700 dark:text-slate-300">plan-parse</span> discovers them depending on ingestion mode:
+            </p>
+            <div className="space-y-1.5 pt-0.5">
+              <div className="p-2 rounded bg-workbench-subpanel border border-workbench-border/70 text-[10px]">
+                <div className="flex items-center gap-1 font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>CLI Workspace Mode</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                  Launches with <code className="font-mono text-slate-700 dark:text-slate-300">-dir</code> or <code className="font-mono text-slate-700 dark:text-slate-300">-plan</code> in your repo. Reads <code className="font-mono text-sky-600 dark:text-sky-400">.terraform/modules/modules.json</code> and parses <code className="font-mono">.tf</code> ASTs to pinpoint exact files (<code className="font-mono text-sky-600 dark:text-sky-400">main.tf</code>) and lines.
+                </p>
+              </div>
+              <div className="p-2 rounded bg-workbench-subpanel border border-workbench-border/70 text-[10px]">
+                <div className="flex items-center gap-1 font-mono font-semibold text-amber-600 dark:text-amber-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  <span>Standalone Web Upload</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                  Without local <code className="font-mono">.tf</code> files, resources gracefully default to <code className="font-mono text-amber-600 dark:text-amber-400">unknown file</code> while keeping full module trees, diffs, and blast radius intact.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

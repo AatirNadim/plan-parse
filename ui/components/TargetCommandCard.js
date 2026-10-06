@@ -85,7 +85,7 @@ export default function TargetCommandCard({
         </p>
         {node.incomers && node.incomers.length > 0 && (
           <div className="pt-2 border-t border-workbench-border/60">
-            <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1.5 font-medium">
+            <div className="text-[10px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5 font-medium">
               Dependent resources to target instead:
             </div>
             <div className="space-y-1 max-h-28 overflow-y-auto custom-scrollbar">
@@ -96,7 +96,7 @@ export default function TargetCommandCard({
                   className="w-full text-left p-1.5 rounded bg-workbench-subpanel hover:bg-workbench-hover text-sky-600 dark:text-sky-400 font-mono text-[11px] truncate transition cursor-pointer flex items-center justify-between"
                 >
                   <span className="truncate">→ {depId}</span>
-                  <span className="text-[10px] text-slate-500 shrink-0 ml-1 font-sans">target this</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0 ml-1 font-sans">target this</span>
                 </button>
               ))}
             </div>
@@ -291,7 +291,7 @@ export default function TargetCommandCard({
                     className="p-1.5 px-2 rounded border border-workbench-border bg-workbench-panel flex items-center justify-between gap-2 text-[11px]"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-slate-400 font-bold shrink-0 font-mono text-[10px]">{idx + 1}.</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-bold shrink-0 font-mono text-[10px]">{idx + 1}.</span>
                       <span
                         className="px-1.5 py-[1px] text-[9px] font-bold rounded uppercase shrink-0 font-mono"
                         style={{

@@ -38,7 +38,7 @@ function StatusBar({
               <span className="text-slate-500 dark:text-slate-400 ml-1">({collapsedCount} collapsed)</span>
             ) : null}
           </span>
-          <span className="text-slate-400 dark:text-slate-600">•</span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
           <span>
             {edgeCount} edges
             {isCollapsed && bridgedCount > 0 ? (
@@ -79,7 +79,7 @@ function StatusBar({
             className={`px-1.5 py-0.5 rounded text-[10px] transition cursor-pointer ${
               isLocked
                 ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                : "text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             }`}
           >
             {isLocked ? "LOCKED" : "UNLOCKED"}
@@ -128,7 +128,7 @@ function StatusBar({
 
         <div className="h-3 w-px bg-workbench-border" />
 
-        <div className="text-slate-400 dark:text-slate-500 flex items-center">
+        <div className="text-slate-600 dark:text-slate-400 flex items-center">
           <span><kbd className="text-slate-600 dark:text-slate-400">{paletteKey}</kbd> search</span>
           <span className="mx-1">•</span>
           <span><kbd className="text-slate-600 dark:text-slate-400">c</kbd> collapse</span>

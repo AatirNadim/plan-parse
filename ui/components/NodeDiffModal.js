@@ -8,6 +8,7 @@ import {
   getDiffSummary,
   formatHclValue,
 } from "../lib/hcl-diff";
+import FileProvenanceBadge from "./FileProvenanceBadge";
 
 /**
  * NodeDiffModal: Tier 2 Deep IaC Diff Modal.
@@ -137,10 +138,10 @@ function NodeDiffModal({ isOpen, node, onClose }) {
               {/* Full Address & File info */}
               <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                 <span className="select-text truncate text-slate-600 dark:text-slate-400">{address}</span>
-                {fileLocation && (
+                {node.file && (
                   <>
                     <span>•</span>
-                    <span className="text-sky-600 dark:text-sky-400 truncate">{fileLocation}</span>
+                    <FileProvenanceBadge file={node.file} line={node.line} />
                   </>
                 )}
               </div>
@@ -283,7 +284,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
                     <div key={idx} className={`flex items-center justify-between px-2 py-0.5 transition-colors ${rowBg}`}>
                       <div className="flex items-center min-w-0 pr-4">
                         {/* Sticky Gutter Line Number */}
-                        <span className="w-10 text-right pr-3 select-none text-slate-400 dark:text-slate-600 font-mono text-[11px] shrink-0 border-r border-workbench-border/40 mr-2.5">
+                        <span className="w-10 text-right pr-3 select-none text-slate-500 dark:text-slate-400 font-mono text-[11px] shrink-0 border-r border-workbench-border/40 mr-2.5">
                           {line.lineNum}
                         </span>
                         {/* Gutter Symbol */}
@@ -483,7 +484,7 @@ function NodeDiffModal({ isOpen, node, onClose }) {
             )}
           </div>
 
-          <div className="text-slate-400 dark:text-slate-500 text-[10px] flex items-center gap-2">
+          <div className="text-slate-600 dark:text-slate-400 text-[10px] flex items-center gap-2">
             <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-slate-600 dark:text-slate-300">Tab</kbd> switch view</span>
             <span>•</span>
             <span><kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-slate-600 dark:text-slate-300">Esc</kbd> close</span>

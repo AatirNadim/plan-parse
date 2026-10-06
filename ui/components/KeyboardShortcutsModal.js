@@ -77,7 +77,7 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
                   </span>
                 </div>
                 {section.subtitle && (
-                  <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {section.subtitle}
                   </span>
                 )}
@@ -94,7 +94,7 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
                         {item.label}
                       </div>
                       {item.detail && (
-                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                           {item.detail}
                         </div>
                       )}
@@ -102,7 +102,7 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
                     <div className="flex items-center gap-1 shrink-0">
                       {item.keys.map((k, kIdx) =>
                         k.divider ? (
-                          <span key={kIdx} className="text-[10px] text-slate-400 dark:text-slate-500 font-mono px-0.5">
+                          <span key={kIdx} className="text-[10px] text-slate-500 dark:text-slate-400 font-mono px-0.5">
                             {k.divider}
                           </span>
                         ) : (
@@ -125,10 +125,10 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
         {/* Footer */}
         <div className="px-5 py-2.5 border-t border-workbench-border bg-workbench-header flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-400 shrink-0" />
             <span className="truncate">Shortcuts are active when focus is outside text inputs.</span>
           </div>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0 hidden sm:inline">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0 hidden sm:inline">
             Press ? or Esc to close
           </span>
         </div>

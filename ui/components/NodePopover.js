@@ -124,7 +124,7 @@ function NodePopover({
 
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 rounded hover:bg-workbench-subpanel transition cursor-pointer shrink-0"
+          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 p-0.5 rounded hover:bg-workbench-subpanel transition cursor-pointer shrink-0"
           title="Dismiss (Esc)"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +205,7 @@ function NodePopover({
       {/* Changed Attributes Preview */}
       {hasChanges && summary?.topChanges?.length > 0 && (
         <div className="space-y-1 pb-1">
-          <div className="text-[9px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <div className="text-[9px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Changed Attributes Preview
           </div>
           <div className="space-y-1">
@@ -248,7 +248,7 @@ function NodePopover({
       <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-workbench-border/60 pt-2.5 mt-2">
         <div className="flex items-center gap-1 font-mono text-[10px]">
           <kbd className="px-1 py-[1px] rounded bg-workbench-subpanel border border-workbench-border text-[9px] text-slate-600 dark:text-slate-300">Space</kbd>
-          <span className="text-slate-400 dark:text-slate-500">toggle</span>
+          <span className="text-slate-500 dark:text-slate-400">toggle</span>
         </div>
 
         <div className="flex items-center gap-1.5">

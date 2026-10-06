@@ -493,7 +493,7 @@ function FeatureEditorial({ feature, index, isLeftOnDesktop }) {
         <div className="pt-2">
           <Link
             href={`/features/${feature.slug}/`}
-            className={`inline-flex items-center space-x-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-workbench-border bg-slate-50 dark:bg-workbench-panel hover:bg-slate-100 dark:hover:bg-workbench-hover text-slate-800 dark:text-slate-200 ${theme.ctaHoverText} text-xs sm:text-sm font-semibold light:font-bold transition-all shadow-xs group`}
+            className={`inline-flex items-center space-x-2 px-5 py-2.5 rounded-lg border-2 border-slate-200 dark:border-workbench-border bg-slate-50 dark:bg-workbench-panel hover:bg-slate-100 dark:hover:bg-workbench-hover text-slate-800 dark:text-slate-200 ${theme.ctaHoverText} text-xs sm:text-sm font-semibold light:font-bold transition-all shadow-xs group`}
           >
             <span>Explore Chapter Specification</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>

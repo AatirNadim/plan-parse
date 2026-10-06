@@ -441,14 +441,14 @@ html.light ::-webkit-scrollbar-thumb:hover {
       to top right,
       rgba(var(--theme-rgb), 0.22) 0%,
       rgba(var(--theme-rgb), 0.08) 35%,
-      transparent 75%
+      transparent 55%
     ),
     linear-gradient(
       to top right,
       #ffffff 0%,
       #ffffff 30%,
-      rgba(255, 255, 255, 0.75) 55%,
-      rgba(255, 255, 255, 0) 85%
+      rgba(255, 255, 255, 0.75) 45%,
+      rgba(255, 255, 255, 0) 60%
     );
   -webkit-mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
   mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
@@ -460,14 +460,14 @@ html.light ::-webkit-scrollbar-thumb:hover {
       to top left,
       rgba(var(--theme-rgb), 0.22) 0%,
       rgba(var(--theme-rgb), 0.08) 35%,
-      transparent 75%
+      transparent 55%
     ),
     linear-gradient(
       to top left,
       #ffffff 0%,
       #ffffff 30%,
-      rgba(255, 255, 255, 0.75) 55%,
-      rgba(255, 255, 255, 0) 85%
+      rgba(255, 255, 255, 0.75) 45%,
+      rgba(255, 255, 255, 0) 60%
     );
   -webkit-mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
   mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
@@ -479,14 +479,14 @@ html.dark .editorial-gradient-tr {
       to top right,
       rgba(var(--theme-rgb), 0.24) 0%,
       rgba(var(--theme-rgb), 0.08) 35%,
-      transparent 75%
+      transparent 55%
     ),
     linear-gradient(
       to top right,
       #0c0e15 0%,
       #0c0e15 30%,
-      rgba(12, 14, 21, 0.75) 55%,
-      rgba(12, 14, 21, 0) 85%
+      rgba(12, 14, 21, 0.75) 45%,
+      rgba(12, 14, 21, 0) 60%
     );
   -webkit-mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
   mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
@@ -498,14 +498,14 @@ html.dark .editorial-gradient-tl {
       to top left,
       rgba(var(--theme-rgb), 0.24) 0%,
       rgba(var(--theme-rgb), 0.08) 35%,
-      transparent 75%
+      transparent 55%
     ),
     linear-gradient(
       to top left,
       #0c0e15 0%,
       #0c0e15 30%,
-      rgba(12, 14, 21, 0.75) 55%,
-      rgba(12, 14, 21, 0) 85%
+      rgba(12, 14, 21, 0.75) 45%,
+      rgba(12, 14, 21, 0) 60%
     );
   -webkit-mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
   mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);

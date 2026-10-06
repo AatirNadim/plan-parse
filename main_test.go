@@ -256,4 +256,3 @@ func TestPositionalPlanArg_NonExistentFile(t *testing.T) {
 // 		t.Errorf("expected stderr to contain 'Successfully loaded plan: 52 resources', but it did not")
 // 	}
 // }
-

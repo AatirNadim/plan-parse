@@ -150,7 +150,7 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {item.title}
                       </h4>
                       {isSelected && (
@@ -160,7 +160,7 @@ export default function CalloutImage({ svgSrc, title, callouts = [] }) {
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
+                    <p className="text-[13px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                       {item.description}
                     </p>
                   </div>

@@ -110,11 +110,11 @@ export default function FeaturePageTemplate({ feature }) {
                         <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-500 dark:text-sky-400 light:text-sky-700 font-mono text-[11px] font-bold flex items-center justify-center light:shadow-xs">
                           {step.step}
                         </span>
-                        <span className="text-xs font-semibold light:font-bold text-slate-900 dark:text-slate-200">
+                        <span className="text-sm font-semibold light:font-bold text-slate-900 dark:text-slate-200">
                           {step.label}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
+                      <p className="text-[13px] text-slate-600 dark:text-slate-400 light:text-slate-800 light:font-medium leading-relaxed">
                         {step.detail}
                       </p>
                     </div>

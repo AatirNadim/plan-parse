@@ -150,9 +150,9 @@
   </g>
 
   <!-- Cross-Module Dependency Edge (Connecting VPC subnet to DB Instance) -->
-  <path d="M 230 311 Q 480 340 540 220" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-amber-cg)" />
-  <rect x="360" y="320" width="130" height="22" rx="4" fill="#090a0f" stroke="#f59e0b" stroke-width="1" />
-  <text x="368" y="335" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="10" font-weight="600">subnet_ids ref</text>
+  <path d="M 230 311 C 255 240, 380 245, 540 220" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-amber-cg)" />
+  <rect x="432" y="222" width="100" height="22" rx="4" fill="#090a0f" stroke="#f59e0b" stroke-width="1" />
+  <text x="438" y="237" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="10" font-weight="600">subnet_ids ref</text>
 
   <!-- CALLOUT PINS & LEADER LINES -->
 
@@ -171,8 +171,8 @@
   </g>
 
   <!-- PIN 3: Directional Dependency Edges -->
-  <line x1="420" y1="342" x2="420" y2="440" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2" />
-  <g class="callout-pin" transform="translate(420, 452)">
+  <line x1="482" y1="244" x2="482" y2="436" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2" />
+  <g class="callout-pin" transform="translate(482, 452)">
     <circle cx="0" cy="0" r="16" fill="#090a0f" stroke="#10b981" stroke-width="2.5" filter="url(#glow-cg)" />
     <text x="0" y="4" text-anchor="middle" fill="#34d399" font-family="'DM Sans', sans-serif" font-size="13" font-weight="700">3</text>
   </g>

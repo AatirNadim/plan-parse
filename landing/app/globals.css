@@ -434,52 +434,89 @@ html.light ::-webkit-scrollbar-thumb:hover {
 .vis-purple { fill: var(--vis-purple); }
 .vis-canvas-bg { fill: var(--vis-canvas-bg); }
 
-/* Editorial Spec Card Directional Conduit Gradients */
+/* Editorial Spec Card Directional Conduit Gradients with Seamless Fading into Dotted Canvas */
 .editorial-gradient-tr {
-  background-image: linear-gradient(
-    to top right,
-    rgba(var(--theme-rgb), 0.16) 0%,
-    rgba(var(--theme-rgb), 0.04) 45%,
-    transparent 80%
-  );
+  background:
+    linear-gradient(
+      to top right,
+      rgba(var(--theme-rgb), 0.22) 0%,
+      rgba(var(--theme-rgb), 0.08) 35%,
+      transparent 75%
+    ),
+    linear-gradient(
+      to top right,
+      #ffffff 0%,
+      #ffffff 30%,
+      rgba(255, 255, 255, 0.75) 55%,
+      rgba(255, 255, 255, 0) 85%
+    );
+  -webkit-mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
+  mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
 }
 
 .editorial-gradient-tl {
-  background-image: linear-gradient(
-    to top left,
-    rgba(var(--theme-rgb), 0.16) 0%,
-    rgba(var(--theme-rgb), 0.04) 45%,
-    transparent 80%
-  );
+  background:
+    linear-gradient(
+      to top left,
+      rgba(var(--theme-rgb), 0.22) 0%,
+      rgba(var(--theme-rgb), 0.08) 35%,
+      transparent 75%
+    ),
+    linear-gradient(
+      to top left,
+      #ffffff 0%,
+      #ffffff 30%,
+      rgba(255, 255, 255, 0.75) 55%,
+      rgba(255, 255, 255, 0) 85%
+    );
+  -webkit-mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
+  mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
 }
 
 html.dark .editorial-gradient-tr {
-  background-image: linear-gradient(
-    to top right,
-    rgba(var(--theme-rgb), 0.20) 0%,
-    rgba(var(--theme-rgb), 0.04) 45%,
-    transparent 80%
-  );
+  background:
+    linear-gradient(
+      to top right,
+      rgba(var(--theme-rgb), 0.24) 0%,
+      rgba(var(--theme-rgb), 0.08) 35%,
+      transparent 75%
+    ),
+    linear-gradient(
+      to top right,
+      #0c0e15 0%,
+      #0c0e15 30%,
+      rgba(12, 14, 21, 0.75) 55%,
+      rgba(12, 14, 21, 0) 85%
+    );
+  -webkit-mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
+  mask-image: linear-gradient(to top right, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
 }
 
 html.dark .editorial-gradient-tl {
-  background-image: linear-gradient(
-    to top left,
-    rgba(var(--theme-rgb), 0.20) 0%,
-    rgba(var(--theme-rgb), 0.04) 45%,
-    transparent 80%
-  );
+  background:
+    linear-gradient(
+      to top left,
+      rgba(var(--theme-rgb), 0.24) 0%,
+      rgba(var(--theme-rgb), 0.08) 35%,
+      transparent 75%
+    ),
+    linear-gradient(
+      to top left,
+      #0c0e15 0%,
+      #0c0e15 30%,
+      rgba(12, 14, 21, 0.75) 55%,
+      rgba(12, 14, 21, 0) 85%
+    );
+  -webkit-mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
+  mask-image: linear-gradient(to top left, #000 0%, #000 35%, rgba(0, 0, 0, 0.5) 65%, transparent 92%);
 }
 
 .editorial-card {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
 
 .editorial-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px -12px rgba(var(--theme-rgb), 0.16), 0 0 1px 1px rgba(var(--theme-rgb), 0.2);
 }
 

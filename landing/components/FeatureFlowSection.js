@@ -427,14 +427,14 @@ function FeatureEditorial({ feature, index, isLeftOnDesktop }) {
 
   return (
     <div
-      className={`editorial-card relative rounded-2xl border border-slate-200/90 dark:border-workbench-border/80 ring-1 ring-inset ring-slate-900/5 dark:ring-white/[0.05] bg-white dark:bg-[#0C0E15] shadow-xl ${theme.cardBorderHover} overflow-hidden p-6 sm:p-8 flex flex-col justify-center space-y-4 w-full`}
+      className="editorial-card relative rounded-2xl overflow-hidden p-6 sm:p-8 flex flex-col justify-center space-y-4 w-full"
       style={{
         "--theme-rgb": theme.rgb,
       }}
     >
-      {/* Directional Conduit Solid Gradient Overlay (Occludes Canvas Dot Grid) */}
+      {/* Directional Conduit Solid Base that Fades Seamlessly into the Dotted Canvas */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${gradientClass}`}
+        className={`absolute inset-0 pointer-events-none rounded-2xl transition-opacity duration-300 ${gradientClass}`}
         aria-hidden="true"
       />
 
